@@ -26,7 +26,7 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev automake autoconf libtool build-essential wget tar    
+          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev automake autoconf libtool build-essential tar    
           pip install numpy scipy
           pip install twine wheel setuptools
       - name: Setup Python ${{ matrix.python-version }}
@@ -42,7 +42,7 @@ jobs:
           # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
           boost_version: 1.87.0
           # OPTIONAL: Specify a custom install location
-          boost_install_dir: build
+          boost_install_dir: /home/runner/work/b2/b2/boost
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
       - name: Checkout eigenpy (Posix)
         uses: actions/checkout@v2
@@ -57,20 +57,20 @@ jobs:
           cd ./eigenpy
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=../../build
+          cmake .. -DCMAKE_PREFIX_PATH=/home/runner/work/b2/b2/boost -DCMAKE_INSTALL_PREFIX=/home/runner/work/b2/b2/build
           make -j 4
           make install
       - name: Build Executables (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
           cd core/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=../../build
+          cmake .. -DCMAKE_PREFIX_PATH=/home/runner/work/b2/b2/boost -DCMAKE_INSTALL_PREFIX=/home/runner/work/b2/b2/build
           make -j 4
           make install
           cd ../..
             
           cd python/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=../../build
+          cmake .. -DCMAKE_PREFIX_PATH=/home/runner/work/b2/b2/boost -DCMAKE_INSTALL_PREFIX=/home/runner/work/b2/b2/build
           make -j 4
           make install
           python3 -m pip install -e .
