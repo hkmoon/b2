@@ -49,6 +49,7 @@ jobs:
         with:
           path: /home/runner/work/b2/b2/build
           key: ${{ runner.os }}-eigenpy
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
       - name: Checkout eigenpy (Posix)
         uses: actions/checkout@v2
         with:
