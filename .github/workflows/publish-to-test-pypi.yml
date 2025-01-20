@@ -46,13 +46,28 @@ jobs:
         uses: MarkusJx/install-boost@v2
         with:
           boost_version: 1.87.0
+      - name: Checkout eigen
+        uses: actions/checkout@v2
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
+        with:
+          repository: libeigen/eigen
+          path: './eigen'
+      - name: Install eigen
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
+        run: |
+          cd eigen
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
+          make -j 4
+          make install
       - name: Checkout eigenpy
         uses: actions/checkout@v2
         with:
           repository: stack-of-tasks/eigenpy
           path: './eigenpy'
       - name: Install eigenpy
-        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
         run: |
           pip install numpy scipy
           cd eigenpy
@@ -62,7 +77,7 @@ jobs:
           make -j 4
           make install
       - name: Build Executables
-        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
         run: |
           cd ${{github.workspace}}/b2/b2/core
           mkdir build
