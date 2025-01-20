@@ -27,7 +27,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev automake autoconf libtool build-essential tar    
-          pip install numpy scipy
           pip install twine wheel setuptools
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -53,7 +52,7 @@ jobs:
       - name: Install eigenpy (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
-          pip install numpy
+          pip install numpy scipy
           cd ./eigenpy
           mkdir build
           cd build
