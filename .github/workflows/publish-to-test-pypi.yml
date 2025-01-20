@@ -64,9 +64,8 @@ jobs:
           repository: stack-of-tasks/eigenpy
           path: './eigenpy'
       - name: Install eigenpy
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
-          pip install numpy scipy
           cd eigenpy
           mkdir build
           cd build
@@ -76,6 +75,7 @@ jobs:
       - name: Build Executables
         if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
         run: |
+          pip install numpy scipy
           cd ${{github.workspace}}/core
           mkdir build
           cd build
