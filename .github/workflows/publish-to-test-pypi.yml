@@ -45,16 +45,21 @@ jobs:
           boost_install_dir: build
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
       - name: Install eigenpy (Posix)
+        uses: actions/checkout@v2
+        with:
+          repository: stack-of-tasks/eigenpy
+          path: './eigenpy'
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-        run: |
-          git clone https://github.com/stack-of-tasks/eigenpy.git
-          cd eigenpy/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=build
-          make -j 4
-          make install
       - name: Build Executables (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
+          cd ./eigenpy
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=build
+          make -j 4
+          make install
+          
           cd core/build
           cmake .. -DCMAKE_INSTALL_PREFIX=../../build
           make -j 4
