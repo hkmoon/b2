@@ -26,7 +26,7 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev automake autoconf libtool build-essential tar    
+          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev automake autoconf libtool build-essential libboost-all-dev tar
           pip install setuptools
       - name: Install necessary dependencies (MacOS)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
@@ -36,16 +36,18 @@ jobs:
           brew install libmpc
           brew install eigen
           brew install eigenpy
+          brew install boost
+          brew install boost-python3
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Boost
-        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
-        id: install-boost
-        uses: MarkusJx/install-boost@v2
-        with:
-          boost_version: 1.87.0
+#      - name: Install Boost
+#        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
+#        id: install-boost
+#        uses: MarkusJx/install-boost@v2
+#        with:
+#          boost_version: 1.87.0
 #      - name: Checkout and install eigen
 #        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
 #        run: |
@@ -98,10 +100,10 @@ jobs:
         with:
           name: built-binary
           path: |
-            b2/b2/python/dist/*.whl
-            b2/b2/python/dist/*.tar.gz
-            b2/b2/python/build/*.exe
-            b2/b2/python/build/*.bin
+            ${{github.workspace}}/python/dist/*.whl
+            ${{github.workspace}}/python/dist/*.tar.gz
+            ${{github.workspace}}/python/build/*.exe
+            ${{github.workspace}}/python/build/*.bin
 #      - name: Install pypa/build
 #        run: >-
 #          python3 -m
