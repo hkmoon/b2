@@ -33,29 +33,34 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install Boost (Posix)
+        id: install-boost
+        uses: MarkusJx/install-boost@v2
+        with:
+          # REQUIRED: Specify the required boost version
+          # A list of supported versions can be found here:
+          # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+          boost_version: 1.73.0
+          # OPTIONAL: Specify a custom install location
+          boost_install_dir: /usr/
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+      - name: Install eigenpy (Posix)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        run: |
+          git clone https://github.com/stack-of-tasks/eigenpy.git
+          cd eigenpy/build
+          cmake .. -DCMAKE_INSTALL_PREFIX=/usr/
+          make -j 4
+          make install
       - name: Build Executables (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
-          wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz
-          tar xvfz boost_1_87_0.tar.gz
-          cd boost_1_87_0
-          ./bootstrap.sh --prefix=/usr/
-          ./b2 install
-          cd ..
-          
-          git clone https://github.com/stack-of-tasks/eigenpy.git
-          cd eigenpy/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=../../b2/build
-          make -j 4
-          make install
-          cd ../..
-          
           cd core/build
           cmake .. -DCMAKE_INSTALL_PREFIX=../../build
           make -j 4
           make install
           cd ../..
-          
+            
           cd python/build
           cmake .. -DCMAKE_INSTALL_PREFIX=../../build
           make -j 4
