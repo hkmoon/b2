@@ -66,6 +66,7 @@ jobs:
       - name: Install eigenpy
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
+          pip install numpy scipy
           cd eigenpy
           mkdir build
           cd build
