@@ -50,7 +50,7 @@ jobs:
         uses: actions/checkout@v2
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
         with:
-          repository: libeigen/eigen
+          repository: libeigen/eigen@master
           path: './eigen'
       - name: Install eigen
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
