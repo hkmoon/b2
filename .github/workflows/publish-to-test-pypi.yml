@@ -62,13 +62,13 @@ jobs:
       - name: Build Executables (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
-          cd core/build
+          cd b2/core/build
           cmake .. -DCMAKE_PREFIX_PATH=/home/runner/work/b2/b2/boost/boost/boost/ -DCMAKE_INSTALL_PREFIX=/home/runner/work/b2/b2/build
           make -j 4
           make install
           cd ../..
             
-          cd python/build
+          cd b2/python/build
           cmake .. -DCMAKE_PREFIX_PATH=/home/runner/work/b2/b2/boost/boost/boost/ -DCMAKE_INSTALL_PREFIX=/home/runner/work/b2/b2/build
           make -j 4
           make install
