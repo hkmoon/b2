@@ -44,22 +44,23 @@ jobs:
           # OPTIONAL: Specify a custom install location
           boost_install_dir: build
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-      - name: Install eigenpy (Posix)
+      - name: Checkout eigenpy (Posix)
         uses: actions/checkout@v2
         with:
           repository: stack-of-tasks/eigenpy
           path: './eigenpy'
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-      - name: Build Executables (Posix)
+      - name: Install eigenpy (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
+          pip install numpy
           cd ./eigenpy
-          mkdir build
-          cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=build
           make -j 4
           make install
-          
+      - name: Build Executables (Posix)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        run: |
           cd core/build
           cmake .. -DCMAKE_INSTALL_PREFIX=../../build
           make -j 4
