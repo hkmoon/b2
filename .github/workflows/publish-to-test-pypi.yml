@@ -52,6 +52,7 @@ jobs:
           repository: stack-of-tasks/eigenpy
           path: './eigenpy'
       - name: Install eigenpy
+        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
         run: |
           pip install numpy scipy
           cd eigenpy
