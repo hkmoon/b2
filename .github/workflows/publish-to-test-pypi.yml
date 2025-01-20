@@ -68,10 +68,11 @@ jobs:
           make install
           cd ../..
             
-          cd b2/python/build
+          cd python/build
           cmake .. -DCMAKE_PREFIX_PATH=/home/runner/work/b2/b2/boost/boost/boost/ -DCMAKE_INSTALL_PREFIX=/home/runner/work/b2/b2/build
           make -j 4
           make install
+          
           python3 -m pip install -e .
           python3 setup.py bdist
 
@@ -80,10 +81,10 @@ jobs:
         with:
           name: built-binary
           path: |
-            dist/*.whl
-            dist/*.tar.gz
-            build/*.exe
-            build/*.bin
+            b2/python/dist/*.whl
+            b2/python/dist/*.tar.gz
+            b2/python/build/*.exe
+            b2/python/build/*.bin
 #      - name: Install pypa/build
 #        run: >-
 #          python3 -m
