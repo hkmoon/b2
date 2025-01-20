@@ -42,14 +42,14 @@ jobs:
           # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
           boost_version: 1.87.0
           # OPTIONAL: Specify a custom install location
-          boost_install_dir: /usr/
+          boost_install_dir: build
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
       - name: Install eigenpy (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
           git clone https://github.com/stack-of-tasks/eigenpy.git
           cd eigenpy/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=/usr/
+          cmake .. -DCMAKE_INSTALL_PREFIX=build
           make -j 4
           make install
       - name: Build Executables (Posix)
