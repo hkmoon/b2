@@ -74,14 +74,14 @@ jobs:
       - name: Build Executables
         if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
         run: |
-          cd ${{github.workspace}}/b2/b2/core
+          cd ${{github.workspace}}/core
           mkdir build
           cd build
           cmake .. -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build
           make -j 4
           make install
             
-          cd ${{github.workspace}}/b2/b2/python
+          cd ${{github.workspace}}/python
           mkdir build
           cd build
           cmake .. -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build
