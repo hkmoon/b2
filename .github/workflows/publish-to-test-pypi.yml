@@ -43,14 +43,20 @@ jobs:
           # OPTIONAL: Specify a custom install location
           boost_install_dir: /home/runner/work/b2/b2/boost
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+      - name: Cache Eigenpy
+        id: cache-eigenpy
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/work/b2/b2/build
+          key: ${{ runner.os }}-eigenpy
       - name: Checkout eigenpy (Posix)
         uses: actions/checkout@v2
         with:
           repository: stack-of-tasks/eigenpy
           path: './eigenpy'
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        if: steps.cache-eigenpy.outputs.cache-hit != 'true'
       - name: Install eigenpy (Posix)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        if: steps.cache-eigenpy.outputs.cache-hit != 'true'
         run: |
           pip install numpy scipy
           cd ./eigenpy
@@ -59,12 +65,6 @@ jobs:
           cmake .. -DCMAKE_PREFIX_PATH=/home/runner/work/b2/b2/boost/boost/boost/ -DCMAKE_INSTALL_PREFIX=/home/runner/work/b2/b2/build
           make -j 4
           make install
-      - name: Cache Eigenpy
-        id: cache-eigenpy
-        uses: actions/cache@v4
-        with:
-          path: /home/runner/work/b2/b2/build
-          key: ${{ runner.os }}-eigenpy
       - name: Build Executables (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
