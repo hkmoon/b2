@@ -54,7 +54,9 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
           pip install numpy
-          cd ./eigenpy/build
+          cd ./eigenpy
+          mkdir build
+          cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=../../build
           make -j 4
           make install
