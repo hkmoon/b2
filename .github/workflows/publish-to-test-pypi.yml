@@ -42,8 +42,16 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Cache boost packages
+        id: cache-boost
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-cache-boost-ubuntu
+          path: |
+            ${{github.workspace}}/boost
       - name: Install Boost
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu')}}
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') && steps.cache-boost.outputs.cache-hit != 'true' }}
         run: |
           wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz
           tar xvfz boost_1_87_0.tar.gz
