@@ -29,6 +29,7 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu')}}
         run: |
           $CONDA/bin/conda env update --file environment.yml --name base
+          $CONDA/bin/conda activate base
           cd ${{github.workspace}}/core
           mkdir build
           cd build
@@ -52,6 +53,7 @@ jobs:
         run: |
           C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
           C:\Miniconda\condabin\conda.bat init powershell
+          C:\Miniconda\condabin\conda.bat activate base
           cd ${{github.workspace}}/core
           mkdir build
           cd build
