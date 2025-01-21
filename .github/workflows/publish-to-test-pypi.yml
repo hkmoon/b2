@@ -29,24 +29,78 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev
-      - name: Install necessary dependencies (Posix)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu')}}
-        shell: bash -l {0}
+          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev automake autoconf libtool build-essential tar
+          pip install setuptools
+      - name: Install necessary dependencies (MacOS)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |
-          $CONDA/bin/conda env update --file environment.yml --name base
-          $CONDA/bin/conda activate base
+          brew install gmp
+          brew install mpfr
+          brew install libmpc
+          brew install eigen
+          brew install eigenpy
+          brew install boost
+          brew install boost-python3
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache boost packages
+        id: cache-boost
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-cache-boost-ubuntu
+          path: |
+            ${{github.workspace}}/boost
+      - name: Install Boost
+        if: ${{ steps.cache-boost.outputs.cache-hit != 'true' && !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        run: |
+          wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz
+          tar xvfz boost_1_87_0.tar.gz
+          cd boost_1_87_0
+          ./bootstrap.sh --with-python=$(which python3) --prefix=${{github.workspace}}/boost
+          ./b2 install
+      - name: Checkout and install eigen
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        run: |
+          git clone https://gitlab.com/libeigen/eigen.git
+          cd eigen
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
+          make -j 4
+          make install
+      - name: Checkout eigenpy
+        uses: actions/checkout@v2
+        with:
+          repository: stack-of-tasks/eigenpy
+          path: './eigenpy'
+      - name: Install eigenpy
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        run: |
+          pip install numpy scipy
+          cd eigenpy
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
+          make -j 4
+          make install
+      - name: Build Executables
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
+        run: |
+          pip install numpy scipy
           cd ${{github.workspace}}/core
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
           make -j 4
           make install
 
           cd ${{github.workspace}}/python
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
           make -j 4
           make install
 
@@ -60,15 +114,15 @@ jobs:
           C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
           C:\Miniconda\condabin\conda.bat init powershell
           C:\Miniconda\condabin\conda.bat activate base
-          cd ${{github.workspace}}/core
-          mkdir build
+          cd ${{github.workspace}}\core
+          md build
           cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
           make -j 4
           make install
 
           cd ${{github.workspace}}/python
-          mkdir build
+          md build
           cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
           make -j 4
@@ -78,38 +132,6 @@ jobs:
           pip install twine wheel
           python3 -m pip install -e .
           python3 setup.py bdist
-      - name: Install necessary dependencies (MacOS)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
-        run: |
-          brew install gmp
-          brew install mpfr
-          brew install libmpc
-          brew install eigen
-          brew install eigenpy
-          brew install boost
-          brew install boost-python3
-#      - name: Build Executables
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
-#        run: |
-#          pip install numpy scipy
-#          cd ${{github.workspace}}/core
-#          mkdir build
-#          cd build
-#          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
-#          make -j 4
-#          make install
-#
-#          cd ${{github.workspace}}/python
-#          mkdir build
-#          cd build
-#          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
-#          make -j 4
-#          make install
-#
-#          cd ..
-#          pip install twine wheel
-#          python3 -m pip install -e .
-#          python3 setup.py bdist
       - name: Upload Builds
         uses: actions/upload-artifact@v3
         with:
@@ -119,99 +141,6 @@ jobs:
             ${{github.workspace}}/python/dist/*.tar.gz
             ${{github.workspace}}/python/build/*.exe
             ${{github.workspace}}/python/build/*.bin
-#      - name: Install necessary dependencies (Posix)
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev automake autoconf libtool build-essential tar
-#          pip install setuptools
-#      - name: Install necessary dependencies (MacOS)
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
-#        run: |
-#          brew install gmp
-#          brew install mpfr
-#          brew install libmpc
-#          brew install eigen
-#          brew install eigenpy
-#          brew install boost
-#          brew install boost-python3
-#      - name: Setup Python ${{ matrix.python-version }}
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: ${{ matrix.python-version }}
-#      - name: Cache boost packages
-#        id: cache-boost
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-#        uses: actions/cache@v3
-#        with:
-#          key: ${{ runner.os }}-cache-boost-ubuntu
-#          path: |
-#            ${{github.workspace}}/boost
-#      - name: Install Boost
-#        if: ${{ steps.cache-boost.outputs.cache-hit != 'true' && !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-#        run: |
-#          wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz
-#          tar xvfz boost_1_87_0.tar.gz
-#          cd boost_1_87_0
-#          ./bootstrap.sh --with-python=$(which python3) --prefix=${{github.workspace}}/boost
-#          ./b2 install
-#      - name: Checkout and install eigen
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-#        run: |
-#          git clone https://gitlab.com/libeigen/eigen.git
-#          cd eigen
-#          mkdir build
-#          cd build
-#          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
-#          make -j 4
-#          make install
-#      - name: Checkout eigenpy
-#        uses: actions/checkout@v2
-#        with:
-#          repository: stack-of-tasks/eigenpy
-#          path: './eigenpy'
-#      - name: Install eigenpy
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-#        run: |
-#          pip install numpy scipy
-#          cd eigenpy
-#          mkdir build
-#          cd build
-#          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
-#          make -j 4
-#          make install
-#      - name: Build Executables
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
-#        run: |
-#          pip install numpy scipy
-#          cd ${{github.workspace}}/core
-#          mkdir build
-#          cd build
-#          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
-#          make -j 4
-#          make install
-#
-#          cd ${{github.workspace}}/python
-#          mkdir build
-#          cd build
-#          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
-#          make -j 4
-#          make install
-#
-#          cd ..
-#          pip install twine wheel
-#          python3 -m pip install -e .
-#          python3 setup.py bdist
-#
-#      - name: Upload Builds
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: built-binary
-#          path: |
-#            ${{github.workspace}}/python/dist/*.whl
-#            ${{github.workspace}}/python/dist/*.tar.gz
-#            ${{github.workspace}}/python/build/*.exe
-#            ${{github.workspace}}/python/build/*.bin
   release:
     name: Create Release
     needs: build
