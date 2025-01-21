@@ -42,22 +42,22 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-#      - name: Install Boost
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
-#        id: install-boost
-#        uses: MarkusJx/install-boost@v2
-#        with:
-#          boost_version: 1.87.0
-#      - name: Checkout and install eigen
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
-#        run: |
-#          git clone https://gitlab.com/libeigen/eigen.git
-#          cd eigen
-#          mkdir build
-#          cd build
-#          cmake .. -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
-#          make -j 4
-#          make install
+      - name: Install Boost
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu')}}
+        id: install-boost
+        uses: MarkusJx/install-boost@v2
+        with:
+          boost_version: 1.87.0
+      - name: Checkout and install eigen
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        run: |
+          git clone https://gitlab.com/libeigen/eigen.git
+          cd eigen
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
+          make -j 4
+          make install
       - name: Checkout eigenpy
         uses: actions/checkout@v2
         with:
