@@ -7,9 +7,6 @@ dependencies:
   - gmp
   - mpfr
   - mpc
-  - automake
-  - autoconf
-  - libtool
   - boost
   - eigen
   - eigenpy
