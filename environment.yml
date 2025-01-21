@@ -1,4 +1,4 @@
-name: test
+name: b2-ubuntu
 channels:
   - conda-forge
   - defaults

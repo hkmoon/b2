@@ -1,4 +1,4 @@
-name: test
+name: b2-windows
 channels:
   - conda-forge
   - defaults
