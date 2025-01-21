@@ -263,7 +263,7 @@ jobs:
           pip install twine wheel
           python3 -m pip install -e .
           python3 setup.py bdist
-      - name: Upload Builds
+      - name: Upload Builds (Posix)
         uses: actions/upload-artifact@v3
         if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows')}}
         with:
@@ -273,9 +273,8 @@ jobs:
             ${{github.workspace}}/python/dist/*.tar.gz
             ${{github.workspace}}/python/build/*.exe
             ${{github.workspace}}/python/build/*.bin
-      - name: Upload Builds
+      - name: Upload Builds (Windows)
         uses: actions/upload-artifact@v3
-
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
         with:
           name: built-binary
