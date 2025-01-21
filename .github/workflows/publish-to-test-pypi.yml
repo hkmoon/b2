@@ -26,7 +26,7 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev automake autoconf libtool build-essential libboost-all-dev libboost1.83-dev tar
+          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev automake autoconf libtool build-essential tar
           pip install setuptools
       - name: Install necessary dependencies (MacOS)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
@@ -56,7 +56,7 @@ jobs:
           wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz
           tar xvfz boost_1_87_0.tar.gz
           cd boost_1_87_0
-          ./bootstrap.sh --with-python --prefix=${{github.workspace}}/boost
+          ./bootstrap.sh --with-python=$(which python3) --prefix=${{github.workspace}}/boost
           ./b2 install
       - name: Checkout and install eigen
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
