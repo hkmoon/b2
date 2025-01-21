@@ -41,6 +41,7 @@ jobs:
       - name: Build (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
+          conda init bash
           conda activate b2-ubuntu
           conda info
           conda list
