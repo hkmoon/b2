@@ -25,12 +25,22 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Install necessary dependencies
-        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
+      - name: Install necessary dependencies (Posix and Windows)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'macos')}}
         run: |
           conda activate
           conda install gmp mpfr automake autoconf libtool boost eigen conda-forge::libboost-python numpy
           conda install conda-forge::eigenpy
+      - name: Install necessary dependencies (MacOS)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
+        run: |
+          brew install gmp
+          brew install mpfr
+          brew install libmpc
+          brew install eigen
+          brew install eigenpy
+          brew install boost
+          brew install boost-python3
       - name: Build Executables
         if: ${{ !startsWith(matrix.python-version, 'pypy') }}
         run: |
