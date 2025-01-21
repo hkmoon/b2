@@ -77,17 +77,17 @@ jobs:
           conda info
           conda list
           
-          cd $env:GITHUB_WORKSPACE\core
+          cd core
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
+          cmake .. -DCMAKE_INSTALL_PREFIX=..\..\b2\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
           cmake --build .
           cmake --install .
 
-          cd $env:GITHUB_WORKSPACE\python
+          cd ..\..\python
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
+          cmake .. -DCMAKE_INSTALL_PREFIX=..\..\b2\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
           cmake --build .
           cmake --install .
 
