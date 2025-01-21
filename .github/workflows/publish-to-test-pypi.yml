@@ -241,7 +241,7 @@ jobs:
           auto-activate-base: false
       - name: Build (Windows)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
-        shell: bash -el {0}
+        shell: powershell
         run: |
           conda info
           conda list
@@ -265,7 +265,7 @@ jobs:
           python3 setup.py bdist
       - name: Upload Builds (Posix)
         uses: actions/upload-artifact@v3
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows')}}
+        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
         with:
           name: built-binary
           path: |
@@ -273,16 +273,6 @@ jobs:
             ${{github.workspace}}/python/dist/*.tar.gz
             ${{github.workspace}}/python/build/*.exe
             ${{github.workspace}}/python/build/*.bin
-      - name: Upload Builds (Windows)
-        uses: actions/upload-artifact@v3
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
-        with:
-          name: built-binary
-          path: |
-            $env:GITHUB_WORKSPACE\python\dist\*.whl
-            $env:GITHUB_WORKSPACE\python\dist\*.tar.gz
-            $env:GITHUB_WORKSPACE\python\build\*.exe
-            $env:GITHUB_WORKSPACE\python\build\*.bin
   release:
     name: Create Release
     needs: build
