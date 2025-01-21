@@ -26,6 +26,11 @@ jobs:
         with:
           persist-credentials: false
       - name: Install necessary dependencies (Posix)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev
+      - name: Install necessary dependencies (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu')}}
         shell: bash -l {0}
         run: |
