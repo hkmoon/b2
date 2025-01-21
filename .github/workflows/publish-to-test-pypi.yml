@@ -30,6 +30,7 @@ jobs:
           activate-environment: b2
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
+          condarc-file: etc/example-condarc.yml
           auto-activate-base: false
       - name: Build (Posix and Windows)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'macos')}}
