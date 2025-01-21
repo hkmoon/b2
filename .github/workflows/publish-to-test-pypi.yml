@@ -248,14 +248,14 @@ jobs:
           cd $env:GITHUB_WORKSPACE\core
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=$env:CONDA_PREFIX
+          cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2\Library
           make -j 4
           make install
 
           cd $env:GITHUB_WORKSPACE\python
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=$env:CONDA_PREFIX
+          cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2\Library
           make -j 4
           make install
 
