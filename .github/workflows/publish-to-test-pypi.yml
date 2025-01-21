@@ -60,7 +60,7 @@ jobs:
           make install
 
           cd ..
-          pip install twine wheel
+          pip install setuptools twine wheel
           python3 setup.py bdist
       - name: conda-windows
         uses: conda-incubator/setup-miniconda@v3
@@ -92,7 +92,7 @@ jobs:
           cmake --install .
 
           cd ..
-          pip install twine wheel
+          pip install setuptools twine wheel
           python3 setup.py bdist
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
@@ -105,7 +105,7 @@ jobs:
           brew install boost
           brew install boost-python3
 
-          pip install numpy scipy setuptools
+          pip install numpy scipy
           cd ${{github.workspace}}/core
           mkdir build
           cd build
@@ -121,7 +121,7 @@ jobs:
           make install
 
           cd ..
-          pip install twine wheel
+          pip install setuptools twine wheel
           python3 setup.py bdist
       - name: Upload Builds
         uses: actions/upload-artifact@v3
