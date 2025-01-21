@@ -90,14 +90,14 @@ jobs:
           cd ${{github.workspace}}/core
           mkdir build
           cd build
-          cmake .. -DBOOST_ROOT=${{github.workspace}}/boost -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
           make -j 4
           make install
             
           cd ${{github.workspace}}/python
           mkdir build
           cd build
-          cmake .. -DBOOST_ROOT=${{github.workspace}}/boost -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
           make -j 4
           make install
           
