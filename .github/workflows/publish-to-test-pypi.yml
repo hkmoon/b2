@@ -25,12 +25,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Install necessary dependencies (Posix & Windows)
+      - name: Install necessary dependencies (Posix)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu')}}
         run: |
-          $CONDA/bin/conda activate base
-          $CONDA/bin/conda install gmp mpfr automake autoconf libtool boost eigen conda-forge::libboost-python numpy
-          $CONDA/bin/conda install conda-forge::eigenpy
+          $CONDA/bin/conda env update --file environment.yml --name base
+      - name: Install necessary dependencies (Windows)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
+        run: |
+          C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
+          C:\Miniconda\condabin\conda.bat init powershell
       - name: Install necessary dependencies (MacOS)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |

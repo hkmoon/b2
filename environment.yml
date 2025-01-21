@@ -1,0 +1,15 @@
+name: test
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - gmp
+  - mpfr
+  - automake
+  - autoconf
+  - libtool
+  - boost
+  - eigen
+  - libboost-python
+  - scipy
