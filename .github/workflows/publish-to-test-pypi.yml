@@ -28,8 +28,7 @@ jobs:
       - name: Install necessary dependencies (Posix and Windows)
         if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'macos')}}
         run: |
-          conda init
-          conda activate
+          conda activate b2
           conda install gmp mpfr automake autoconf libtool boost eigen conda-forge::libboost-python numpy
           conda install conda-forge::eigenpy
       - name: Install necessary dependencies (MacOS)
