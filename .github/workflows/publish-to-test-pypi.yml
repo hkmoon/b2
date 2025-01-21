@@ -305,6 +305,7 @@ jobs:
           body_path: ./TEMP_CHANGELOG.md
             python/dist/*.whl
             python/dist/*.tar.gz
+            python/dist/*.zip
             python/build/*.exe
             python/build/*.bin
 
