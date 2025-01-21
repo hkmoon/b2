@@ -105,7 +105,7 @@ jobs:
           brew install boost
           brew install boost-python3
 
-          pip install numpy scipy
+          pip install numpy scipy setuptools
           cd ${{github.workspace}}/core
           mkdir build
           cd build
