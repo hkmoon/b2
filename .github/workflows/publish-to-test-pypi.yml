@@ -90,14 +90,14 @@ jobs:
           cd ${{github.workspace}}/core
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
+          cmake .. -DBOOST_ROOT=${{github.workspace}}/boost -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
           make -j 4
           make install
             
           cd ${{github.workspace}}/python
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
+          cmake .. -DBOOST_ROOT=${{github.workspace}}/boost -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
           make -j 4
           make install
           
@@ -115,6 +115,54 @@ jobs:
             ${{github.workspace}}/python/dist/*.tar.gz
             ${{github.workspace}}/python/build/*.exe
             ${{github.workspace}}/python/build/*.bin
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: built-binary
+
+#      - name: Check Version
+#        uses: nowsprinting/check-version-format-action@v3
+#        id: version
+#        with:
+#          prefix: 'v'
+
+      - name: Check for Pre-Release
+        uses: haya14busa/action-cond@v1
+        id: is_prerelease
+        with:
+          cond: ${{ steps.version.outputs.prerelease != '' }}
+          if_true: true
+          if_false: false
+
+      - name: Get Newest Changelog
+        run: |
+          python -c "import re; from pathlib import Path; text=re.sub('<!--(.*?)-->', '', (Path.cwd() / 'CHANGELOG.md').read_text(), flags=re.DOTALL); start=text.find('_' * 79); (Path.cwd() / 'TEMP_CHANGELOG.md').write_text(text[start:text.find('_' * 79, start+1)])"
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: ${{ steps.is_prerelease.outputs.value }}
+          body_path: ./TEMP_CHANGELOG.md
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+            build/*.exe
+            build/*.bin
 #      - name: Install pypa/build
 #        run: >-
 #          python3 -m
