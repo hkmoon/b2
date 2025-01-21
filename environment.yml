@@ -6,6 +6,7 @@ dependencies:
   - numpy
   - gmp
   - mpfr
+  - libmpc
   - automake
   - autoconf
   - libtool
