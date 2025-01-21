@@ -197,6 +197,7 @@ jobs:
           make install
       - name: Checkout eigenpy
         uses: actions/checkout@v2
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         with:
           repository: stack-of-tasks/eigenpy
           path: './eigenpy'
@@ -249,15 +250,13 @@ jobs:
           mkdir build
           cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2\Library
-          make -j 4
-          make install
+          cmake --build . --target all
 
           cd $env:GITHUB_WORKSPACE\python
           mkdir build
           cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2\Library
-          make -j 4
-          make install
+          cmake --build . --target all
 
           cd ..
           pip install twine wheel
