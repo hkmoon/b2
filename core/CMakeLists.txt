@@ -15,8 +15,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Set default compile flags for GCC
 if(CMAKE_COMPILER_IS_GNUCXX)
-    message(STATUS "GCC detected, adding compile flags")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -368,7 +369,11 @@ target_link_libraries(bertini2 ${Boost_LIBRARIES})
 
 target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 
-target_compile_options(bertini2 PRIVATE -Wall -Wextra)
+if(CMAKE_COMPILER_IS_GNUCXX)
+    target_compile_options(bertini2 PRIVATE -Wall -Wextra)
+else()
+    target_compile_options(bertini2 PRIVATE -Wall)
+endif(CMAKE_COMPILER_IS_GNUCXX)
 
 
 install( 
