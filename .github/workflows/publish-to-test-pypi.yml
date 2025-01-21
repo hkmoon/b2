@@ -60,7 +60,6 @@ jobs:
           make install
 
           cd ..
-          pip install -U pip setuptools
           pip install twine wheel
           python3 setup.py bdist
       - name: conda-windows
@@ -93,7 +92,6 @@ jobs:
           cmake --install .
 
           cd ..
-          pip install -U pip setuptools
           pip install twine wheel
           python3 setup.py bdist
       - name: Build MacOS
@@ -106,7 +104,8 @@ jobs:
           brew install eigenpy
           brew install boost
           brew install boost-python3
-
+          brew install python-setuptools
+          
           pip install numpy scipy
           cd ${{github.workspace}}/core
           mkdir build
