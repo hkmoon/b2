@@ -245,17 +245,17 @@ jobs:
         run: |
           conda info
           conda list
-          cd ${{ GITHUB_WORKSPACE }}\core
+          cd $env:GITHUB_WORKSPACE\core
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{ GITHUB_WORKSPACE }}\b2\build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
           make -j 4
           make install
 
-          cd ${{ GITHUB_WORKSPACE }}\python
+          cd $env:GITHUB_WORKSPACE\python
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{ GITHUB_WORKSPACE }}\b2\build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          cmake .. -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\b2\build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
           make -j 4
           make install
 
