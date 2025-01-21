@@ -55,7 +55,7 @@ jobs:
           cd eigen
           mkdir build
           cd build
-          cmake .. -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
           make -j 4
           make install
       - name: Checkout eigenpy
