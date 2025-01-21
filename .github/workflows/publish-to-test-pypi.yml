@@ -70,7 +70,7 @@ jobs:
           cd eigenpy
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
           make -j 4
           make install
       - name: Build Executables
@@ -80,14 +80,14 @@ jobs:
           cd ${{github.workspace}}/core
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
           make -j 4
           make install
             
           cd ${{github.workspace}}/python
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
           make -j 4
           make install
           
