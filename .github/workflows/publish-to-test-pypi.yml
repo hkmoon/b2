@@ -26,6 +26,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: goanpeca/setup-miniconda@v1
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'macos')}}
         with:
           activate-environment: test
           environment-file: environment.yml
