@@ -279,10 +279,10 @@ jobs:
         with:
           name: built-binary
           path: |
-            ${{ GITHUB_WORKSPACE }}/python/dist/*.whl
-            ${{ GITHUB_WORKSPACE }}/python/dist/*.tar.gz
-            ${{ GITHUB_WORKSPACE }}/python/build/*.exe
-            ${{ GITHUB_WORKSPACE }}/python/build/*.bin
+            $env:GITHUB_WORKSPACE\python\dist\*.whl
+            $env:GITHUB_WORKSPACE\python\dist\*.tar.gz
+            $env:GITHUB_WORKSPACE\python\build\*.exe
+            $env:GITHUB_WORKSPACE\python\build\*.bin
   release:
     name: Create Release
     needs: build
