@@ -232,7 +232,37 @@ jobs:
           pip install twine wheel
           python3 -m pip install -e .
           python3 setup.py bdist
+      - uses: conda-incubator/setup-miniconda@v3
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
+        with:
+          activate-environment: b2
+          environment-file: environment.yml
+          python-version: ${{ matrix.python-version }}
+          auto-activate-base: false
+      - name: Build (Windows)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
+        shell: bash -el {0}
+        run: |
+          conda info
+          conda list
+          cd ${{github.workspace}}/core
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          make -j 4
+          make install
 
+          cd ${{github.workspace}}/python
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          make -j 4
+          make install
+
+          cd ..
+          pip install twine wheel
+          python3 -m pip install -e .
+          python3 setup.py bdist
       - name: Upload Builds
         uses: actions/upload-artifact@v3
         with:
