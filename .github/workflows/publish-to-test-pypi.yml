@@ -1,6 +1,9 @@
 name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
-on: push
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -166,27 +169,20 @@ jobs:
         with:
           name: built-binary
 
-#      - name: Check Version
-#        uses: nowsprinting/check-version-format-action@v3
-#        id: version
-#        with:
-#          prefix: 'v'
-      - name: Get tag name from ref
-        shell: bash
-        run: echo "{tag}={${GITHUB_REF#refs/tags/}}" >> $GITHUB_OUTPUT
-        id: get_tag
-      - name: Create tag in public repository
-        run: |
-          cd ${{github.workspace}}
-          git tag ${{ steps.get_tag.outputs.tag }}
-          git push --tags --porcelain
-#      - name: Check for Pre-Release
-#        uses: haya14busa/action-cond@v1
-#        id: is_prerelease
-#        with:
-#          cond: ${{ steps.version.outputs.prerelease != '' }}
-#          if_true: true
-#          if_false: false
+      - name: Check Version
+        uses: nowsprinting/check-version-format-action@v3
+        id: version
+        with:
+          prefix: 'v'
+
+      - name: Check for Pre-Release
+        uses: haya14busa/action-cond@v1
+        id: is_prerelease
+        with:
+          cond: ${{ steps.version.outputs.prerelease != '' }}
+          if_true: true
+          if_false: false
+
       - name: Get Newest Changelog
         run: |
           python -c "import re; from pathlib import Path; text=re.sub('<!--(.*?)-->', '', (Path.cwd() / 'CHANGELOG.md').read_text(), flags=re.DOTALL); start=text.find('_' * 79); (Path.cwd() / 'TEMP_CHANGELOG.md').write_text(text[start:text.find('_' * 79, start+1)])"
@@ -197,16 +193,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: Release ${{ steps.get_tag.outputs.tag }}
-          tag_name: ${{ steps.get_tag.outputs.tag }}
+          tag_name: ${{ github.ref }}
+          name: Release ${{ github.ref_name }}
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.is_prerelease.outputs.value }}
           body_path: ./TEMP_CHANGELOG.md
-          files: |
             python/dist/*.whl
             python/dist/*.tar.gz
             python/build/*.exe
             python/build/*.bin
+
+
 #      - name: Install pypa/build
 #        run: >-
 #          python3 -m
