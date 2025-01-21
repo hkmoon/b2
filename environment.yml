@@ -6,11 +6,12 @@ dependencies:
   - numpy
   - gmp
   - mpfr
-  - libmpc
+  - mpc
   - automake
   - autoconf
   - libtool
   - boost
   - eigen
+  - eigenpy
   - libboost-python
   - scipy
