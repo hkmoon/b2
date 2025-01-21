@@ -29,25 +29,6 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu')}}
         run: |
           $CONDA/bin/conda env update --file environment.yml --name base
-      - name: Install necessary dependencies (Windows)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
-        run: |
-          C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
-          C:\Miniconda\condabin\conda.bat init powershell
-      - name: Install necessary dependencies (MacOS)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
-        run: |
-          brew install gmp
-          brew install mpfr
-          brew install libmpc
-          brew install eigen
-          brew install eigenpy
-          brew install boost
-          brew install boost-python3
-      - name: Build Executables
-        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
-        run: |
-          pip install numpy scipy
           cd ${{github.workspace}}/core
           mkdir build
           cd build
@@ -66,6 +47,61 @@ jobs:
           pip install twine wheel
           python3 -m pip install -e .
           python3 setup.py bdist
+      - name: Install necessary dependencies (Windows)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
+        run: |
+          C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
+          C:\Miniconda\condabin\conda.bat init powershell
+          cd ${{github.workspace}}/core
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          make -j 4
+          make install
+
+          cd ${{github.workspace}}/python
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          make -j 4
+          make install
+
+          cd ..
+          pip install twine wheel
+          python3 -m pip install -e .
+          python3 setup.py bdist
+      - name: Install necessary dependencies (MacOS)
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
+        run: |
+          brew install gmp
+          brew install mpfr
+          brew install libmpc
+          brew install eigen
+          brew install eigenpy
+          brew install boost
+          brew install boost-python3
+#      - name: Build Executables
+#        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
+#        run: |
+#          pip install numpy scipy
+#          cd ${{github.workspace}}/core
+#          mkdir build
+#          cd build
+#          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+#          make -j 4
+#          make install
+#
+#          cd ${{github.workspace}}/python
+#          mkdir build
+#          cd build
+#          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+#          make -j 4
+#          make install
+#
+#          cd ..
+#          pip install twine wheel
+#          python3 -m pip install -e .
+#          python3 setup.py bdist
       - name: Upload Builds
         uses: actions/upload-artifact@v3
         with:
