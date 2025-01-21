@@ -245,17 +245,17 @@ jobs:
         run: |
           conda info
           conda list
-          cd ${{github.workspace}}/core
+          cd ${{ GITHUB_WORKSPACE }}\core
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{ GITHUB_WORKSPACE }}\b2\build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
           make -j 4
           make install
 
-          cd ${{github.workspace}}/python
+          cd ${{ GITHUB_WORKSPACE }}\python
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{ GITHUB_WORKSPACE }}\b2\build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
           make -j 4
           make install
 
@@ -265,6 +265,7 @@ jobs:
           python3 setup.py bdist
       - name: Upload Builds
         uses: actions/upload-artifact@v3
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows')}}
         with:
           name: built-binary
           path: |
@@ -272,6 +273,17 @@ jobs:
             ${{github.workspace}}/python/dist/*.tar.gz
             ${{github.workspace}}/python/build/*.exe
             ${{github.workspace}}/python/build/*.bin
+      - name: Upload Builds
+        uses: actions/upload-artifact@v3
+
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
+        with:
+          name: built-binary
+          path: |
+            ${{ GITHUB_WORKSPACE }}/python/dist/*.whl
+            ${{ GITHUB_WORKSPACE }}/python/dist/*.tar.gz
+            ${{ GITHUB_WORKSPACE }}/python/build/*.exe
+            ${{ GITHUB_WORKSPACE }}/python/build/*.bin
   release:
     name: Create Release
     needs: build
