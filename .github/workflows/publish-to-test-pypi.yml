@@ -51,7 +51,7 @@ jobs:
           path: |
             ${{github.workspace}}/boost
       - name: Install Boost
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') && steps.cache-boost.outputs.cache-hit != 'true' }}
+        if: ${{ steps.cache-boost.outputs.cache-hit != 'true' && !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
           wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz
           tar xvfz boost_1_87_0.tar.gz
