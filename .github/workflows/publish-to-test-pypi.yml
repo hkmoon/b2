@@ -56,7 +56,7 @@ jobs:
           wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz
           tar xvfz boost_1_87_0.tar.gz
           cd boost_1_87_0
-          ./bootstrap.sh --prefix=${{github.workspace}}/boost
+          ./bootstrap.sh --with-python --prefix=${{github.workspace}}/boost
           ./b2 install
       - name: Checkout and install eigen
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
