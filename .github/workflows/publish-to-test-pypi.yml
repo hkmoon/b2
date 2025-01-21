@@ -131,6 +131,7 @@ jobs:
           path: |
             ${{github.workspace}}/python/dist/*.whl
             ${{github.workspace}}/python/dist/*.tar.gz
+            ${{github.workspace}}/python/dist/*.zip
             ${{github.workspace}}/python/build/*.exe
             ${{github.workspace}}/python/build/*.bin
 
