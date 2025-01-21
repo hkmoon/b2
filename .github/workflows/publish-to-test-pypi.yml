@@ -122,7 +122,6 @@ jobs:
           make install
 
           cd ..
-          pip install -U pip setuptools
           pip install twine wheel
           python3 setup.py bdist
       - name: Upload Builds
