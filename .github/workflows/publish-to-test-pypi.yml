@@ -44,10 +44,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Boost
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu')}}
-        id: install-boost
-        uses: MarkusJx/install-boost@v2
-        with:
-          boost_version: 1.87.0
+        run: |
+          wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz
+          tar xvfz boost_1_87_0.tar.gz
+
+          ./bootstrap.sh --prefix=${{github.workspace}}/boost
+          ./b2 install
       - name: Checkout and install eigen
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         run: |
@@ -55,7 +57,7 @@ jobs:
           cd eigen
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
           make -j 4
           make install
       - name: Checkout eigenpy
@@ -70,7 +72,7 @@ jobs:
           cd eigenpy
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost
           make -j 4
           make install
       - name: Build Executables
@@ -80,14 +82,14 @@ jobs:
           cd ${{github.workspace}}/core
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build
           make -j 4
           make install
             
           cd ${{github.workspace}}/python
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build -DCMAKE_PREFIX_PATH=${{github.workspace}}/boost/boost
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/b2/build
           make -j 4
           make install
           
