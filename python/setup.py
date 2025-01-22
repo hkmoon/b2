@@ -1,10 +1,8 @@
 from setuptools import find_packages, setup
 
-
 import os
 
 SRC_PATH = os.path.relpath(os.path.join(os.path.dirname(__file__), "pybertini"))
-
 
 EXCLUDE_FROM_PACKAGES = []
 
@@ -15,6 +13,7 @@ setup(name='pybertini',
       author='Bertini Team',
       author_email='amethyst@uwec.edu',
       license='GPL3 with permitted additional clauses',
+      setup_requires=['wheel'],
       packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
       package_dir = {'pybertini': SRC_PATH},
       include_package_data=True,
