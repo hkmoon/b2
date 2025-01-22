@@ -12,4 +12,6 @@ dependencies:
   - eigenpy
   - libboost-python
   - scipy
+  - python-dev
+  - python3-wheel
   - wheel
