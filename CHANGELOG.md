@@ -24,59 +24,18 @@ A message that notes the main changes in the update.
 ### Removed
 
 ### Security
-
-_______________________________________________________________________________
- 
- -->
-
-<!--
-EXAMPLE
-
-## [0.2.0] - 2021-06-02
-
-Lorem Ipsum dolor sit amet.
-
-### Added
-
-- Cat pictures hidden in the library
-- Added beeswax to the gears
-
-### Changed
-
-- Updated localisation files
-
-### Fixed
-
-- some fixes
-
--->
-
-<!--
-_______________________________________________________________________________
-
-## [2.0.1] - 2025-01-21
-
-This is the initial version of the project.
-
-### Added
-
-- The base project
-- github action
-- automatic release build
-
 -->
 
 _______________________________________________________________________________
 
-## [2.0.1] - 2025-01-21
+## [2.0.0] - 2025-01-22
 
-This is the initial version of the project.
+This version is the first release of the [Semantic Versioning]
 
 ### Added
 
-- The base project
-- github action
-- automatic release build
+- CI script for github
+
 
 [CHANGELOG.md]: https://web.archive.org/web/20220330064336/https://changelog.md/
 [Semantic Versioning]: http://semver.org/
