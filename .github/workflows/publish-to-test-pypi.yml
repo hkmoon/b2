@@ -1,9 +1,9 @@
 name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
-on: push
-#  push:
-#    tags:
-#      - 'v*'
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -163,7 +163,7 @@ jobs:
 
       - name: Get Newest Changelog
         run: |
-          python -c "import re; from pathlib import Path; text=re.sub('<!--(.*?)-->', '', (Path.cwd() / 'CHANGELOG.md').read_text(), flags=re.DOTALL); start=text.find('_' * 79); (Path.cwd() / 'TEMP_CHANGELOG.md').write_text(text[start:text.find('_' * 79, start+1)])"
+          python3 -c "import re; from pathlib import Path; text=re.sub('<!--(.*?)-->', '', (Path.cwd() / 'CHANGELOG.md').read_text(), flags=re.DOTALL); start=text.find('_' * 79); (Path.cwd() / 'TEMP_CHANGELOG.md').write_text(text[start:text.find('_' * 79, start+1)])"
 
       - name: Create Release
         id: create_release
