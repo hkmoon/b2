@@ -3,7 +3,7 @@ name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 on:
   push:
     tags:
-      - 'v*'
+      - 'ci-test'
 
 jobs:
   build:
@@ -151,7 +151,7 @@ jobs:
         uses: nowsprinting/check-version-format-action@v3
         id: version
         with:
-          prefix: 'v'
+          prefix: 'ci-test'
 
       - name: Create Release
         id: create_release
@@ -159,8 +159,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref_name }}
+          tag_name: v2.0.0  # ${{ github.ref }}
+          name: Release v2.0.0 # ${{ github.ref_name }}
           draft: false
           prerelease: true
           files: |
