@@ -153,18 +153,6 @@ jobs:
         with:
           prefix: 'v'
 
-      - name: Check for Pre-Release
-        uses: haya14busa/action-cond@v1
-        id: is_prerelease
-        with:
-          cond: ${{ steps.version.outputs.prerelease != '' }}
-          if_true: true
-          if_false: false
-
-      - name: Get Newest Changelog
-        run: |
-          python3 -c "import re; from pathlib import Path; text=re.sub('<!--(.*?)-->', '', (Path.cwd() / 'CHANGELOG.md').read_text(), flags=re.DOTALL); start=text.find('_' * 79); (Path.cwd() / 'TEMP_CHANGELOG.md').write_text(text[start:text.find('_' * 79, start+1)])"
-
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -174,13 +162,9 @@ jobs:
           tag_name: ${{ github.ref }}
           name: Release ${{ github.ref_name }}
           draft: false
-          prerelease: ${{ steps.is_prerelease.outputs.value }}
-          body_path: ./TEMP_CHANGELOG.md
-            dist/*.whl
-            dist/*.tar.gz
-            dist/*.zip
-            build/*.exe
-            build/*.bin
+          prerelease: true
+          files: |
+            dist/*.*
 
 #      - name: Install pypa/build
 #        run: >-
