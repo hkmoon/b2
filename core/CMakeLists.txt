@@ -372,7 +372,7 @@ target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 if(CMAKE_COMPILER_IS_GNUCXX)
     target_compile_options(bertini2 PRIVATE -Wall -Wextra)
 else()
-    target_compile_options(bertini2 PRIVATE -Wall)
+    target_compile_options(bertini2 PRIVATE -Wall -mbigobj)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 
