@@ -60,7 +60,7 @@ jobs:
           make install
 
           cd ..
-          python3 setup.py bdist_wheel --plat-name=linux_x64
+          python3 setup.py bdist_wheel
       - name: conda-windows
         uses: conda-incubator/setup-miniconda@v3
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
@@ -93,7 +93,7 @@ jobs:
           cd ..
           python3 -m pip install build
           python3 -m build --wheel
-          python3 setup.py bdist_wheel --plat-name=windows_x64
+          python3 setup.py bdist_wheel
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |
@@ -122,11 +122,11 @@ jobs:
           make install
 
           cd ..
-          python3 setup.py bdist_wheel --plat-name=macosx_arm
+          python3 setup.py bdist_wheel
       - name: Upload Builds
         uses: actions/upload-artifact@v4
         with:
-          name: built-binary
+          name: built-binary-${{ matrix.os }}
           path: |
             ${{github.workspace}}/python/dist/*.whl
             ${{github.workspace}}/python/dist/*.tar.gz
@@ -145,8 +145,6 @@ jobs:
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
-        with:
-          name: built-binary
 
       - name: Get Newest Changelog
         run: |
