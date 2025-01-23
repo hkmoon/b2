@@ -42,6 +42,8 @@
 
 #include <Eigen/Core>
 
+typedef unsigned int uint;
+
 namespace {
 using mpfr_real = bertini::mpfr_float;
 using mpfr_complex = bertini::mpfr_complex;
