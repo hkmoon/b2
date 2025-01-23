@@ -34,20 +34,20 @@
 
 __author__ = 'James Collins'
 
-from pybertini import *
-from pybertini.function_tree.symbol import *
-from pybertini.function_tree.root import *
-from pybertini.function_tree import *
-from pybertini.tracking import *
-from pybertini.tracking.config import *
+from bertini import *
+from bertini.function_tree.symbol import *
+from bertini.function_tree.root import *
+from bertini.function_tree import *
+from bertini.tracking import *
+from bertini.tracking.config import *
 
 import unittest
 import numpy as np
 import pdb
 
-import pybertini.multiprec as mp
-from pybertini.multiprec import Float as mpfr_float
-from pybertini.multiprec import Complex as mpfr_complex
+import bertini.multiprec as mp
+from bertini.multiprec import Float as mpfr_float
+from bertini.multiprec import Complex as mpfr_complex
 
 
 class AMPTrackingTest(unittest.TestCase):

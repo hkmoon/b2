@@ -6,24 +6,24 @@
 🛤 Tracking configs
 ---------------------------
 
-* :class:`pybertini.tracking.config.SteppingConfig`
-* :class:`pybertini.tracking.config.NewtonConfig`
-* :class:`pybertini.tracking.config.AMPConfig`
-* :class:`pybertini.tracking.config.FixedPrecisionConfig`
+* :class:`bertini.tracking.config.SteppingConfig`
+* :class:`bertini.tracking.config.NewtonConfig`
+* :class:`bertini.tracking.config.AMPConfig`
+* :class:`bertini.tracking.config.FixedPrecisionConfig`
 
-.. autoclass:: pybertini.tracking.config.SteppingConfig
+.. autoclass::bertini.tracking.config.SteppingConfig
 
-.. autoclass:: pybertini.tracking.config.NewtonConfig
+.. autoclass::bertini.tracking.config.NewtonConfig
 
-.. autoclass:: pybertini.tracking.config.AMPConfig
+.. autoclass::bertini.tracking.config.AMPConfig
 
-.. autoclass:: pybertini.tracking.config.FixedPrecisionConfig
+.. autoclass::bertini.tracking.config.FixedPrecisionConfig
 
 
 🎮 Endgame configs
 -------------------------
 
-.. autoclass:: pybertini.endgame.config.Endgame
+.. autoclass::bertini.endgame.config.Endgame
 
 Algorithm configs
 ---------------------------

@@ -1,4 +1,4 @@
-import pybertini
+import bertini
 
 
 def exercise_ring(a, b):
@@ -46,13 +46,13 @@ def eq(a,b):
 
 	print('{} {} passed eq checks'.format(type(a),type(b)))
 
-rings = [pybertini.multiprec.Int(2)]
+rings = [bertini.multiprec.Int(2)]
 
-fields = [pybertini.multiprec.Float(3),pybertini.multiprec.Rational(3,4),pybertini.multiprec.Complex(5,6)]
+fields = [bertini.multiprec.Float(3),bertini.multiprec.Rational(3,4),bertini.multiprec.Complex(5,6)]
 
-ordereds = [pybertini.multiprec.Int(2), pybertini.multiprec.Float(3),pybertini.multiprec.Rational(3,4)]
+ordereds = [bertini.multiprec.Int(2),bertini.multiprec.Float(3),bertini.multiprec.Rational(3,4)]
 
-all_types = [pybertini.multiprec.Int(2), pybertini.multiprec.Float(3),pybertini.multiprec.Rational(3,4), pybertini.multiprec.Complex(5,6)]
+all_types = [bertini.multiprec.Int(2),bertini.multiprec.Float(3),bertini.multiprec.Rational(3,4),bertini.multiprec.Complex(5,6)]
 
 
 for ii in rings:

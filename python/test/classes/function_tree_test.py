@@ -31,16 +31,16 @@
 #
 
 
-from pybertini import *
-from pybertini.function_tree.symbol import *
-from pybertini.function_tree.root import *
-from pybertini.function_tree import *
+from bertini import *
+from bertini.function_tree.symbol import *
+from bertini.function_tree.root import *
+from bertini.function_tree import *
 import numpy as np;
 import unittest
 
-import pybertini.multiprec as mp
-from pybertini.multiprec import Float as mpfr_float
-from pybertini.multiprec import Complex as mpfr_complex
+import bertini.multiprec as mp
+from bertini.multiprec import Float as mpfr_float
+from bertini.multiprec import Complex as mpfr_complex
 
 class SymbolTest(unittest.TestCase):
     def setUp(self):

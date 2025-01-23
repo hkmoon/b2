@@ -38,6 +38,7 @@ python/build/
 *.pyc
 
 python/pybertini_*.log
+python/bertini_*.log
 
 *.dirstamp
 *.deps

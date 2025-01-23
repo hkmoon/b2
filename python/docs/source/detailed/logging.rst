@@ -1,4 +1,4 @@
-📋 pybertini.logging
+📋 bertini.logging
 =====================
 
 .. include:: common_doc_nav.incl
@@ -10,9 +10,9 @@ Logging is enabled for PyBertini through Bertini2's core logging facilities, in 
 
 They currently aren't fancy, but you have a few things you can do.
 
-#. Adjust the level.  See :class:`~pybertini.logging.severity_level` and :func:`~pybertini.logging.set_level`
+#. Adjust the level.  See :class:`~bertini.logging.severity_level` and :func:`~bertini.logging.set_level`
 
 Auto-generated docs
 --------------------
 
-.. automodule:: pybertini.logging
+.. automodule:: bertini.logging

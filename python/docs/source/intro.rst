@@ -23,7 +23,7 @@ Consider checking out the :ref:`🔦 Tutorials`.
 ⛲️ Source code
 ---------------------------
 
-PyBertini is distributed with Bertini2, available at `its GitHub repo <https://github.com/bertiniteam/b2>`_.
+The Bertini 2 source code is available at `its GitHub repo <https://github.com/bertiniteam/b2>`_.
 
 The core is written in template-heavy C++, and is exposed to Python through Boost.Python.
 

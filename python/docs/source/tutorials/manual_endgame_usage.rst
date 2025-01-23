@@ -22,7 +22,7 @@ An endgame is a computational tool that one does in the final stage of a path tr
 
 Both try to compute the cycle number :math:`c` for the root.  In PSEG, :math:`c` is used as the degree of a Hermite interpolant used to extrapolate to 0.  In CauchyEG,  it is used for the number of cycles to walk before doing a trapezoid-rule integral.
 
-Each is provided in the three precision modes, double, fixed multiple, and adaptive.  Since we are using the :class:`~pybertini.tracking.AMPTracker` in this tutorial, we will of course use the adaptive endgame.  I really like the Cauchy endgame, so we're in the land of the :class:`~pybertini.endgame.AMPCauchyEG`.
+Each is provided in the three precision modes, double, fixed multiple, and adaptive.  Since we are using the :class:`~bertini.tracking.AMPTracker` in this tutorial, we will of course use the adaptive endgame.  I really like the Cauchy endgame, so we're in the land of the :class:`~bertini.endgame.AMPCauchyEG`.
 
 
 Example
@@ -42,19 +42,19 @@ Let's build it from scratch, for the practice.
 
 :: 
 
-	import pybertini
+	import bertini
 
-	gw = pybertini.System()
+	gw = bertini.System()
 
-	x = pybertini.Variable("x")
-	y = pybertini.Variable("y")
+	x = bertini.Variable("x")
+	y = bertini.Variable("y")
 
-	vg = pybertini.VariableGroup()
+	vg = bertini.VariableGroup()
 	vg.append(x)
 	vg.append(y)
 	gw.add_variable_group(vg)
 
-	gw.add_function(pybertini.multiprec.Rational(29,16)*x**3 - 2*x*y)
+	gw.add_function(bertini.multiprec.Rational(29,16)*x**3 - 2*x*y)
 	gw.add_function(y - x**2)
 
 
@@ -65,9 +65,9 @@ Next, we make the total degree start system for `gw`, and couple it using the ga
 
 ::
 
-	t = pybertini.Variable('t')
-	td = pybertini.system.start_system.TotalDegree(gw)
-	gamma = pybertini.function_tree.symbol.Rational.rand()
+	t = bertini.Variable('t')
+	td = bertini.system.start_system.TotalDegree(gw)
+	gamma = bertini.function_tree.symbol.Rational.rand()
 	hom = (1-t)*gw + t*gamma*td
 	hom.add_path_variable(t)
 
@@ -80,16 +80,16 @@ Make a tracker.  I use adaptive precision a lot, so we'll roll with that.  There
 
 ::
 
-	tr = pybertini.tracking.AMPTracker(hom)
+	tr = bertini.tracking.AMPTracker(hom)
 
-	start_time = pybertini.multiprec.Complex("1")
-	eg_boundary = pybertini.multiprec.Complex("0.1")
+	start_time = bertini.multiprec.Complex("1")
+	eg_boundary = bertini.multiprec.Complex("0.1")
 
 	midpath_points = [None]*td.num_start_points()
 	for ii in range(td.num_start_points()):
-		midpath_points[ii] = pybertini.multiprec.Vector()
+		midpath_points[ii] = bertini.multiprec.Vector()
 		code = tr.track_path(result=midpath_points[ii], start_time=start_time, end_time=eg_boundary, start_point=td.start_point_mp(ii))
-		if code != pybertini.tracking.SuccessCode.Success:
+		if code != bertini.tracking.SuccessCode.Success:
 			print('uh oh, tracking a path before the endgame boundary failed, successcode ' + code)
 
 
@@ -103,10 +103,10 @@ To make an endgame, we need to feed it the tracker that is used to run.  There a
 
 ::
 
-	eg = pybertini.endgame.AMPCauchyEG(tr)
+	eg = bertini.endgame.AMPCauchyEG(tr)
 
 	# make an observer to be able to see what's going on inside
-	ob = pybertini.endgame.observers.amp_cauchy.GoryDetailLogger()
+	ob = bertini.endgame.observers.amp_cauchy.GoryDetailLogger()
 
 	eg.add_observer(ob)
 
@@ -120,7 +120,7 @@ The endgames are used by invoking ``run``, feeding it the point we are tracking 
 	final_points = []
 
 
-	target_time = pybertini.multiprec.Complex(0)
+	target_time = bertini.multiprec.Complex(0)
 	codes = []
 	for ii in range(td.num_start_points()):
 		eg_boundary.precision( midpath_points[ii][0].precision())

@@ -1,4 +1,4 @@
-import pybertini as pb
+import bertini as pb
 
 pb.logging.init()
 # pb.logging.add_file('asdf.txt')

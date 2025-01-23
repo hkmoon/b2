@@ -1,4 +1,4 @@
-💬 pybertini.parse
+💬 bertini.parse
 =====================
 
 .. include:: common_doc_nav.incl
@@ -9,4 +9,4 @@ Notes
 Auto-generated docs
 --------------------
 
-.. automodule:: pybertini.parse
+.. automodule:: bertini.parse

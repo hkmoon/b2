@@ -1,19 +1,19 @@
 # This file is part of Bertini 2.
 # 
-# python/pybertini/__init__.py is free software: you can redistribute it and/or modify
+# python/bertini/__init__.py is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# python/pybertini/__init__.py is distributed in the hope that it will be useful,
+# python/bertini/__init__.py is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with python/pybertini/__init__.py.  If not, see <http://www.gnu.org/licenses/>.
+# along with python/bertini/__init__.py.  If not, see <http://www.gnu.org/licenses/>.
 # 
-#  Copyright(C) 2018 by Bertini2 Development Team
+#  Copyright(C) 2018-2025 by Bertini2 Development Team
 # 
 #  See <http://www.gnu.org/licenses/> for a copy of the license, 
 #  as well as COPYING.  Bertini2 is provided with permitted 
@@ -24,6 +24,9 @@
 #  silviana amethyst
 #  UWEC
 #  Spring 2018
+#
+#  MPI-CBG 
+#  2025
 # 
 
 
@@ -48,21 +51,21 @@ from ._version import __version__, __version_info__
 version = __version__
 
 
-# put stuff in the pybertini namespace
+# put stuff in the bertini namespace
 
-import pybertini.function_tree as function_tree
+import bertini.function_tree as function_tree
 
-import pybertini.system as system
-import pybertini.tracking as tracking
-import pybertini.endgame as endgame
-import pybertini.parse as parse
-import pybertini.container as container
-import pybertini.logging as logging
-import pybertini.nag_algorithm as nag_algorithm
-import pybertini.random as random
+import bertini.system as system
+import bertini.tracking as tracking
+import bertini.endgame as endgame
+import bertini.parse as parse
+import bertini.container as container
+import bertini.logging as logging
+import bertini.nag_algorithm as nag_algorithm
+import bertini.random as random
 
 
-import pybertini.multiprec as multiprec
+import bertini.multiprec as multiprec
 
 # some convenience assignments
 Variable = function_tree.symbol.Variable

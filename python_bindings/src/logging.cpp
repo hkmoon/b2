@@ -14,7 +14,7 @@
 //You should have received a copy of the GNU General Public License
 //along with python/src/logging.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2018 by Bertini2 Development Team
+// Copyright(C) 2018-2025 by Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -62,7 +62,7 @@ void ExportLogging()
 
 
 	def("init", &bertini::logging::Logging::Init, 
-		(boost::python::arg("pattern") = "pybertini_%N.log", boost::python::arg("format") = "%Message%", boost::python::arg("rotation_size") = 10*1024*1024, boost::python::arg("level") = logging::severity_level::info), "Initialize logging. See set_level and add_file.");
+		(boost::python::arg("pattern") = "bertini_%N.log", boost::python::arg("format") = "%Message%", boost::python::arg("rotation_size") = 10*1024*1024, boost::python::arg("level") = logging::severity_level::info), "Initialize logging. See set_level and add_file.");
 
 	def("set_level", &bertini::logging::Logging::SetLevel, (boost::python::arg("level")), "Set the threshold severity level.  Events with lower-than-this level will be ignored.  All messages are written to files.  Writing to strings back into Python is not currently enabled.  If this is a problem, please file an issue on GitHub at github.com/bertiniteam/b2/issues .  YAGNI");
 

@@ -1,5 +1,5 @@
 import numpy as np
-import pybertini as pb
+import bertini as pb
 
 v = np.zeros(shape=(3,), dtype=pb.multiprec.Complex)
 
