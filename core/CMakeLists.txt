@@ -17,8 +17,12 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -mbig-obj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC")
 endif(CMAKE_COMPILER_IS_GNUCXX)
+
+if(WIN64)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -mbig-obj")
+endif(WIN64)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
@@ -372,8 +376,12 @@ target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 if(CMAKE_COMPILER_IS_GNUCXX)
     target_compile_options(bertini2 PRIVATE -Wall -Wextra)
 else()
-    target_compile_options(bertini2 PRIVATE -Wall -mbigobj)
+    target_compile_options(bertini2 PRIVATE -Wall)
 endif(CMAKE_COMPILER_IS_GNUCXX)
+
+if(WIN64)
+	target_compile_options(bertini2 PRIVATE -Wall -mbigobj)
+endif(WIN64)
 
 
 install(
