@@ -357,7 +357,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_sources(bertini2_exe PUBLIC ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
 
-target_include_directories(bertini2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# see https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source
+# for more on these generator expressions, $<INSTALL_INTERFACE, etc.
+
+target_include_directories(bertini2 PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  
+    $<INSTALL_INTERFACE:include>  # <prefix>/include
+    )
 
 
 

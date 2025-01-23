@@ -39,12 +39,10 @@ find_package(eigenpy 3.3 REQUIRED CONFIG)
 
 
 
-# so that we can `python_add_library`
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
 # Find python and Boost - both are required dependencies
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
-
+# so that we can `python_add_library`
+find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
