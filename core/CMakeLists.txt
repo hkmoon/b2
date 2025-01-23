@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.22) 
-project(bertini2)
+project(bertini2-core)
 
+include(CMakePrintHelpers) # so we can print cmake variable values
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -10,13 +11,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # We can either explicitly list all files or use glob, we chose to explicitly list files and not to glob
 #file(GLOB SOURCES src/*.cpp)
 
-include_directories(include)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC")
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
+
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC")
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
@@ -55,7 +56,7 @@ set(endgames_headers
 	include/bertini2/endgames/prec_base.hpp
 )
 
-set (basics_rootinclude_headers
+set(basics_rootinclude_headers
     include/bertini2/have_bertini.hpp
     include/bertini2/mpfr_extensions.hpp
     include/bertini2/mpfr_complex.hpp
@@ -72,7 +73,7 @@ set (basics_rootinclude_headers
     include/bertini2/version.hpp
 )
 
-set (common_headers
+set(common_headers
     include/bertini2/common/config.hpp 
     include/bertini2/common/stream_enum.hpp
 )
@@ -149,7 +150,7 @@ set(io_headers
     include/bertini2/io/splash.hpp
 )
 
-set (io_parsing_headers
+set(io_parsing_headers
     include/bertini2/io/parsing/classic_utilities.hpp
     include/bertini2/io/parsing/function_parsers.hpp
     include/bertini2/io/parsing/function_rules.hpp
@@ -162,7 +163,7 @@ set (io_parsing_headers
     include/bertini2/io/parsing/system_rules.hpp 
 )
 
-set (io_parsing_settings_headers
+set(io_parsing_settings_headers
     include/bertini2/io/parsing/settings_parsers/algorithm.hpp
     include/bertini2/io/parsing/settings_parsers/base.hpp
     include/bertini2/io/parsing/settings_parsers/endgames.hpp
@@ -344,14 +345,29 @@ set(BERTINI2_EXE_HEADERS
     include/bertini2/blackbox/user_homotopy.hpp
 )
 
-add_executable(bertini2_exe ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
-set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
+if(PROJECT_IS_TOP_LEVEL)
+    add_library(bertini2)
+
+    add_executable(bertini2_exe)
+    set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
+endif()
+
+# this is correct if run from core, but not if from a higher level...
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_sources(bertini2_exe PUBLIC ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
+
+target_include_directories(bertini2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+
+
 
 # All library files
-add_library(bertini2 
+target_sources(bertini2 PRIVATE
     ${BERTINI2_LIBRARY_SOURCES}
     ${BERTINI2_LIBRARY_HEADERS}
 )
+
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
@@ -362,9 +378,12 @@ target_link_libraries(bertini2 ${MPC_LIBRARIES})
 target_link_libraries(bertini2 Eigen3::Eigen)
 target_link_libraries(bertini2 ${Boost_LIBRARIES})
 
+
+
 target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 
-target_compile_options(bertini2 PRIVATE -Wall -Wextra)
+# todo: this should be made a devmode thing
+#target_compile_options(bertini2 PRIVATE -Wall -Wextra)
 
 
 install( 
@@ -527,6 +546,32 @@ install(
 
 
 
+
+
+
+
+
+###################
+#
+#
+#       UNIT TESTING
+#
+#
+#############
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 set(B2_CLASS_TEST_SOURCES
     test/classes/boost_multiprecision_test.cpp 
     test/classes/fundamentals_test.cpp 
@@ -548,9 +593,12 @@ set(B2_CLASS_TEST_SOURCES
 )
 
 
+# todo here
+
+
+
 add_executable(test_classes ${B2_CLASS_TEST_SOURCES})
-target_include_directories(test_classes PUBLIC
-                                         ${CMAKE_CURRENT_SOURCE_DIR}/test/classes)
+target_include_directories(test_classes PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_link_libraries(test_classes ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_classes COMMAND ${CMAKE_BINARY_DIR}/test_classes)
@@ -564,6 +612,7 @@ set(B2_BLACKBOX_TEST
 )
 
 add_executable(test_blackbox ${B2_BLACKBOX_TEST})
+target_include_directories(test_blackbox PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(test_blackbox ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_blackbox COMMAND ${CMAKE_BINARY_DIR}/test_blackbox)
 
@@ -574,6 +623,7 @@ set(B2_CLASSIC_TEST
 )
 
 add_executable(test_classic ${B2_CLASSIC_TEST})
+target_include_directories(test_classic PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_classic ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_classic COMMAND ${CMAKE_BINARY_DIR}/test_classic)
 
@@ -592,6 +642,7 @@ set(B2_ENDGAMES_TEST
 )
 
 add_executable(test_endgames ${B2_ENDGAMES_TEST})
+target_include_directories(test_endgames PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_endgames ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_endgames COMMAND ${CMAKE_BINARY_DIR}/test_endgames)
 
@@ -604,6 +655,7 @@ set(B2_GENERATING_TEST
 )
 
 add_executable(test_generating ${B2_GENERATING_TEST})
+target_include_directories(test_generating PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_generating ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_generating COMMAND ${CMAKE_BINARY_DIR}/test_generating)
 
@@ -615,6 +667,7 @@ set(B2_NAG_ALGORITHMS_TEST
 )
 
 add_executable(test_nag_algorithms ${B2_NAG_ALGORITHMS_TEST})
+target_include_directories(test_nag_algorithms PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_nag_algorithms ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_nag_algorithms COMMAND ${CMAKE_BINARY_DIR}/test_nag_algorithms)
 
@@ -625,6 +678,7 @@ set(B2_NAG_DATATYPES_TEST
 )
 
 add_executable(test_nag_datatypes ${B2_NAG_DATATYPES_TEST})
+target_include_directories(test_nag_datatypes PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_nag_datatypes ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_nag_datatypes COMMAND ${CMAKE_BINARY_DIR}/test_nag_datatypes)
 
@@ -633,6 +687,7 @@ set(B2_POOLS_TEST
 )
 
 add_executable(test_pool ${B2_NAG_DATATYPES_TEST})
+target_include_directories(test_pool PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_pool ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_pool COMMAND ${CMAKE_BINARY_DIR}/test_pool)
 
@@ -641,6 +696,7 @@ set(B2_SETTINGS_TEST
 )
 
 add_executable(test_settings ${B2_SETTINGS_TEST})
+target_include_directories(test_settings PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_settings ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_settings COMMAND ${CMAKE_BINARY_DIR}/test_settings)
 
@@ -657,6 +713,7 @@ set(B2_TRACKING_BASICS_TEST
 )
 
 add_executable(test_tracking_basics ${B2_TRACKING_BASICS_TEST})
+target_include_directories(test_tracking_basics PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_tracking_basics ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_tracking_basics COMMAND ${CMAKE_BINARY_DIR}/test_tracking_basics)
 

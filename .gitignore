@@ -87,4 +87,6 @@ python/src/UNKNOWN.egg-info/PKG-INFO
 python/src/UNKNOWN.egg-info/SOURCES.txt
 python/src/UNKNOWN.egg-info/top_level.txt
 
+_skbuild/
 */build/
+build/

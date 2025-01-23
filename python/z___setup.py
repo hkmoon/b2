@@ -1,5 +1,4 @@
-from setuptools import find_packages, setup
-
+from skbuild import setup
 
 import os
 
@@ -8,18 +7,24 @@ SRC_PATH = os.path.relpath(os.path.join(os.path.dirname(__file__), "pybertini"))
 
 EXCLUDE_FROM_PACKAGES = []
 
-setup(name='pybertini',
+setup(
+      name='pybertini',
       version='1.0.alpha5',
       description='Software for numerical algebraic geometry',
       url='http://github.com/bertiniteam/b2',
       author='Bertini Team',
-      author_email='amethyst@uwec.edu',
+      author_email='amethyst@mpi-cbg.de',
+
       license='GPL3 with permitted additional clauses',
-      packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
+
+      packages=["pybertini"],
       package_dir = {'pybertini': SRC_PATH},
+
+
       include_package_data=True,
       package_data= {"":["_pybertini.so"]},
-      zip_safe=False
+      zip_safe=False,
+      python_requires=">3.12",
       )
 
 # dependencies to add
