@@ -145,6 +145,8 @@ jobs:
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
 
       - name: Get Newest Changelog
         run: |
