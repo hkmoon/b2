@@ -137,7 +137,9 @@ target_include_directories(_pybertini PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 target_sources(_pybertini PRIVATE ${PYBERTINI_SOURCES} ${PYBERTINI_HEADERS})
 
 if(NOT PROJECT_IS_TOP_LEVEL)
-    target_link_libraries(_pybertini PRIVATE bertini2)
+    target_link_libraries(_pybertini PUBLIC bertini2)
+else()
+    target_link_libraries(_pybertini PUBLIC ${Bertini2_LIBRARIES})
 endif()
 
 # which libraries are needed
@@ -155,7 +157,6 @@ include_directories(${Bertini2_INCLUDES})
 # which libraries do we need to link to
 target_link_libraries(_pybertini PUBLIC Eigen3::Eigen)
 target_link_libraries(_pybertini PUBLIC eigenpy::eigenpy)
-target_link_libraries(_pybertini PUBLIC ${Bertini2_LIBRARIES})
 target_link_libraries(_pybertini PUBLIC ${Boost_LIBRARIES})
 
 cmake_print_variables(SKBUILD)
