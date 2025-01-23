@@ -41,23 +41,23 @@ else:
     run_tests = False
 
 
-from pybertini import *
-from pybertini.function_tree.symbol import *
-from pybertini.function_tree.root import *
-from pybertini.function_tree import *
-from pybertini.tracking import *
-from pybertini.tracking.config import *
-from pybertini.endgame import *
-from pybertini.endgame.config import *
+from bertini import *
+from bertini.function_tree.symbol import *
+from bertini.function_tree.root import *
+from bertini.function_tree import *
+from bertini.tracking import *
+from bertini.tracking.config import *
+from bertini.endgame import *
+from bertini.endgame.config import *
 
 import unittest
 import numpy as np
 import pdb
 
-import pybertini.system.start_system as ss
-import pybertini.multiprec as mp
-from pybertini.multiprec import Float as mpfr_float
-from pybertini.multiprec import Complex as mpfr_complex
+import bertini.system.start_system as ss
+import bertini.multiprec as mp
+from bertini.multiprec import Float as mpfr_float
+from bertini.multiprec import Complex as mpfr_complex
 
 
 class EndgameTest(unittest.TestCase):

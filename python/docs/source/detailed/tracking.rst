@@ -1,4 +1,4 @@
-🛤 pybertini.tracking
+🛤 bertini.tracking
 ===========================
 
 .. include:: common_doc_nav.incl
@@ -10,45 +10,45 @@ Trackers in Bertini2 are stateful objects, that refer to a system they are track
 
 Here are some particular classes and functions to pay attention to:
 
-* :class:`pybertini.tracking.AMPTracker`
-* :class:`pybertini.tracking.DoublePrecisionTracker`
-* :class:`pybertini.tracking.MultiplePrecisionTracker`
+* :class:`bertini.tracking.AMPTracker`
+* :class:`bertini.tracking.DoublePrecisionTracker`
+* :class:`bertini.tracking.MultiplePrecisionTracker`
 
 Here are the implemented ODE predictors you can choose from:
 
-* :class:`pybertini.tracking.Predictor`
+* :class:`bertini.tracking.Predictor`
 
-Calls to :meth:`track_path` return a :class:`pybertini.tracking.SuccessCode`.
+Calls to :meth:`track_path` return a :class:`bertini.tracking.SuccessCode`.
 
-And, trackers are implemented using observer pattern.  They live in the ``pybertini.tracking.observers`` namespace, with provisions for each tracker type available under a submodule thereof: ``amp``, ``multiple``, and ``double``.  They are also conveniently available using the ``tr.observers``, where ``tr`` is a tracker you already made.  See :mod:`pybertini.tracking.observers.amp`
+And, trackers are implemented using observer pattern.  They live in the ``bertini.tracking.observers`` namespace, with provisions for each tracker type available under a submodule thereof: ``amp``, ``multiple``, and ``double``.  They are also conveniently available using the ``tr.observers``, where ``tr`` is a tracker you already made.  See :mod:`bertini.tracking.observers.amp`
 
 
 Auto-generated docs
 --------------------
 
-.. automodule:: pybertini.tracking
+.. automodule:: bertini.tracking
 
 
-🛤 pybertini.tracking.config
+🛤 bertini.tracking.config
 =====================================
 
-.. automodule:: pybertini.tracking.config
+.. automodule:: bertini.tracking.config
 
 
-🛤 pybertini.tracking.observers
+🛤 bertini.tracking.observers
 ===================================
 
-📝 All of these are available for all trackers, though you should use the ones for your tracker type.  Look in ``pybertini.tracking.AMPTracker.observers``, etc.
+📝 All of these are available for all trackers, though you should use the ones for your tracker type.  Look in ``bertini.tracking.AMPTracker.observers``, etc.
 
-.. automodule:: pybertini.tracking.observers
+.. automodule:: bertini.tracking.observers
 
-#. ``pybertini.tracking.observers.amp``
-#. ``pybertini.tracking.observers.double``
-#. ``pybertini.tracking.observers.multiple``
+#. ``bertini.tracking.observers.amp``
+#. ``bertini.tracking.observers.double``
+#. ``bertini.tracking.observers.multiple``
 
 📝 Symmetrically, there are the same observers in all three.
 
-.. automodule:: pybertini.tracking.observers.amp
+.. automodule:: bertini.tracking.observers.amp
 
 
  Know that you are loved and appreciated, dear reader.  💟

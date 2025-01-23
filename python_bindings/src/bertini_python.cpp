@@ -49,7 +49,7 @@ namespace bertini
 			// docstring_options d(true, true, false); // local_
 			docstring_options docopt;
 			docopt.enable_all();
-			docopt.disable_cpp_signatures();
+			// docopt.disable_cpp_signatures();
 
 			object package = scope();
 		    package.attr("__path__") = "_pybertini";

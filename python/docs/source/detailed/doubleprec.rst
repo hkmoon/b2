@@ -1,4 +1,4 @@
-2️⃣ pybertini.doubleprec
+2️⃣ bertini.doubleprec
 ==============================
 
 .. include:: common_doc_nav.incl
@@ -9,4 +9,4 @@ Notes
 Auto-generated docs
 --------------------
 
-.. automodule:: pybertini.doubleprec
+.. automodule:: bertini.doubleprec

@@ -1,18 +1,18 @@
-import pybertini as pb
+import bertini as pb
 
-from pybertini import Variable, VariableGroup, System
-import pybertini.system.start_system as ss
+from bertini import Variable, VariableGroup, System
+import bertini.system.start_system as ss
 
-from pybertini.function_tree.symbol import Rational
+from bertini.function_tree.symbol import Rational
 
-from pybertini.endgame import *
-from pybertini.endgame.config import *
+from bertini.endgame import *
+from bertini.endgame.config import *
 
-from pybertini.tracking import *
-from pybertini.tracking.config import *
+from bertini.tracking import *
+from bertini.tracking.config import *
 
-from pybertini.multiprec import Float as mpfr_float
-from pybertini.multiprec import Complex as mpfr_complex
+from bertini.multiprec import Float as mpfr_float
+from bertini.multiprec import Complex as mpfr_complex
 
 import numpy as np
 

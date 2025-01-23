@@ -38,7 +38,7 @@ namespace bertini{
 		void TrackerVisitor<TrackerT>::visit(PyClass& cl) const
 		{
 			cl
-			.def("setup", &TrackerT::Setup, (boost::python::arg("predictor"), boost::python::arg("tolerance"), boost::python::arg("truncation"), boost::python::arg("stepping"),boost::python::arg("newton")), "Set values for the internal configuration of the tracker.  tolerance and truncation are both real doubles.  predictor is a valid value for predictor choice.  stepping and newton are the config structs from pybertini.tracking.config.")
+			.def("setup", &TrackerT::Setup, (boost::python::arg("predictor"), boost::python::arg("tolerance"), boost::python::arg("truncation"), boost::python::arg("stepping"),boost::python::arg("newton")), "Set values for the internal configuration of the tracker.  tolerance and truncation are both real doubles.  predictor is a valid value for predictor choice.  stepping and newton are the config structs from bertini.tracking.config.")
 
 			.def("track_path", &track_path_wrap, 
 				 (boost::python::arg("result"), "start_time", "end_time", "start_point"), 
@@ -175,7 +175,7 @@ namespace bertini{
 
 		void ExportFixedMultipleTracker()
 		{
-			class_<MultiplePrecisionTracker, std::shared_ptr<MultiplePrecisionTracker> >("MultiplePrecisionTracker", "The fixed multiple precision tracker.  Ambient numeric type is multiple-precision (mpfr_complex).  Precision is the value of pybertini.default_precision() at contruction.  Errors if you try to feed it things not at that precision.  Contruct one by feeding it a system -- cannot be constructed without feeding it a system.  Adjust its settings via configs and the `setup` function.  Then, call method `track_path`.", init<const System&>())
+			class_<MultiplePrecisionTracker, std::shared_ptr<MultiplePrecisionTracker> >("MultiplePrecisionTracker", "The fixed multiple precision tracker.  Ambient numeric type is multiple-precision (mpfr_complex).  Precision is the value of bertini.default_precision() at contruction.  Errors if you try to feed it things not at that precision.  Contruct one by feeding it a system -- cannot be constructed without feeding it a system.  Adjust its settings via configs and the `setup` function.  Then, call method `track_path`.", init<const System&>())
 			.def(TrackerVisitor<MultiplePrecisionTracker>())
 			.def(FixedMultipleTrackerVisitor<MultiplePrecisionTracker>())
 			;

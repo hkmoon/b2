@@ -1,6 +1,6 @@
 # finding issue
 
-import pybertini as pb
+import bertini as pb
 
 x = pb.Variable('x')
 y = pb.Variable('y')

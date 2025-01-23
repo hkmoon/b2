@@ -1,4 +1,4 @@
-🌳 pybertini.function_tree
+🌳 bertini.function_tree
 ===================================
 
 .. include:: common_doc_nav.incl
@@ -9,18 +9,18 @@ Notes
 Auto-generated docs
 --------------------
 
-.. automodule:: pybertini.function_tree
+.. automodule:: bertini.function_tree
    :members:
 
-🌳 pybertini.function_tree.symbol
+🌳 bertini.function_tree.symbol
 ======================================
 
-.. automodule:: pybertini.function_tree.symbol
+.. automodule:: bertini.function_tree.symbol
    :members:
 
 
-🌳 pybertini.function_tree.root
+🌳 bertini.function_tree.root
 ==================================
 
-.. automodule:: pybertini.function_tree.root
+.. automodule:: bertini.function_tree.root
    :members:

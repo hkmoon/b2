@@ -1,19 +1,19 @@
 # This file is part of Bertini 2.
 # 
-# python/pybertini/tracking/__init__.py is free software: you can redistribute it and/or modify
+# python/bertini/tracking/__init__.py is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# python/pybertini/tracking/__init__.py is distributed in the hope that it will be useful,
+# python/bertini/tracking/__init__.py is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with python/pybertini/tracking/__init__.py.  If not, see <http://www.gnu.org/licenses/>.
+# along with python/bertini/tracking/__init__.py.  If not, see <http://www.gnu.org/licenses/>.
 # 
-#  Copyright(C) 2018 by Bertini2 Development Team
+#  Copyright(C) 2018-2025 by Bertini2 Development Team
 # 
 #  See <http://www.gnu.org/licenses/> for a copy of the license, 
 #  as well as COPYING.  Bertini2 is provided with permitted 
@@ -33,12 +33,12 @@
 """
 Tracking-specific things -- trackers, configs
 """
-import pybertini._pybertini.tracking
-from pybertini._pybertini.tracking import *
+import bertini._pybertini.tracking
+from bertini._pybertini.tracking import *
 
-__all__ = dir(pybertini._pybertini.tracking)
+__all__ = dir(bertini._pybertini.tracking)
 
 
-AMPTracker.observers = pybertini._pybertini.tracking.observers.amp
-DoublePrecisionTracker.observers = pybertini._pybertini.tracking.observers.double
-MultiplePrecisionTracker.observers = pybertini._pybertini.tracking.observers.multiple
+AMPTracker.observers = dir(bertini._pybertini.tracking.observers.amp)
+DoublePrecisionTracker.observers = dir(bertini._pybertini.tracking.observers.double)
+MultiplePrecisionTracker.observers =  dir(bertini._pybertini.tracking.observers.multiple)
