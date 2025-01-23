@@ -249,7 +249,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: built-binary
-          path: dist/
       - name: Publish distribution 📦 to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
