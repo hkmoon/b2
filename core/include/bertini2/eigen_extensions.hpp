@@ -42,8 +42,6 @@
 
 #include <Eigen/Core>
 
-typedef unsigned int uint;
-
 namespace {
 using mpfr_real = bertini::mpfr_float;
 using mpfr_complex = bertini::mpfr_complex;
@@ -501,7 +499,7 @@ namespace bertini {
 	*/
 	template <typename NumberType>
 	inline
-	Mat<NumberType> RandomOfUnits(uint rows, uint cols)
+	Mat<NumberType> RandomOfUnits(unsigned int rows, unsigned int cols)
 	{
 		return Mat<NumberType>(rows,cols).unaryExpr([](NumberType const& x) { return RandomUnit<NumberType>(); });
 	}
@@ -516,7 +514,7 @@ namespace bertini {
 	*/
 	template <typename NumberType>
 	inline
-	Vec<NumberType> RandomOfUnits(uint size)
+	Vec<NumberType> RandomOfUnits(unsigned int size)
 	{
 		return Vec<NumberType>(size).unaryExpr([](NumberType const& x) { return RandomUnit<NumberType>(); });
 	}

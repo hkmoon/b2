@@ -15,7 +15,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Set default compile flags for GCC
 if(MSVC)
-    set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS} /W1 /Zc:lambda /std:c++17 /bigobj")
+    set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS} /W1 /fp:precise /permissive- /std:c++17 /bigobj")
     set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS} /MD /O2 /Ob2")
 else()
     set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS} -fPIC -Wextra -Wall")
