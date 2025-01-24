@@ -7,7 +7,7 @@ SRC_PATH = os.path.relpath(os.path.join(os.path.dirname(__file__), "pybertini"))
 EXCLUDE_FROM_PACKAGES = []
 
 setup(name='pybertini',
-      version='1.0.alpha6',
+      version='1.0.alpha1',
       description='Software for numerical algebraic geometry',
       url='http://github.com/bertiniteam/b2',
       author='Bertini Team',
