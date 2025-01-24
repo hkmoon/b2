@@ -14,15 +14,15 @@ include_directories(include)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Set default compile flags for GCC
-if(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC")
+if(MSVC)
+    set(CMAKE_C_FLAGS           "/W3")
+    set(CMAKE_C_FLAGS_RELEASE   "/MD /O2 /Ob2")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC")
-endif(CMAKE_COMPILER_IS_GNUCXX)
-
-if(WIN64)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -mbig-obj")
-endif(WIN64)
+    set(CMAKE_C_FLAGS           "${CMAKE_CXX_FLAGS} -fPIC -Wextra -Wall")
+    set(CMAKE_C_FLAGS_RELEASE   "-O2")
+    set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+endif()
+set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
@@ -373,16 +373,11 @@ target_link_libraries(bertini2 ${Boost_LIBRARIES})
 
 target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-    target_compile_options(bertini2 PRIVATE -Wall -Wextra)
-else()
+if(MSVC)
     target_compile_options(bertini2 PRIVATE -Wall)
-endif(CMAKE_COMPILER_IS_GNUCXX)
-
-if(WIN64)
-	target_compile_options(bertini2 PRIVATE -Wall -mbigobj)
-endif(WIN64)
-
+else()
+    target_compile_options(bertini2 PRIVATE -Wall -Wextra)
+endif()
 
 install(
     TARGETS bertini2

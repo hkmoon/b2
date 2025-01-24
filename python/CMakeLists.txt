@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22) 
+cmake_minimum_required(VERSION 3.22)
 project(pybertini)
 
 # In order to find conda, run 'conda activate' and then use 'cmake .. -DCMAKE_PREFIX_PATH=$CONDA_PREFIX' when cmaking
@@ -31,9 +31,12 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 # Without this, any build libraries automatically have names "lib{x}.so"
 set(CMAKE_SHARED_MODULE_PREFIX "")
 
-# this should be OS-specific, as .so is only for macos and unix.
-set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
-
+if(MSVC)
+    set(CMAKE_C_FLAGS_RELEASE   "/MD /O2 /Ob2")
+else()
+    set(CMAKE_C_FLAGS_RELEASE   "-O2")
+    set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+endif()
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
@@ -42,7 +45,7 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(bertini2 REQUIRED)
 
 find_package(Boost 1.82 REQUIRED
-                COMPONENTS 
+                COMPONENTS
                     serialization
                     wserialization
                     unit_test_framework
