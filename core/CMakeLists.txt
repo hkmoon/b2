@@ -15,14 +15,12 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Set default compile flags for GCC
 if(MSVC)
-    set(CMAKE_C_FLAGS           "/W3")
-    set(CMAKE_C_FLAGS_RELEASE   "/MD /O2 /Ob2")
+    set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS} /W3")
+    set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS} /MD /O2 /Ob2")
 else()
-    set(CMAKE_C_FLAGS           "${CMAKE_CXX_FLAGS} -fPIC -Wextra -Wall")
-    set(CMAKE_C_FLAGS_RELEASE   "-O2")
-    set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+    set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS} -fPIC -Wextra -Wall")
+    set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS} -O2")
 endif()
-set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")

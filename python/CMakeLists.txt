@@ -32,8 +32,11 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 set(CMAKE_SHARED_MODULE_PREFIX "")
 
 if(MSVC)
-    set(CMAKE_C_FLAGS_RELEASE   "/MD /O2 /Ob2")
+    set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS} /W3 /bigobj")
+    set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS} /MD /O2 /Ob2")
 else()
+	set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS} -fPIC -Wextra -Wall")
+    set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS} -O2")
     set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 endif()
 
