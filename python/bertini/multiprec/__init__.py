@@ -23,7 +23,7 @@
 # 
 #  silviana amethyst
 #  UWEC
-#  Spring 2018, summer 2023
+#  Spring 2018, summer 2023, winter/spring 2025
 # 
 
 
@@ -31,14 +31,29 @@
 
 
 """
-Multiprecision types
+Multiprecision types, and functions that operate on them.
 
+Numeric types exposed are 
 
+* Complex (Boost.Multiprecision mpc)
+* Float (Boost.Multiprecision mpfr)
+* Int (Boost.Multiprecision mpz)
+* Rational (Boost.Multiprecision.mpq)
+
+This namespace also includes the mathematical operators, like `cos`, etc.
 """
 
 import bertini._pybertini.multiprec
+import numpy as np
 
 from bertini._pybertini.multiprec import *
 
+def Vector(n=0):
+	"""
+	make a vector, which is just a numpy array of multiprecision complexes.
+	"""
+	return np.zeros((n,), dtype = Complex)
 
 __all__ = dir(bertini._pybertini.multiprec)
+
+

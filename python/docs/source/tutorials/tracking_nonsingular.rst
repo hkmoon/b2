@@ -13,6 +13,7 @@ Forming a system
 First, gain access to bertini::
 
     import bertini
+    import numpy as np
 
 Let's make a couple of :class:`~bertini.function_tree.symbol.Variable`'s::
 
@@ -32,7 +33,7 @@ Let's make an empty :class:`~bertini.system.System`, then build into it::
 	sys.add_function(f, 'f')  # name the function
 	sys.add_function(g)       # or not...
 
-``sys`` doesn't know its variables yet, so let's group them into an affine :class:`~bertini.container.ListOfVariableGroup` [#]_, and stuff it into ``sys``::
+``sys`` doesn't know its variables yet, so let's group them into an affine :class:`~bertini.container.VariableGroup` [#]_, and stuff it into ``sys``::
 
 	grp = bertini.VariableGroup()
 	grp.append(x)
@@ -162,7 +163,7 @@ Once we feel comfortable with the configs (of which there are many, see the book
 
 ::
 
-	result = bertini.multiprec.Vector()
+	result = np.zeros((1,), dtype=bertini.multiprec.Complex)
 	tr.track_path(result,bertini.multiprec.Complex(1),bertini.multiprec.Complex(0), td.start_point_mp(0))
 
 Logging to inspect the path that was tracked
@@ -183,7 +184,6 @@ Re-running it, you should find a ton of stuff printed to the screen.
 
 ::
 
-	result = bertini.multiprec.Vector()
 	tr.track_path(result,bertini.multiprec.Complex(1),bertini.multiprec.Complex(0), td.start_point_mp(0))
 
 If you are going to keep tracking, but want to turn off the logging, remove the observer.::
@@ -201,6 +201,7 @@ Now that we've tracked a single path, you might want to loop over all start poin
 .. testcode:: tracking_nonsingular_main
 	
 	import bertini
+	import numpy as np
 
 	x = bertini.function_tree.symbol.Variable("x") #yes, you can make a variable not match its name...
 	y = bertini.function_tree.symbol.Variable("y")
@@ -243,12 +244,13 @@ Now that we've tracked a single path, you might want to loop over all start poin
 	expected_code = bertini.tracking.SuccessCode.Success
 	codes = []
 	for ii in range(td.num_start_points()):
-		results.append(bertini.multiprec.Vector())
+		results.append(np.zeros((1,),dtype=bertini.multiprec.Complex))
 		codes.append(tr.track_path(result=results[-1], start_time=bertini.multiprec.Complex(1), end_time=bertini.multiprec.Complex(0), start_point=td.start_point_mp(ii)))
 
-	tr.remove_observer(g)
+	#tr.remove_observer(g)
 
-	print(codes == [expected_code]*2)
+	print(results)
+	print("were all paths tracked successfully?", codes == [expected_code]*2)
 
 .. testoutput:: tracking_nonsingular_main
 
