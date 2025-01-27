@@ -71,8 +71,7 @@ Now, let's evaluate it at the origin -- all zero's (0 is the default value for m
 
 ::
 
-	s = bertini.multiprec.Vector() 
-	s.resize(num_vars)
+	s = numpy.zeros((10,), dtype=bertini.multiprec.Complex) 
 	sys.eval(s)
 
 Yay, all zeros, except the last one is -1.  Huzzah.
