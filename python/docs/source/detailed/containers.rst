@@ -1,4 +1,4 @@
-🕳bertini.list
+🕳 bertini.list
 =====================
 
 .. include:: common_doc_nav.incl
