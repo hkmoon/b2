@@ -37,6 +37,7 @@ namespace bertini{ namespace endgame{
 
 \brief class used to finish tracking paths during Homotopy Continuation
 
+\ingroup endgame
 
 ## Explanation
 

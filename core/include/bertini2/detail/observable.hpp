@@ -27,6 +27,8 @@
 \file bertini2/detail/observable.hpp
 
 \brief Contains the observable base types
+
+\defgroup observable
 */
 
 #ifndef BERTINI_DETAIL_OBSERVABLE_HPP

@@ -23,7 +23,7 @@
 // silviana amethyst, university of notre dame
 
 /**
-\file b2/core/include/bertini2/system/start_systems.hpp 
+\file bertini2/system/start_systems.hpp 
 
 \brief Aggregate include for the various start systems in Bertini2.
 */
