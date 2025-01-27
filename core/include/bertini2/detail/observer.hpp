@@ -27,6 +27,9 @@
 \file bertini2/detail/observer.hpp
 
 \brief Contains the observer base types.
+
+\defgroup observer
+
 */
 
 #ifndef BERTINI_DETAIL_OBSERVER_HPP

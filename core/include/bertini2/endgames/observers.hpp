@@ -45,7 +45,7 @@ namespace bertini {
 /**
 \brief Logs the endgame run, with gory detail.
 
-\ingroup loggers observers
+\ingroup observer
 */
 template <typename EndgameT>
 struct GoryDetailLogger : public Observer<EndgameT>

@@ -1,14 +1,3 @@
-### Important note on cloning
-
-The recommended method for getting the code for Bertini 2 is to clone from command line using git:
-
-`git clone https://github.com/bertiniteam/b2 --recursive`
-
-This ensures that any other repo's we depend on get cloned into their correct locations.  
-
-(As of 2023, we removed the dependency that required this, but it's still good practice.)
-
----
 
 # Quick links
 
@@ -37,10 +26,10 @@ The theoretical basis for the solution of polynomials with Bertini is a theorem 
 
 Bertini2 currently has implemented the foundations of Numerical Algebraic Geometry.  Development is ongoing, but here's what we have so far:
 
-- C++ and Python bindings for access into any functionality.
-- Construction of polynomial and non-polynomial multivariate systems.
+- C++ functions and types, with Python bindings.
+- Construction of multivariate polynomial and non-polynomial systems.
 - Evaluation of systems and Jacobians in double and arbitrary multiple precision.
-- Construction of the Total Degree start system.
+- Construction of the Total Degree and Multihomogeneous start systems.
 - Construction of homotopies (they're just systems with path variables defined).
 - Tracking of a start point x_0, corresponding to a particular time $t_0 \in \mathbb{C}^n$ in a homotopy $H$, from $t_0$ to $t_1$.
 - Running of the Power Series and Cauchy endgames.
@@ -49,9 +38,20 @@ Development is ongoing, and we want your help!
 
 ---
 
+# Missing functionality
+
+* Parallel solving
+* Numerical irreducible decomposition
+* Membership testing
+* and other algorithms
+
+Users wanting a more developed implementation are recommended to use [Bertini 1](https://bertini.nd.edu) or [homotopycontinuation.jl](https://www.juliahomotopycontinuation.org/), or one of the other packages implementing the theory.  
+
+---
+
 # Building and Installing
 
-Please see [the Wiki compiling section](https://github.com/bertiniteam/b2/wiki/Compilation-Guide) for instructions on compiling Bertini2's core library, and companion Python bindings, PyBertini.
+Please see [the Wiki compiling section](https://github.com/bertiniteam/b2/wiki/Compilation-Guide) for instructions on compiling Bertini2's core library, and companion Python bindings.
 
 ---
 

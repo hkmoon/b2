@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with base_endgame.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) 2015 - 2025 by Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -33,6 +33,8 @@
 \file base_endgame.hpp
 
 \brief Contains base class, Endgame.
+
+\defgroup endgame
 */
 
 #include <iostream>
@@ -62,6 +64,8 @@ namespace bertini{ namespace endgame {
 \class Endgame
 
 \brief Base endgame class for all endgames offered in Bertini2.
+
+\ingroup endgame
 
 \see PowerSeriesEndgame
 \see CauchyEndgame

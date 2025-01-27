@@ -30,12 +30,20 @@
 #include "bertini2/endgames/base_endgame.hpp"
 
 
+/**
+\file bertini2/endgames/cauchy.hpp
+
+\brief The concrete Cauchy endgame type
+
+*/
+
 namespace bertini{ namespace endgame{
 
 
 /** 
 \class CauchyEndgame
 \brief Class used to finish tracking paths during Homotopy Continuation.
+\ingroup endgame
 
 ## Explanation
 The bertini::CauchyEngame class enables us to finish tracking on possibly singular paths on an arbitrary square homotopy.  

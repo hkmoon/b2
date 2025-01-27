@@ -23,7 +23,7 @@
 // silviana amethyst, university of wisconsin eau claire
 
 /**
-\file include/bertini2/system/patch.hpp 
+\file bertini2/system/patch.hpp 
 
 \brief Provides the bertini::Patch class.
 */
