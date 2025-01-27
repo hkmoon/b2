@@ -40,12 +40,22 @@ import bertini._pybertini.container
 
 from bertini._pybertini.container import *
 
-__all__ = dir(bertini._pybertini.container)
 
 
-vector_types = (ListOfVectorComplexVariablePrecision, ListOfVectorComplexDoublePrecision)
-
-
-# for v in vector_types:
-# 	v.Zero = lambda n: v( (0,)*n )
+__all__ = [
+"ListOfEGBoundaryMetaData_DoublePrec",
+"ListOfJacobian",
+"ListOfVariableGroup",
+"ListOfEGBoundaryMetaData_MultiPrec",
+"ListOfRational",
+"ListOfVectorComplexDoublePrecision",
+"ListOfFunction",
+"ListOfSolutionMetaData_DoublePrec",
+"ListOfVectorComplexVariablePrecision",
+"ListOfInt",
+"ListOfSolutionMetaData_MultiPrec",
+"VariableGroup",
+"ListOfVectorComplexVariablePrecision", 
+"ListOfVectorComplexDoublePrecision"
+]
 
