@@ -35,15 +35,15 @@
 """
 Provides utilities for working with systems of functions -- polynomials are intended, although you can work with functions involving things like trig functions, arbitrary powers, etc.
 
-Making a new `System` is the starting point you want, probably:
+Making a new `System` is the starting point you want, probably some of these things:
 
 ::
 
-	sys = dir(bertini.system.System()
-
------------
-
-There are also things available in the `start_system` submodule.
+	sys = bertini.system.System()
+	sys.add_function(...)
+	sys.add_variable_group(...)
+	
+	x = sys.dehomogenize_point(z)
 
 """
 
