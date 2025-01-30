@@ -11,6 +11,8 @@ The main algorithm for numerical algebraic geometry implemented in Bertini is ho
 
 .. figure:: images_common/homotopycontinuation_generic.png
    :scale: 100 %
+   :height:  285 px
+   :width: 400 px
    :alt: Homotopy continuation
 
    Predictor-corrector methods with optional adaptive precision track paths from 1 to 0, solving :math:`f`.
