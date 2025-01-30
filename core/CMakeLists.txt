@@ -14,9 +14,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
 
-add_compile_options(-O3) # using O2 or O3 cuts runtime by over half.  
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC")
+
+add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
+add_compile_options(
+    # put things for debug compile here
+    $<$<CONFIG:Debug>:-g>
+    $<$<CONFIG:Debug>:-Wall>
+
+    # and things for release here
+    $<$<CONFIG:Release>:-O3>  
+    # using O2 or O3 cuts runtime by over half. 
+)  
+
+
+
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
