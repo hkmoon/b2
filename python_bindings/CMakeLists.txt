@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 
-add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
+# add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
 add_compile_options(
     # put things for debug compile here
     $<$<CONFIG:Debug>:-g>

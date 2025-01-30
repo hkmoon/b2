@@ -17,7 +17,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 
-add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
+# add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
 add_compile_options(
     # put things for debug compile here
     $<$<CONFIG:Debug>:-g>
