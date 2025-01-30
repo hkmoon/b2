@@ -201,7 +201,7 @@ namespace bertini{
 		{
 			
 			// System class
-			class_<System, std::shared_ptr<System> >("System", init<>())
+		class_<System, std::shared_ptr<System> >("System", "The type in Bertini for systems of simultaneous equations.  Add functions and variable groups via member functions.", init<>())
 			.def(SystemVisitor<System>())
 			;
 
