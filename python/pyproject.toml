@@ -1,12 +1,18 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "scikit-build>=0.13",
-    "cmake>=3.22",
-    "ninja"
+    "scikit-build-core",
+    "numpy"
 ]
 
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
+
+[project]
+
+name = "bertini"
+version = "1.0.5" # this version number needs to be programmatically set.
+
+requires-python = ">= 3.8"
+readme = "../README.md"
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
