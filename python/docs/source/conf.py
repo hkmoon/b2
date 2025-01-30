@@ -68,8 +68,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'PyBertini'
-copyright = '2015-2021, Bertini Team'
+project = 'Bertini'
+copyright = '2015-2025, Bertini Team'
 author = 'Bertini Team'
 
 
@@ -95,7 +95,7 @@ except:
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -131,7 +131,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PyBertinidoc'
+htmlhelp_basename = 'Bertinidoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -158,7 +158,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'PyBertini.tex', 'PyBertini Documentation',
+    (master_doc, 'Bertini.tex', 'Bertini 2 Python Documentation',
      'Bertini Team', 'manual'),
 ]
 
@@ -168,7 +168,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pybertini', 'PyBertini Documentation',
+    (master_doc, 'bertini', 'Bertini 2 Python Documentation',
      [author], 1)
 ]
 
@@ -179,8 +179,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'PyBertini', 'PyBertini Documentation',
-     author, 'PyBertini', 'Software for Numerical Algebraic Geometry.',
+    (master_doc, 'Bertini 2', 'Bertini 2 Python Documentation',
+     author, 'Bertini', 'Software for Numerical Algebraic Geometry.',
      'Miscellaneous'),
 ]
 

@@ -3,7 +3,7 @@
 
 .. include:: common_doc_nav.incl
 
-This is a stub page, which merely acts to point you to more specific places in the documentation.  Table of contents below 🔽.  
+This page acts to point you to more specific places in the documentation.  Table of contents below 🔽.  
 
 🖍 Highlights
 --------------------
@@ -20,7 +20,6 @@ This is a stub page, which merely acts to point you to more specific places in t
    :maxdepth: 1
 
    top_level
-   doubleprec
    multiprec
    function_tree
    system
@@ -39,7 +38,7 @@ This is a stub page, which merely acts to point you to more specific places in t
   :maxdepth: 1
 
   cpp_side
-  🕸 PyBertini doc archives <https://doc.bertini2.org/pybertini_archives>
+  🕸 Bertini 2 Python documentation archives <https://doc.bertini2.org/pybertini_archives>
 
 
 

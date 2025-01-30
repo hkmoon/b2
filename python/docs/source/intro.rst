@@ -9,8 +9,10 @@ Bertini is software for numerically solving systems of polynomials.  PyBertini i
 The main algorithm for numerical algebraic geometry implemented in Bertini is homotopy continuation.  A homotopy is formed, and the solutions to the start system are continued into the solutions for the target system.
 
 
-.. figure:: images_common/homotopycontinuation_generic_40ppi.png
+.. figure:: images_common/homotopycontinuation_generic.png
    :scale: 100 %
+   :height:  285 px
+   :width: 400 px
    :alt: Homotopy continuation
 
    Predictor-corrector methods with optional adaptive precision track paths from 1 to 0, solving :math:`f`.
@@ -23,7 +25,7 @@ Consider checking out the :ref:`🔦 Tutorials`.
 ⛲️ Source code
 ---------------------------
 
-PyBertini is distributed with Bertini2, available at `its GitHub repo <https://github.com/bertiniteam/b2>`_.
+The Bertini 2 source code is available at `its GitHub repo <https://github.com/bertiniteam/b2>`_.
 
 The core is written in template-heavy C++, and is exposed to Python through Boost.Python.
 

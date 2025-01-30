@@ -25,7 +25,7 @@
 // michael mumm, university of wisconsin eau claire
 
 /**
-\file straight_line_program.hpp
+\file bertini2/system/straight_line_program.hpp
 
 \brief Provides the bertini::StraightLineProgram class.
 */

@@ -12,13 +12,13 @@ Let's start by making some variables, programmatically [1]_.
 
 ::
 
-	import pybertini
+	import bertini
 	import numpy
 
 	num_vars = 10
 	x = [None] * num_vars # preallocate the list
 	for ii in range(num_vars):
-	    x[ii] = pybertini.Variable('x' + str(ii))
+	    x[ii] = bertini.Variable('x' + str(ii))
 
 Huzzah, we have `num_vars` variables!  This was hard to do in Bertini 1's classic style input files.  Now we can do it directly! 🎯
 
@@ -45,7 +45,7 @@ Now we will make a System, and put the cyclic polynomials into it.
 
 ::
 
-	sys = pybertini.System()
+	sys = bertini.System()
 
 	for f in cyclic(x):
 	    sys.add_function(f)
@@ -56,7 +56,7 @@ We also need to associate the variables with the system.  Unassociated variables
 
 ::
 	
-	vg = pybertini.VariableGroup()
+	vg = bertini.VariableGroup()
 	for var in x:
 		vg.append(var)
 	sys.add_variable_group(vg)
@@ -65,14 +65,13 @@ Let's simplify this.  It will modify elements of the constructed function tree, 
 
 ::
 
-	pybertini.system.simplify(sys)
+	bertini.system.simplify(sys)
 
 Now, let's evaluate it at the origin -- all zero's (0 is the default value for multiprecision complex numbers in Bertini2).  The returned value should be all zero's except the last entry, which should be -1.
 
 ::
 
-	s = pybertini.multiprec.Vector() 
-	s.resize(num_vars)
+	s = numpy.zeros((10,), dtype=bertini.multiprec.Complex) 
 	sys.eval(s)
 
 Yay, all zeros, except the last one is -1.  Huzzah.
@@ -82,10 +81,10 @@ Let's change the values of our vector, and re-evaluate.
 ::
 
 	for ii in range(num_vars):
-		s[ii] = pybertini.multiprec.Complex(ii)
+		s[ii] = bertini.multiprec.Complex(ii)
 	sys.eval(s)
 
 
-There is much more one can do, too!  Please write the authors, particularly Dani Brake, for more.
+There is much more one can do, too!  Please write the authors, particularly Silviana, for more.
 
 .. [1] This is one of the reasons we wrote Bertini2's symbolic C++ core and exposed it to Python.

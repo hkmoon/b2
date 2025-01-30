@@ -1,4 +1,4 @@
-import pybertini as pb
+import bertini as pb
 import numpy as np
 
 mpfr_complex = pb.multiprec.Complex

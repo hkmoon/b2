@@ -23,7 +23,7 @@
 // silviana amethyst, university of notre dame
 
 /**
-\file b2/core/include/bertini2/system/start_base.hpp 
+\file bertini2/system/start_base.hpp 
 
 \brief Defines generic start system type.
 */

@@ -34,12 +34,12 @@
 
 __author__ = 'jcollins'
 
-from pybertini import *
+from bertini import *
 import unittest
 import numpy as np
 import pdb
 
-import pybertini.parse as pp
+import bertini.parse as pp
 
 
 class ParserTest(unittest.TestCase):

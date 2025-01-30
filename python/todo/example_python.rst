@@ -2,23 +2,23 @@ give a polynomial system and solve it
 
 ::
 
-x = pybertini.function_tree.symbol.Variable("x") #yes, you can make a variable not match its name...
-y = pybertini.function_tree.symbol.Variable("y")
+x = bertini.function_tree.symbol.Variable("x") #yes, you can make a variable not match its name...
+y = bertini.function_tree.symbol.Variable("y")
 f = x**2 + y**2 -1
 g = x+y
 
-sys = pybertini.System()
+sys = bertini.System()
 sys.add_function(f)
 sys.add_function(g)
 
-grp = pybertini._pybertini.VariableGroup()
+grp = bertini._pybertini.VariableGroup()
 grp.append(x)
 grp.append(y)
 sys.add_variable_group(grp)
 
-td = pybertini.start_system.TotalDegree(sys)
+td = bertini.start_system.TotalDegree(sys)
 
-zd = pybertini.algorithms.ZeroDim(sys, td)
+zd = bertini.algorithms.ZeroDim(sys, td)
 
 
 

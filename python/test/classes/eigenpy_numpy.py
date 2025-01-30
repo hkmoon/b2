@@ -28,9 +28,9 @@
 # the purpose of this test suite is to make ensure numpy functionality with the custom types defined by Bertini (via EigenPy).
 
 import numpy as np
-import pybertini as pb
+import bertini as pb
 
-from pybertini import multiprec as mp
+from bertini import multiprec as mp
 
 import unittest
 import pdb

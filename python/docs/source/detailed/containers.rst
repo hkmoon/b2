@@ -1,4 +1,4 @@
-🕳 pybertini.list
+🕳 bertini.container
 =====================
 
 .. include:: common_doc_nav.incl
@@ -12,4 +12,7 @@ These types are exposed to Python, because they are returned types from some fun
 Auto-generated docs
 --------------------
 
-.. automodule:: pybertini.list
+.. automodule:: bertini.container
+   :members:
+   :undoc-members:
+

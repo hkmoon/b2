@@ -30,9 +30,9 @@
 #   Spring 2016
 # 
 
-import pybertini as pb
+import bertini as pb
 
-from pybertini import multiprec as mp
+from bertini import multiprec as mp
 
 import unittest
 import pdb

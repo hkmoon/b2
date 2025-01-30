@@ -23,7 +23,7 @@
 // silviana amethyst, university of wisconsin eau claire
 
 /**
-\file system.hpp 
+\file bertini2/system/system.hpp 
 
 \brief Provides the bertini::System class.
 */
@@ -54,10 +54,10 @@
 #include "bertini2/system/straight_line_program.hpp"
 
 #include <boost/archive/binary_oarchive.hpp>
-	#include <boost/archive/binary_iarchive.hpp>
-	#include <boost/iostreams/stream_buffer.hpp>
-	#include <boost/iostreams/stream.hpp>
-	#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/iostreams/stream_buffer.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
 
 namespace bertini {
 
@@ -1357,7 +1357,7 @@ namespace bertini {
 		 for (int jj = 0; jj < num_vars; ++jj)
 			for (int ii = 0; ii < num_functions; ++ii)
 				space_derivatives_[ii+jj*num_functions] = functions_[ii]->Differentiate(vars[jj]);
-		```		
+		 ```		
 		 */
 		std::vector< Nd > GetSpaceDerivatives() const;
 
