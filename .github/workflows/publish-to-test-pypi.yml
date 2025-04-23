@@ -68,10 +68,8 @@ jobs:
           cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
           cmake --build .
-          cmake --install .
 
           cd ..
-          python3 -m pip install build
           python3 -m build --wheel
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
