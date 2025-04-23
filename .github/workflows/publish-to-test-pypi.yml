@@ -99,7 +99,6 @@ jobs:
           make -j 4
 
           cd ..
-          python3 -m pip install build
           python3 -m build --wheel
       - name: Upload Builds
         uses: actions/upload-artifact@v4
