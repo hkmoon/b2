@@ -47,14 +47,8 @@ jobs:
           
           cd ${{github.workspace}}
           mkdir build
-          cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
-          make -j 4
-          make install
-
-          cd ..
-          python3 -m pip install build
           python3 -m build --wheel
+          ls -alF build/dist
       - name: conda-windows
         uses: conda-incubator/setup-miniconda@v3
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}

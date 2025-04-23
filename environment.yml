@@ -16,3 +16,4 @@ dependencies:
   - libboost-python
   - scipy
   - wheel
+  - build
