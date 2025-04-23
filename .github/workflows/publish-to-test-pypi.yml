@@ -91,7 +91,7 @@ jobs:
           brew install boost-python3
           brew install python-setuptools
           
-          pip install numpy scipy wheel build
+          pip3 install numpy scipy wheel build
           cd ${{github.workspace}}
           mkdir build
           cd build
