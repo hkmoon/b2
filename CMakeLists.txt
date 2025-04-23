@@ -12,7 +12,7 @@ include(GNUInstallDirs)  # so that `CMAKE_INSTALL_LIBDIR` is not blank. eg
 
 
 
-find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+find_package(Python 3.12 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 
 
@@ -35,7 +35,7 @@ add_subdirectory(core)
 #
 
 
-python_add_library(_pybertini MODULE WITH_SOABI) 
+python_add_library(_pybertini MODULE WITH_SOABI)
 
 add_subdirectory(python_bindings)
 
