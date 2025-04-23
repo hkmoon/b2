@@ -20,12 +20,12 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
 add_compile_options(
     # put things for debug compile here
-    $<$<CONFIG:Debug>:-g>
-    $<$<CONFIG:Debug>:-Wall>
+    #$<$<CONFIG:Debug>:-g>
+    #$<$<CONFIG:Debug>:-Wall>
     # for windows
-    $<$<CONFIG:Debug>:-flto>
-    $<$<CONFIG:Debug>:-Wl,-allow-multiple-definition>
-    $<$<CONFIG:Debug>:-fuse-linker-plugin>
+    #$<$<CONFIG:Debug>:-flto>
+    #$<$<CONFIG:Debug>:-Wl,-allow-multiple-definition>
+    #$<$<CONFIG:Debug>:-fuse-linker-plugin>
     $<$<CONFIG:Debug>:-Wa,-mbig-obj>
 
     # and things for release here
