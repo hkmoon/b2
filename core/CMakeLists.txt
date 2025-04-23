@@ -23,7 +23,9 @@ add_compile_options(
     $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:Debug>:-Wall>
     # for windows
-    $<$<CONFIG:Debug>:-fto>
+    $<$<CONFIG:Debug>:-flto>
+    $<$<CONFIG:Debug>:-Wl,-allow-multiple-definition>
+    $<$<CONFIG:Debug>:-fuse-linker-plugin>
     $<$<CONFIG:Debug>:-Wa,-mbig-obj>
 
     # and things for release here
