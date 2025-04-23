@@ -91,11 +91,11 @@ jobs:
           brew install boost-python3
           brew install python-setuptools
           
-          pip install numpy scipy wheel
+          pip install numpy scipy wheel build
           cd ${{github.workspace}}
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
+          cmake ..
           make -j 4
 
           cd ..
