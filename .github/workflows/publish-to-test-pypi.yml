@@ -97,7 +97,6 @@ jobs:
           cd build
           cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX
           make -j 4
-#          make install
 
           cd ..
           python3 -m pip install build
