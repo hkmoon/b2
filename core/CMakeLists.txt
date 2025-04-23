@@ -21,9 +21,10 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 add_compile_options(
     # put things for debug compile here
     $<$<CONFIG:Debug>:-g>
+    $<$<CONFIG:Debug>:-Wall>
     # for windows
-    $<$<CONFIG:Debug>:-Wa,-mbig-obj>
     $<$<CONFIG:Debug>:-m64>
+    $<$<CONFIG:Debug>:--enable-split-sections>
 
     # and things for release here
     $<$<CONFIG:Release>:-O3>
