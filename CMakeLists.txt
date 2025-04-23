@@ -11,8 +11,8 @@ include(CMakePrintHelpers) # so we can print cmake variable values
 include(GNUInstallDirs)  # so that `CMAKE_INSTALL_LIBDIR` is not blank. eg
 
 
-# conda doesn't have 3.13 compatible eigenpy yet
-find_package(Python 3.12 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+# conda doesn't have 3.13 compatible eigenpy yet and build module needs 3.11
+find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 
 
