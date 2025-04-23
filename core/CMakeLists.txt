@@ -23,7 +23,7 @@ add_compile_options(
     $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:Debug>:-Wall>
     # for windows
-    $<$<CONFIG:Debug>:-m64>
+    $<$<CONFIG:Debug>:-fto>
     $<$<CONFIG:Debug>:-Wa,-mbig-obj>
 
     # and things for release here
