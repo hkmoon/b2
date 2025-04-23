@@ -13,14 +13,14 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         python-version: [
-          '3.13',
-          'pypy-3.13',
+          '3.13.2',
+          'pypy-3.13.2',
         ]
         exclude:
           - os: windows-latest
-            python-version: 'pypy-3.13'
+            python-version: 'pypy-3.13.2'
           - os: macos-latest
-            python-version: 'pypy-3.13'
+            python-version: 'pypy-3.13.2'
     steps:
       - uses: actions/checkout@v4
         with:
