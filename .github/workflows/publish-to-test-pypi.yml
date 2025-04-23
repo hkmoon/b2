@@ -91,7 +91,9 @@ jobs:
           brew install boost-python3
           brew install python-setuptools
           
-          pip3 install numpy scipy wheel build
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install numpy scipy wheel build
           cd ${{github.workspace}}
           mkdir build
           cd build
