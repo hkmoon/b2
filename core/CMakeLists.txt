@@ -24,7 +24,7 @@ add_compile_options(
     $<$<CONFIG:Debug>:-Wall>
     # for windows
     $<$<CONFIG:Debug>:-m64>
-    $<$<CONFIG:Debug>:--enable-split-sections>
+    $<$<CONFIG:Debug>:-Wa,-mbig-obj>
 
     # and things for release here
     $<$<CONFIG:Release>:-O3>
