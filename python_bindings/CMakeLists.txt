@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22) 
+cmake_minimum_required(VERSION 3.22)
 project(pybertini)
 
 
@@ -18,9 +18,9 @@ add_compile_options(
     $<$<CONFIG:Debug>:-Wall>
 
     # and things for release here
-    $<$<CONFIG:Release>:-O3>  
-    # using O2 or O3 cuts runtime by over half. 
-)  
+    $<$<CONFIG:Release>:-O3>
+    # using O2 or O3 cuts runtime by over half.
+)
 
 #sometimes you need to see a lot, and this lets you see ... so much
 #include(CMakePrintHelpers)
@@ -58,7 +58,7 @@ find_package(eigenpy 3.3 REQUIRED CONFIG)
 
 # Find python and Boost - both are required dependencies
 # so that we can `python_add_library`
-find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+find_package(Python 3.12 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
@@ -69,7 +69,7 @@ if (PROJECT_IS_TOP_LEVEL)
 endif()
 
 find_package(Boost 1.82 REQUIRED
-                COMPONENTS 
+                COMPONENTS
                     serialization
                     wserialization
                     unit_test_framework
@@ -146,7 +146,7 @@ set(PYBERTINI_SOURCES
 
 
 if(PROJECT_IS_TOP_LEVEL)
-    python_add_library(_pybertini MODULE WITH_SOABI) 
+    python_add_library(_pybertini MODULE WITH_SOABI)
 endif()
 
 target_include_directories(_pybertini PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
