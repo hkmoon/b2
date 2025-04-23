@@ -10,7 +10,7 @@ dependencies:
   - automake
   - autoconf
   - libtool
-  - boost=1.88
+  - boost=1.84
   - eigen
   - eigenpy
   - libboost-python
