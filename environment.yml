@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - numpy=2.2.5
+  - numpy
   - gmp
   - mpfr
   - mpc
@@ -12,7 +12,7 @@ dependencies:
   - libtool
   - boost
   - eigen
-  - eigenpy
+  - eigenpy=3.11.0
   - libboost-python
   - scipy
   - wheel
