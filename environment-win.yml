@@ -7,7 +7,7 @@ dependencies:
   - gmp
   - mpfr
   - mpc
-  - boost
+  - libboost=1.88.0
   - eigen
   - eigenpy
   - libboost-python
