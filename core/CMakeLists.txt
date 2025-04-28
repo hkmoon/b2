@@ -4,7 +4,8 @@ project(bertini2-core)
 include(CMakePrintHelpers) # so we can print cmake variable values
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(BUILD_SHARED_LIBS ON)
+#  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # In order to find conda, run 'conda activate' and then use 'cmake .. -DCMAKE_PREFIX_PATH=$CONDA_PREFIX' when cmaking
 
