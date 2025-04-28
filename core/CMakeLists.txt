@@ -4,6 +4,7 @@ project(bertini2-core)
 include(CMakePrintHelpers) # so we can print cmake variable values
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # In order to find conda, run 'conda activate' and then use 'cmake .. -DCMAKE_PREFIX_PATH=$CONDA_PREFIX' when cmaking
 
@@ -390,7 +391,7 @@ target_sources(bertini2 PRIVATE
 )
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_ -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
 
 target_link_libraries(bertini2 ${GMP_LIBRARIES})
