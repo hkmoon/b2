@@ -22,7 +22,6 @@ add_compile_options(
     # put things for debug compile here
     $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:Debug>:-Wall>
-    $<$<CONFIG:Debug>:-fPIC>
 
     # and things for release here
     $<$<CONFIG:Release>:-O3>
@@ -391,7 +390,7 @@ target_sources(bertini2 PRIVATE
 )
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_ -fPIC")
 
 
 target_link_libraries(bertini2 ${GMP_LIBRARIES})
