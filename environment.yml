@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - numpy
+  - numpy=1.26.4
   - gmp
   - mpfr
   - mpc
