@@ -394,14 +394,10 @@ target_sources(bertini2 PRIVATE
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
-if(NOT WIN32)
-  target_compile_options(
-    ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
-                            "-Wno-conversion")
-else()
-  target_compile_options(${PROJECT_NAME}
+if(WIN32)
+  target_compile_options(bertini2_exe
                          PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_SNPRINTF")
+  target_compile_definitions(bertini2_exe PUBLIC "HAVE_SNPRINTF")
 endif()
 
 
