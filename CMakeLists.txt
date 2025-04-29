@@ -4,8 +4,18 @@ project(bertini2)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+if(NOT WIN32)
+  target_compile_options(
+    ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
+                            "-Wno-conversion")
+else()
+  target_compile_options(${PROJECT_NAME}
+                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_SNPRINTF")
+endif()
 
 include(CMakePrintHelpers) # so we can print cmake variable values
 
