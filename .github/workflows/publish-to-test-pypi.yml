@@ -61,6 +61,8 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
         shell: powershell
         run: |
+          set PYTHONHOME=
+          set PYTHONPATH=
           conda info
           conda list
           
