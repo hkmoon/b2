@@ -61,8 +61,8 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
         shell: powershell
         run: |
-          $env:PYTHONHOME = $pwd
-          $env:PYTHONPATH = $pwd  
+          $env:PYTHONHOME = 'C:\hostedtoolcache\windows\Python\3.9.13'
+          $env:PYTHONPATH = 'C:\hostedtoolcache\windows\Python\3.9.13'
           conda info
           conda list
           
