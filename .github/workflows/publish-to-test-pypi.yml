@@ -64,15 +64,10 @@ jobs:
           conda info
           conda list
 
-          pip3 install venv
-          python3 -m venv venv
-          venv/Scripts/activate.ps1
-          
-          pip3 install build win-unicode-console
-
           cd ${{github.workspace}}
           mkdir bld
-          python3 -m build --wheel
+          cd bld
+          cmake ..
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |
