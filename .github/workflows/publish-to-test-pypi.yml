@@ -48,7 +48,6 @@ jobs:
           cd ${{github.workspace}}
           mkdir build
           python3 -m build --wheel
-          ls -alF build/dist
       - name: conda-windows
         uses: conda-incubator/setup-miniconda@v3
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
