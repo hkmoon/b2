@@ -395,9 +395,9 @@ target_sources(bertini2 PRIVATE
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
 if(WIN32)
-  target_compile_options(bertini2_exe
+  target_compile_options(bertini2
                          PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
-  target_compile_definitions(bertini2_exe PUBLIC "HAVE_SNPRINTF")
+  target_compile_definitions(bertini2 PUBLIC "HAVE_SNPRINTF")
 endif()
 
 
