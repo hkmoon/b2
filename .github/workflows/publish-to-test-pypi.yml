@@ -67,7 +67,6 @@ jobs:
           cd ${{github.workspace}}
           mkdir bld
           cd bld
-          cmake ..
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |
