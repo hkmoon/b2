@@ -64,7 +64,7 @@ jobs:
           conda info
           conda list
 
-          pip install build win-unicode-console
+          pip3 install build win-unicode-console
 
           cd ${{github.workspace}}
           mkdir bld
