@@ -58,23 +58,23 @@ jobs:
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
       - name: Build Windows
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
-        shell: powershell
-        run: |
-          conda info
-          conda list
-          
-          python3 -m venv venv
-          venv\Scripts\activate.ps1
-          pip install numpy scipy wheel build encodings
-
-          mkdir bld
-          cd bld
-          cmake .. -DCMAKE_INSTALL_PREFIX=..\bld -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
-          cmake --build .
-
-          cd ..
-          python3 -m build --wheel
+#        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
+#        shell: powershell
+#        run: |
+#          conda info
+#          conda list
+#
+#          python3 -m venv venv
+#          venv\Scripts\activate.ps1
+#          pip install build
+#
+#          mkdir bld
+#          cd bld
+#          cmake .. -DCMAKE_INSTALL_PREFIX=..\bld -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
+#          cmake --build .
+#
+#          cd ..
+#          python3 -m build --wheel
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |
