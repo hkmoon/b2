@@ -177,6 +177,10 @@ target_link_libraries(_pybertini PUBLIC Eigen3::Eigen)
 target_link_libraries(_pybertini PUBLIC eigenpy::eigenpy)
 target_link_libraries(_pybertini PUBLIC ${Boost_LIBRARIES})
 
+if(NOT WIN32)
+  target_compile_options(_pybertini PRIVATE "-Wno-conversion")
+endif()
+
 cmake_print_variables(SKBUILD)
 if(${SKBUILD})
     # see https://stackoverflow.com/questions/1242904/finding-python-site-packages-directory-with-cmake
