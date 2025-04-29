@@ -61,14 +61,10 @@ jobs:
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
         shell: powershell
         run: |
-          $env:PYTHONHOME = 'C:\hostedtoolcache\windows\Python\3.9.13'
-          $env:PYTHONPATH = 'C:\hostedtoolcache\windows\Python\3.9.13'
           conda info
           conda list
-          
-          python3 -m venv venv
-          venv\Scripts\activate.ps1
-          pip install build
+
+          pip install build win-unicode-console
 
           cd ${{github.workspace}}
           mkdir build
