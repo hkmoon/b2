@@ -67,7 +67,7 @@ jobs:
           pip install build win-unicode-console
 
           cd ${{github.workspace}}
-          mkdir build
+          mkdir bld
           python3 -m build --wheel
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
