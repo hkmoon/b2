@@ -64,6 +64,10 @@ jobs:
           conda info
           conda list
 
+          pip3 install venv
+          python3 -m venv venv
+          venv/Scripts/activate.ps1
+          
           pip3 install build win-unicode-console
 
           cd ${{github.workspace}}
