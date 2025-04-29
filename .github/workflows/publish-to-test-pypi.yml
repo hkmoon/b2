@@ -68,9 +68,9 @@ jobs:
           venv\Scripts\activate.ps1
           pip install numpy scipy wheel build encodings
 
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
+          mkdir bld
+          cd bld
+          cmake .. -DCMAKE_INSTALL_PREFIX=..\bld -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
           cmake --build .
 
           cd ..
