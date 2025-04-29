@@ -29,16 +29,6 @@ if(POLICY CMP0177)
   set(CMAKE_POLICY_DEFAULT_CMP0177 NEW)
 endif()
 
-if(NOT WIN32)
-  target_compile_options(
-    ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
-                            "-Wno-conversion")
-else()
-  target_compile_options(${PROJECT_NAME}
-                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_SNPRINTF")
-endif()
-
 include(CMakePrintHelpers) # so we can print cmake variable values
 
 include(GNUInstallDirs)  # so that `CMAKE_INSTALL_LIBDIR` is not blank. eg

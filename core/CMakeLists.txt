@@ -394,6 +394,16 @@ target_sources(bertini2 PRIVATE
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
+if(NOT WIN32)
+  target_compile_options(
+    ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
+                            "-Wno-conversion")
+else()
+  target_compile_options(${PROJECT_NAME}
+                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_SNPRINTF")
+endif()
+
 
 target_link_libraries(bertini2 ${GMP_LIBRARIES})
 target_link_libraries(bertini2 ${MPFR_LIBRARIES})
