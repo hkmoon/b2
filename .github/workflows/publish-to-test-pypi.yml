@@ -48,6 +48,7 @@ jobs:
           cd ${{github.workspace}}
           mkdir build
           python3 -m build --wheel
+          ls -alF dist/
       - name: conda-windows
         uses: conda-incubator/setup-miniconda@v3
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
@@ -56,20 +57,20 @@ jobs:
           environment-file: environment-win.yml
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
-#      - name: Build Windows
-#        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
-#        shell: powershell
-#        run: |
-#          conda info
-#          conda list
-#
-#          mkdir build
-#          cd build
-#          cmake .. -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
-#          cmake --build .
-#
-#          cd ..
-#          python3 -m build --wheel
+      - name: Build Windows
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
+        shell: powershell
+        run: |
+          conda info
+          conda list
+
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
+          cmake --build .
+
+          cd ..
+          python3 -m build --wheel
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |
