@@ -67,6 +67,12 @@ jobs:
           cd ${{github.workspace}}
           mkdir bld
           cd bld
+          pip3 install build
+          set CC=clang-cl
+          set CXX=clang-cl
+          cmake ..
+          cmake --build .
+
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |
