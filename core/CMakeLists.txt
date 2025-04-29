@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.22)
 project(bertini2-core)
 
 include(CMakePrintHelpers) # so we can print cmake variable values
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(BUILD_SHARED_LIBS ON)
 #  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
