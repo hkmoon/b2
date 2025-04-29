@@ -7,6 +7,28 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# ----------------------------------------------------
+# --- Policy -----------------------------------------
+# CMake Policy setup
+# ----------------------------------------------------
+# Policy can be removed when cmake_minimum_required is updated.
+
+# We also set CMAKE_POLICY_DEFAULT_CMPXXXX because CMake modules can reset
+# policy and redefine some macros like `find_dependency` that will not use our
+# policy.
+
+# Use BoostConfig module distributed by boost library instead of using FindBoost
+# module distributed by CMake (to remove in 3.30).
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+  set(CMAKE_POLICY_DEFAULT_CMP0167 NEW)
+endif()
+# install() DESTINATION paths are normalized (to remove in 3.31).
+if(POLICY CMP0177)
+  cmake_policy(SET CMP0177 NEW)
+  set(CMAKE_POLICY_DEFAULT_CMP0177 NEW)
+endif()
+
 if(NOT WIN32)
   target_compile_options(
     ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
