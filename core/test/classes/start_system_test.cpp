@@ -117,10 +117,10 @@ BOOST_AUTO_TEST_CASE(index_and_subscript_generation3)
 
 BOOST_AUTO_TEST_CASE(index_and_subscript_generation_out_of_range)
 {
-
+	size_t index = 120;
 
 	std::vector<size_t> dimensions{2,3,4,5};
-	BOOST_CHECK_THROW(bertini::IndexToSubscript(120ul,dimensions),std::out_of_range);
+	BOOST_CHECK_THROW(bertini::IndexToSubscript(index,dimensions),std::out_of_range);
 }
 
 
