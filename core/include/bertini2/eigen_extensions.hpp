@@ -499,7 +499,7 @@ namespace bertini {
 	*/
 	template <typename NumberType>
 	inline
-	Mat<NumberType> RandomOfUnits(unsigned rows, unsigned cols)
+	Mat<NumberType> RandomOfUnits(unsigned int rows, unsigned int cols)
 	{
 		return Mat<NumberType>(rows,cols).unaryExpr([](NumberType const& x) { return RandomUnit<NumberType>(); });
 	}
@@ -514,7 +514,7 @@ namespace bertini {
 	*/
 	template <typename NumberType>
 	inline
-	Vec<NumberType> RandomOfUnits(unsigned size)
+	Vec<NumberType> RandomOfUnits(unsigned int size)
 	{
 		return Vec<NumberType>(size).unaryExpr([](NumberType const& x) { return RandomUnit<NumberType>(); });
 	}

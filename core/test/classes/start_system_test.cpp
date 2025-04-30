@@ -60,26 +60,29 @@ template<typename NumType> using Mat = bertini::Mat<NumType>;
 
 BOOST_AUTO_TEST_CASE(index_and_subscript_generation1)
 {
-
+	// some system use size_t as unsigned long long
 	std::vector<size_t> dimensions{2,2};
 	std::vector<size_t> v;
+	size_t index = 0;
 
 	std::vector<size_t> solution{0,0};
-	v = bertini::IndexToSubscript(0ull,dimensions);
+	v = bertini::IndexToSubscript(index,dimensions);
 	BOOST_CHECK(v==solution);
 
+	index = 1;
 	solution[0] = 1; solution[1] = 0;
-	v = bertini::IndexToSubscript(1ull,dimensions);
+	v = bertini::IndexToSubscript(index,dimensions);
 	BOOST_CHECK(v==solution);
 
+	index = 2;
 	solution[0] = 0; solution[1] = 1;
-	v = bertini::IndexToSubscript(2ull,dimensions);
+	v = bertini::IndexToSubscript(index,dimensions);
 	BOOST_CHECK(v==solution);
 
+	index = 3;
 	solution[0] = 1; solution[1] = 1;
-	v = bertini::IndexToSubscript(3ull,dimensions);
+	v = bertini::IndexToSubscript(index,dimensions);
 	BOOST_CHECK(v==solution);
-
 }
 
 
