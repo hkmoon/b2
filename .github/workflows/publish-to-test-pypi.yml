@@ -70,12 +70,16 @@ jobs:
           pip3 install build
           $env:CC='clang-cl'
           $env:CXX='clang-cl'
-          
+
+#          https://stackoverflow.com/questions/79073953/clang-undefined-symbol-boostarchivearchive-exception
           (Get-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp).Replace('public virtual std::exception', 'public std::exception') | Set-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp
           
           cmake -G Ninja .. -DCMAKE_PREFIX_PATH=C:\Miniconda\envs\b2-windows\Library
           cmake --build .
 
+#          cd ..
+#          python -m build --wheel
+#          ls -alF dist/
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |
