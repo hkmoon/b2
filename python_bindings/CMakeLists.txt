@@ -173,6 +173,12 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 include_directories(${Python3_NumPy_INCLUDE_DIRS})
 include_directories(${Bertini2_INCLUDES})
 
+if(WIN32)
+  target_compile_options(_pybertini
+                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
+  target_compile_definitions(_pybertini PUBLIC "HAVE_SNPRINTF")
+endif()
+
 # which libraries do we need to link to
 target_link_libraries(_pybertini PUBLIC Eigen3::Eigen)
 target_link_libraries(_pybertini PUBLIC eigenpy::eigenpy)
