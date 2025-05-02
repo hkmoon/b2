@@ -46,11 +46,11 @@ jobs:
           conda list
           
           cd ${{github.workspace}}
-          mkdir build
-          python3 -m build --wheel
+          mkdir bld
+          python3 -m build --wheel  --no-isolation
           
           for whl in dist/*.whl; do
-            auditwheel repair $whl -w dist/
+            repairwheel $whl -l bld/  -o dist/
             rm $whl
           done
           
