@@ -16,5 +16,4 @@ dependencies:
   - libboost-python
   - scipy
   - wheel
-  - repairwheel
   - build

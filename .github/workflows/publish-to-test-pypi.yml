@@ -45,9 +45,11 @@ jobs:
           conda info
           conda list
           
+          pip3 install repairwheel
+          
           cd ${{github.workspace}}
           mkdir bld
-          python3 -m build --wheel  --no-isolation
+          python3 -m build --wheel --no-isolation
           
           for whl in dist/*.whl; do
             repairwheel $whl -l bld/  -o dist/
