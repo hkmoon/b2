@@ -48,6 +48,12 @@ jobs:
           cd ${{github.workspace}}
           mkdir build
           python3 -m build --wheel
+          
+          for whl in dist/*.whl; do
+            auditwheel repair $whl -w dist/
+            rm $whl
+          done
+          
           ls -alF dist/
       - name: conda-windows
         uses: conda-incubator/setup-miniconda@v3
