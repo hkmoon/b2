@@ -81,7 +81,6 @@ jobs:
                
           cd ..
           python -m build --wheel --no-isolation
-          ls -alF dist/
       - name: Build MacOS
         if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
         run: |
