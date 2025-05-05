@@ -45,7 +45,7 @@ jobs:
           conda info
           conda list
           
-          pip3 install repairwheel
+          pip3 install repairwheel scikit-build-core
           
           cd ${{github.workspace}}
           mkdir bld
