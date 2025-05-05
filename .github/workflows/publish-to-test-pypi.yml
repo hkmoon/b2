@@ -51,8 +51,10 @@ jobs:
           mkdir bld
           python3 -m build --wheel --no-isolation
           
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/miniconda/envs/b2-ubuntu/lib
+          
           for whl in dist/*.whl; do
-            repairwheel $whl -l bld/:/usr/share/miniconda/envs/b2-ubuntu/lib  -o dist/
+            repairwheel $whl -l bld/  -o dist/
             rm $whl
           done
           
