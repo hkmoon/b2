@@ -44,17 +44,13 @@ jobs:
         run: |
           conda info
           conda list
-          
-          pip3 install repairwheel scikit-build-core
-          
+                   
           cd ${{github.workspace}}
           mkdir bld
-          python3 -m build --wheel --no-isolation
-          
-          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/miniconda/envs/b2-ubuntu/lib
+          python3 -m build --wheel
           
           for whl in dist/*.whl; do
-            repairwheel $whl -l bld/  -o dist/
+            auditwheel -v repair $whl -w dist/ --plat manylinux_2_39_x86_64
             rm $whl
           done
           

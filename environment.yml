@@ -3,10 +3,12 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - gxx==13.3.0
   - numpy
   - gmp
   - mpfr
   - mpc
+  - auditwheel
   - automake
   - autoconf
   - libtool
@@ -17,3 +19,4 @@ dependencies:
   - scipy
   - wheel
   - build
+  - patchelf
