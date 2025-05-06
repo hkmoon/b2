@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 3.22) 
+cmake_minimum_required(VERSION 3.22)
 project(pybertini)
 
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+# set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(BUILD_SHARED_LIBS ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
 
@@ -26,10 +29,9 @@ add_compile_options(
     $<$<CONFIG:Debug>:-Wall>
 
     # and things for release here
-    $<$<CONFIG:Release>:-O3> 
-    $<$<CONFIG:Release>:-g>  
-    # using O2 or O3 cuts runtime by over half. 
-)  
+    $<$<CONFIG:Release>:-O3>
+    # using O2 or O3 cuts runtime by over half.
+)
 
 #sometimes you need to see a lot, and this lets you see ... so much
 #include(CMakePrintHelpers)
@@ -67,7 +69,7 @@ find_package(eigenpy 3.3 REQUIRED CONFIG)
 
 # Find python and Boost - both are required dependencies
 # so that we can `python_add_library`
-find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
@@ -78,7 +80,7 @@ if (PROJECT_IS_TOP_LEVEL)
 endif()
 
 find_package(Boost 1.82 REQUIRED
-                COMPONENTS 
+                COMPONENTS
                     serialization
                     wserialization
                     unit_test_framework
@@ -155,7 +157,7 @@ set(PYBERTINI_SOURCES
 
 
 if(PROJECT_IS_TOP_LEVEL)
-    python_add_library(_pybertini MODULE WITH_SOABI) 
+    python_add_library(_pybertini MODULE WITH_SOABI)
 endif()
 
 target_include_directories(_pybertini PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -179,10 +181,20 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 include_directories(${Python3_NumPy_INCLUDE_DIRS})
 include_directories(${Bertini2_INCLUDES})
 
+if(WIN32)
+  target_compile_options(_pybertini
+                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
+  target_compile_definitions(_pybertini PUBLIC "HAVE_SNPRINTF")
+endif()
+
 # which libraries do we need to link to
 target_link_libraries(_pybertini PUBLIC Eigen3::Eigen)
 target_link_libraries(_pybertini PUBLIC eigenpy::eigenpy)
 target_link_libraries(_pybertini PUBLIC ${Boost_LIBRARIES})
+
+if(NOT WIN32)
+  target_compile_options(_pybertini PRIVATE "-Wno-conversion")
+endif()
 
 cmake_print_variables(SKBUILD)
 if(${SKBUILD})

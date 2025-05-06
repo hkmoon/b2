@@ -1,0 +1,17 @@
+name: b2-windows
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - gmp
+  - mpfr
+  - mpc
+  - libboost
+  - eigen
+  - eigenpy
+  - libboost-python
+  - scipy
+  - wheel
+  - build
+  - scikit-build-core
