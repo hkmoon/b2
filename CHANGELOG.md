@@ -30,8 +30,8 @@ Preparation for pypi release with github workflow
 ### New Contributors
 * @hkmoon made their first contribution in https://github.com/hkmoon/b2/pull/1
 
--->
 _______________________________________________________________________________
+-->
 
 ## [1.0.2] - 2025-05-07
 
