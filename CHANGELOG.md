@@ -7,6 +7,7 @@ The format is based on [CHANGELOG.md][CHANGELOG.md]
 and this project adheres to [Semantic Versioning][Semantic Versioning].
 
 <!--
+
 _______________________________________________________________________________
 
 ## [1.0.2] - 2025-05-06
@@ -54,6 +55,8 @@ Preparation for pypi release with github workflow
 
 ### New Contributors
 * @hkmoon made their first contribution in https://github.com/hkmoon/b2/pull/1
+
+_______________________________________________________________________________
 
 ## [1.0.1] - 2025-05-06
 
