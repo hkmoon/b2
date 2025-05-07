@@ -321,7 +321,7 @@ public:
 	*/
 	void SetCauchySettings(CauchyConfig const& new_cauchy_settings)
 	{
-		this->template Set(new_cauchy_settings);
+		this->template Set<CauchyConfig>(new_cauchy_settings);
 	}
 
 	/**
@@ -951,7 +951,7 @@ public:
 
 
 		auto total_num_pts = this->CycleNumber() * this->EndgameSettings().num_sample_points;
-		this->template RefineAllSamples(cau_samples, cau_times);
+		this->template RefineAllSamples<CT>(cau_samples, cau_times);
 
 		Precision(result, Precision(cau_samples.back()));
 
