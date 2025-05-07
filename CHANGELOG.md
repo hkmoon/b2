@@ -27,33 +27,10 @@ Preparation for pypi release with github workflow
 * For linux wheel naming convention, we cannot use x86_64, x86_i386 anymore for pypi repository. https://peps.python.org/pep-0600/
   * use `auditwheel` for it
 
-## New Contributors
+### New Contributors
 * @hkmoon made their first contribution in https://github.com/hkmoon/b2/pull/1
 
-_______________________________________________________________________________
-
-TEMPLATE
-
-## [major.minor.patch] - yyyy-mm-dd
-
-A message that notes the main changes in the update.
-
-### Added
-
-### Changed
-
-### Deprecated
-
-### Fixed
-
-### Removed
-
-### Security
-
-### New Contributors
- 
 -->
-
 _______________________________________________________________________________
 
 ## [1.0.2] - 2025-05-07
@@ -74,7 +51,7 @@ Preparation for pypi release with github workflow
 * For linux wheel naming convention, we cannot use x86_64, x86_i386 anymore for pypi repository. https://peps.python.org/pep-0600/
     * use `auditwheel` for it
 
-## New Contributors
+### New Contributors
 * @hkmoon made their first contribution in https://github.com/hkmoon/b2/pull/1
 
 ## [1.0.1] - 2025-05-06
