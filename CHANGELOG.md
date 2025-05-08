@@ -9,13 +9,17 @@ and this project adheres to [Semantic Versioning][Semantic Versioning].
 <!--
 _______________________________________________________________________________
 
-## [1.0.2] - 2025-05-06
+## [1.0.2] - 2025-05-07
 
 Preparation for pypi release with github workflow
 
 ### Added
 
 - github workflow for pypi and github release
+
+### Changed
+
+- `publish-to-test-pypi.yml` for handling the comments
 
 ### Changed
 
@@ -34,7 +38,7 @@ _______________________________________________________________________________
 
 -->
 
-<!-- 
+<!--
 _______________________________________________________________________________
 TEMPLATE
 
@@ -57,8 +61,10 @@ A message that notes the main changes in the update.
 ### New Contributors
 
 _______________________________________________________________________________
- 
- -->
+
+-->
+
+_______________________________________________________________________________
 
 ## [1.0.2] - 2025-05-07
 
@@ -67,6 +73,10 @@ Preparation for pypi release with github workflow
 ### Added
 
 - github workflow for pypi and github release
+
+### Changed
+
+- `publish-to-test-pypi.yml` for handling the comments correctly
 
 ### Changed
 
@@ -80,6 +90,8 @@ Preparation for pypi release with github workflow
 
 ### New Contributors
 * @hkmoon made their first contribution in https://github.com/hkmoon/b2/pull/1
+
+_______________________________________________________________________________
 
 ## [1.0.1] - 2025-05-06
 
