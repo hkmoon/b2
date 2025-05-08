@@ -202,7 +202,7 @@ jobs:
 
       - name: Get Newest Changelog
         run: |
-          python3 -c "import re; from pathlib import Path; text=re.sub('<-(.*?)-->', '', (Path.cwd() / 'CHANGELOG.md').read_text(), flags=re.DOTALL); start=text.find('_' * 79); (Path.cwd() / 'TEMP_CHANGELOG.md').write_text(text[start:text.find('_' * 79, start+1)])"
+          python -c 'import re; from pathlib import Path; text=re.sub("<!--(.*?)-->", "", (Path.cwd() / "CHANGELOG.md").read_text(), flags=re.DOTALL); print(text); start=text.find("_" * 79); (Path.cwd() / "TEMP_CHANGELOG.md").write_text(text[start:text.find("_" * 79, start+1)])'
 
       - name: Create GitHub Release
         id: create_release
