@@ -746,7 +746,7 @@ set(B2_TRACKING_BASICS_TEST
 add_executable(test_tracking_basics ${B2_TRACKING_BASICS_TEST})
 target_include_directories(test_tracking_basics PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_tracking_basics ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_tracking_basics COMMAND ${CMAKE_BINARY_DIR}/test_tracking_basics)
+add_test(NAME test_tracking_basics COMMAND ${CMAKE_BINARY_DIR}/core/test_tracking_basics)
 
 enable_testing()
 
