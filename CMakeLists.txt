@@ -39,6 +39,33 @@ find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumP
 
 
 
+if(WIN32)
+  set(LINK copy_if_different)
+else(WIN32)
+  set(LINK create_symlink)
+endif(WIN32)
+
+#if(CMAKE_CROSSCOMPILING)
+#  set(PYTHON_COMPONENTS Interpreter NumPy)
+#else()
+#  set(PYTHON_COMPONENTS Interpreter Development.Module NumPy)
+#endif()
+#set(PYTHON_EXPORT_DEPENDENCY ON)
+
+if(WIN32)
+  link_directories(${PYTHON_LIBRARY_DIRS})
+  # # Set default Windows build paths SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY
+  # ${PROJECT_BINARY_DIR}/Bin CACHE PATH "Single directory for all libraries")
+  # SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Bin CACHE PATH
+  # "Single directory for all executables") SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+  # ${PROJECT_BINARY_DIR}/Bin CACHE PATH "Sing$le directory for all archives")
+endif(WIN32)
+
+# set_boost_default_options()
+# export_boost_default_options()
+find_package(Boost REQUIRED)
+# search_for_boost_python(REQUIRED)
+
 ############################
 # the core builds a library and an executable depending on that library
 #
