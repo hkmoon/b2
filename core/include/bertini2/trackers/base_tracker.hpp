@@ -15,8 +15,8 @@
 //
 // Copyright(C) 2015 - 2021 by Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
@@ -25,7 +25,7 @@
 /**
 \file base_tracker.hpp
 
-\brief 
+\brief
 
 \brief Contains the abstract base Tracker type, from which all other Trackers inherit.
 */
@@ -55,9 +55,9 @@ namespace bertini{
 		\class Tracker
 
 		\brief Base tracker class for trackers offered in Bertini2.
-	
+
 		\see AMPTracker
-		
+
 		## Using a tracker
 
 		Trackers in Bertini2 are the engine for tracking a path from one space-time pair to another.  The path is implicitly described by the system being tracked.
@@ -75,15 +75,15 @@ namespace bertini{
 		Please see their detailed documentation for description of how to use them correctly.
 
 
-		## Purpose 
+		## Purpose
 
 		Since the Bertini trackers have common functionality, and we want to be able to call arbitrary algorithms using and tracker type, we use inheritance.  That is, there is common functionality in all trackers, such as
 
 		* Setup
 		* TrackPath
 		* Refine
-		
-		which we want all Trackers to be able to do.  However, the internal behaviour of a particular tracker varies -- which is why it is a different type.  In particular, the fixed precision trackers produce and work in a fixed precision, whereas the AMPTracker varies precision to get around or near branch points while tracking. 
+
+		which we want all Trackers to be able to do.  However, the internal behaviour of a particular tracker varies -- which is why it is a different type.  In particular, the fixed precision trackers produce and work in a fixed precision, whereas the AMPTracker varies precision to get around or near branch points while tracking.
 
 		Hence, the use of trackers in Bertini2 is through pointers or references to Trackers, enabling the use of any kind of tracking in any algorithm, and further allowing the development of new tracker types as the theory and practice advance.
 
@@ -93,12 +93,12 @@ namespace bertini{
 		To create a new Tracker type, inherit from this, and override the following functions:
 
 		\code
-		
+
 		public:
 		SuccessCode Refine(Vec<mpfr> & new_space,
 							Vec<mpfr> const& start_point, mpfr const& current_time) override
 		{}
-		
+
 		private:
 
 		void TrackerLoopInitialization(mpfr const& start_time, Vec<mpfr> const& start_point) override
@@ -115,9 +115,9 @@ namespace bertini{
 
 		void CopyFinalSolution(Vec<mpfr> & solution_at_endtime) const override
 		{}
-		
+
 		\endcode
-	
+
 		and optionally override the following functions
 
 		\code
@@ -133,7 +133,7 @@ namespace bertini{
 
 		*/
 		template<class D>
-		class Tracker : 
+		class Tracker :
 			public Observable,
 			public detail::Configured<
 				typename TrackerTraits< D >::NeededConfigs
@@ -145,8 +145,8 @@ namespace bertini{
 
 			using CT = BaseComplexType;
 			using RT = BaseRealType;
-			
-			
+
+
 		public:
 			using Config = detail::Configured< typename TrackerTraits< D >::NeededConfigs >;
 			using Stepping = SteppingConfig;
@@ -176,13 +176,13 @@ namespace bertini{
 			{
 				SetPredictor(new_predictor_choice);
 				corrector_->Settings(newton);
-				
+
 				SetTrackingTolerance(tracking_tolerance);
 
 				path_truncation_threshold_ = path_truncation_threshold;
 
-				this->template Set(stepping);
-				this->template Set(newton);
+				this->template Set<SteppingConfig>(stepping);
+				this->template Set<NewtonConfig>(newton);
 
 				current_stepsize_ = BaseRealType(stepping.initial_step_size);
 			}
@@ -226,19 +226,19 @@ namespace bertini{
 			\param endtime The time to track to.
 			\param start_point The intial space values for tracking.
 			\return A success code indicating whether tracking was successful.  Will be SuccessCode::Success if was successful, and something else otherwise.
-			
+
 			The is the fundamental method for the tracker.  First, you create and set up the tracker, telling it what system you will solve, and the settings to use.  Then, you actually do the tracking.
 			*/
 			SuccessCode TrackPath(Vec<CT> & solution_at_endtime,
 									CT const& start_time, CT const& endtime,
 									Vec<CT> const& start_point
 									) const
-			{	
+			{
 				if (start_point.size()!=GetSystem().NumVariables())
 					throw std::runtime_error("start point size must match the number of variables in the system to be tracked");
 
-				
-				
+
+
 				SuccessCode initialization_code = TrackerLoopInitialization(start_time, endtime, start_point);
 				if (initialization_code!=SuccessCode::Success)
 				{
@@ -248,7 +248,7 @@ namespace bertini{
 
 				// as precondition to this while loop, the correct container, either dbl or mpfr, must have the correct data.
 				while (!IsSymmRelDiffSmall(current_time_,endtime_, Eigen::NumTraits<CT>::epsilon()))
-				{	
+				{
 					SuccessCode pre_iteration_code = PreIterationCheck();
 					if (pre_iteration_code!=SuccessCode::Success)
 					{
@@ -267,7 +267,7 @@ namespace bertini{
 					step_success_code_ = TrackerIteration();
 
 					if (infinite_path_truncation_ && (CheckGoingToInfinity()==SuccessCode::GoingToInfinity))
-					{	
+					{
 						OnInfiniteTruncation();
 						PostTrackCleanup();
 						return SuccessCode::GoingToInfinity;
@@ -290,10 +290,10 @@ namespace bertini{
 
 			/**
 			\brief Refine a point to tolerance implicitly internally set.
-			
+
 			Runs Newton's method using the current settings for tracking, including the min and max number of iterations allowed, the tracking tolerance, precision, etc.  YOU must ensure that the input point has the correct precision.
 
-			\return The SuccessCode indicating whether the refinement completed.  
+			\return The SuccessCode indicating whether the refinement completed.
 
 			\param[out] new_space The result of refinement.
 			\param start_point The seed for Newton's method for refinement.
@@ -313,10 +313,10 @@ namespace bertini{
 
 			/**
 			\brief Refine a point to a given tolerance.
-			
+
 			Runs Newton's method using the current settings for tracking, including the min and max number of iterations allowed, precision, etc, EXCEPT for the tracking tolerance and max number of iterations, which you feed in here.  YOU must ensure that the input point has the correct precision.
 
-			\return The SuccessCode indicating whether the refinement completed.  
+			\return The SuccessCode indicating whether the refinement completed.
 
 			\param[out] new_space The result of refinement.
 			\param start_point The seed for Newton's method for refinement.
@@ -389,7 +389,7 @@ namespace bertini{
 			\brief Set how large the stepsize should be.
 
 			\param new_stepsize The new value.
-			*/ 
+			*/
 			void SetStepSize(RT const& new_stepsize) const
 			{
 				current_stepsize_ = new_stepsize;
@@ -405,7 +405,7 @@ namespace bertini{
 			{
 				reinitialize_stepsize_ = should_reinitialize_stepsize;
 			}
-			
+
 			virtual ~Tracker() = default;
 
 			auto TrackingTolerance() const
@@ -435,14 +435,14 @@ namespace bertini{
 			*/
 			virtual
 			SuccessCode TrackerLoopInitialization(CT const& start_time, CT const& end_time, Vec<CT> const& start_point) const = 0;
-			
+
 
 			/**
-			\brief Check internal state for whether tracking should continue.  
+			\brief Check internal state for whether tracking should continue.
 
 			\return Code for whether to go on.  Tracking will terminate if the returned value is not Success.
 			*/
-			virtual 
+			virtual
 			SuccessCode PreIterationCheck() const = 0;
 
 			/**
@@ -450,7 +450,7 @@ namespace bertini{
 
 			\return Whether the tracker loop was successful or not.  Incrementing of counters for the base class happens automatically.
 			*/
-			virtual 
+			virtual
 			SuccessCode TrackerIteration() const = 0;
 
 			/**
@@ -468,7 +468,7 @@ namespace bertini{
 		protected:
 
 
-			
+
 
 
 			template <typename ComplexType>
@@ -486,7 +486,7 @@ namespace bertini{
 			\brief Function to be called before exiting the tracker loop.
 			*/
 			virtual
-			void PostTrackCleanup() const 
+			void PostTrackCleanup() const
 			{}
 
 			/**
@@ -518,7 +518,7 @@ namespace bertini{
 			*/
 			void IncrementBaseCountersSuccess() const
 			{
-				num_successful_steps_taken_++; 
+				num_successful_steps_taken_++;
 				num_consecutive_successful_steps_++;
 				current_time_ += delta_t_;
 				num_consecutive_failed_steps_ = 0;
@@ -545,14 +545,14 @@ namespace bertini{
 			void OnStepFail() const = 0;
 
 			/**
-			\brief Check whether the path is going to infinity, as it tracks.  
+			\brief Check whether the path is going to infinity, as it tracks.
 
 			This check is necessary because a homotopy may be malformed, or may have encountered a probability-0 event.  That it is a 0 probability event is why this check is disable-able via a toggle.
 			*/
-			virtual 
+			virtual
 			SuccessCode CheckGoingToInfinity() const = 0;
 
-			virtual 
+			virtual
 			void OnInfiniteTruncation() const = 0;
 
 
@@ -565,10 +565,10 @@ namespace bertini{
 			mutable unsigned num_total_steps_taken_; ///< The number of steps taken, including failures and successes.
 			mutable unsigned num_successful_steps_taken_;  ///< The number of successful steps taken so far.
 			mutable unsigned num_consecutive_successful_steps_; ///< The number of CONSECUTIVE successful steps taken in a row.
-			mutable unsigned num_consecutive_failed_steps_; ///< The number of CONSECUTIVE failed steps taken in a row. 
+			mutable unsigned num_consecutive_failed_steps_; ///< The number of CONSECUTIVE failed steps taken in a row.
 			mutable unsigned num_failed_steps_taken_; ///< The total number of failed steps taken.
 
-			
+
 			// configuration for tracking
 			std::shared_ptr<predict::ExplicitRKPredictor > predictor_; // The predictor to use while tracking
 			unsigned predictor_order_; ///< The order of the predictor -- one less than the error estimate order.
@@ -600,13 +600,13 @@ namespace bertini{
 
 			using TupOfVec = typename NeededTypes::ToTupleOfVec;
 			using TupOfReal = typename NeededTypes::ToTupleOfReal;
-			
-			mutable TupOfVec current_space_; ///< The current space value. 
+
+			mutable TupOfVec current_space_; ///< The current space value.
 			mutable TupOfVec tentative_space_; ///< After correction, the tentative next space value
 			mutable TupOfVec temporary_space_; ///< After prediction, the tentative next space value.
 
 
-			mutable NumErrorT condition_number_estimate_; ///< An estimate on the condition number of the Jacobian		
+			mutable NumErrorT condition_number_estimate_; ///< An estimate on the condition number of the Jacobian
 			mutable NumErrorT error_estimate_; ///< An estimate on the error of a step.
 			mutable NumErrorT norm_J_; ///< An estimate on the norm of the Jacobian
 			mutable NumErrorT norm_J_inverse_;///< An estimate on the norm of the inverse of the Jacobian
@@ -616,21 +616,21 @@ namespace bertini{
 
 
 
-			public: 
+			public:
 
-			
+
 			NumErrorT LatestConditionNumber() const
 			{
 				return this->condition_number_estimate_;
 			}
 
-			
+
 			NumErrorT LatestErrorEstimate() const
 			{
 				return this->error_estimate_;
 			}
 
-			
+
 			NumErrorT LatestNormOfStep() const
 			{
 				return this->norm_delta_z_;
@@ -640,7 +640,7 @@ namespace bertini{
 			{
 				infinite_path_truncation_ = b;
 			}
-	
+
 			auto InfiniteTruncation()
 			{
 				return infinite_path_truncation_;
