@@ -26,18 +26,20 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "ENABLE_UNIT_TESTING: ${ENABLE_UNIT_TESTING}")
 
 
-# add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
-add_compile_options(
-    # put things for debug compile here
-    $<$<CONFIG:Debug>:-g>
-    $<$<CONFIG:Debug>:-Wall>
+if (MSVC)
+    add_compile_options(/bigobj)
+else ()
+    # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
+    add_compile_options(
+        # put things for debug compile here
+        $<$<CONFIG:Debug>:-g>
+        $<$<CONFIG:Debug>:-Wall>
 
-    # and things for release here
-    $<$<CONFIG:Release>:-O3>
-    # using O2 or O3 cuts runtime by over half.
-)
-
-
+        # and things for release here
+        $<$<CONFIG:Release>:-O3>
+        # using O2 or O3 cuts runtime by over half.
+	)
+endif ()
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
@@ -630,7 +632,7 @@ add_executable(test_classes ${B2_CLASS_TEST_SOURCES})
 target_include_directories(test_classes PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_link_libraries(test_classes ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_classes COMMAND ${CMAKE_BINARY_DIR}/test_classes)
+add_test(NAME test_classes COMMAND ${CMAKE_BINARY_DIR}/core/test_classes)
 
 
 set(B2_BLACKBOX_TEST
@@ -643,7 +645,7 @@ set(B2_BLACKBOX_TEST
 add_executable(test_blackbox ${B2_BLACKBOX_TEST})
 target_include_directories(test_blackbox PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(test_blackbox ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_blackbox COMMAND ${CMAKE_BINARY_DIR}/test_blackbox)
+add_test(NAME test_blackbox COMMAND ${CMAKE_BINARY_DIR}/core/test_blackbox)
 
 
 set(B2_CLASSIC_TEST
@@ -654,7 +656,7 @@ set(B2_CLASSIC_TEST
 add_executable(test_classic ${B2_CLASSIC_TEST})
 target_include_directories(test_classic PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_classic ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_classic COMMAND ${CMAKE_BINARY_DIR}/test_classic)
+add_test(NAME test_classic COMMAND ${CMAKE_BINARY_DIR}/core/test_classic)
 
 set(B2_ENDGAMES_TEST
     test/endgames/endgames_test.cpp
@@ -673,7 +675,7 @@ set(B2_ENDGAMES_TEST
 add_executable(test_endgames ${B2_ENDGAMES_TEST})
 target_include_directories(test_endgames PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_endgames ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_endgames COMMAND ${CMAKE_BINARY_DIR}/test_endgames)
+add_test(NAME test_endgames COMMAND ${CMAKE_BINARY_DIR}/core/test_endgames)
 
 set(B2_GENERATING_TEST
     test/generating/mpfr_float.cpp
@@ -686,7 +688,7 @@ set(B2_GENERATING_TEST
 add_executable(test_generating ${B2_GENERATING_TEST})
 target_include_directories(test_generating PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_generating ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_generating COMMAND ${CMAKE_BINARY_DIR}/test_generating)
+add_test(NAME test_generating COMMAND ${CMAKE_BINARY_DIR}/core/test_generating)
 
 set(B2_NAG_ALGORITHMS_TEST
     test/nag_algorithms/nag_algorithms_test.cpp
@@ -698,7 +700,7 @@ set(B2_NAG_ALGORITHMS_TEST
 add_executable(test_nag_algorithms ${B2_NAG_ALGORITHMS_TEST})
 target_include_directories(test_nag_algorithms PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_nag_algorithms ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_nag_algorithms COMMAND ${CMAKE_BINARY_DIR}/test_nag_algorithms)
+add_test(NAME test_nag_algorithms COMMAND ${CMAKE_BINARY_DIR}/core/test_nag_algorithms)
 
 set(B2_NAG_DATATYPES_TEST
 	test/nag_datatypes/witness_set.cpp
@@ -709,7 +711,7 @@ set(B2_NAG_DATATYPES_TEST
 add_executable(test_nag_datatypes ${B2_NAG_DATATYPES_TEST})
 target_include_directories(test_nag_datatypes PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_nag_datatypes ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_nag_datatypes COMMAND ${CMAKE_BINARY_DIR}/test_nag_datatypes)
+add_test(NAME test_nag_datatypes COMMAND ${CMAKE_BINARY_DIR}/core/test_nag_datatypes)
 
 set(B2_POOLS_TEST
     test/pools/pool_test.cpp
@@ -718,7 +720,7 @@ set(B2_POOLS_TEST
 add_executable(test_pool ${B2_NAG_DATATYPES_TEST})
 target_include_directories(test_pool PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_pool ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_pool COMMAND ${CMAKE_BINARY_DIR}/test_pool)
+add_test(NAME test_pool COMMAND ${CMAKE_BINARY_DIR}/core/test_pool)
 
 set(B2_SETTINGS_TEST
     test/settings/settings_test.cpp
@@ -727,7 +729,7 @@ set(B2_SETTINGS_TEST
 add_executable(test_settings ${B2_SETTINGS_TEST})
 target_include_directories(test_settings PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_settings ${Boost_LIBRARIES} bertini2)
-add_test(NAME test_settings COMMAND ${CMAKE_BINARY_DIR}/test_settings)
+add_test(NAME test_settings COMMAND ${CMAKE_BINARY_DIR}/core/test_settings)
 
 set(B2_TRACKING_BASICS_TEST
     test/tracking_basics/newton_correct_test.cpp
