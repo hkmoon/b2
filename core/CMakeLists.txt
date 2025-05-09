@@ -28,19 +28,21 @@ message(STATUS "ENABLE_UNIT_TESTING: ${ENABLE_UNIT_TESTING}")
 
 
 
-# add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
-add_compile_options(
-    # put things for debug compile here
-    $<$<CONFIG:Debug>:-g>
-    $<$<CONFIG:Debug>:-Wall>
+if (MSVC)
+    add_compile_options(/bigobj)
+else ()
+    # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
+    add_compile_options(
+        # put things for debug compile here
+        $<$<CONFIG:Debug>:-g>
+        $<$<CONFIG:Debug>:-Wall>
 
-    # and things for release here
-    $<$<CONFIG:Release>:-O3>
-    $<$<CONFIG:Release>:-g>
-    # using O2 or O3 cuts runtime by over half.
-)
-
-
+        # and things for release here
+        $<$<CONFIG:Release>:-O3>
+        $<$<CONFIG:Release>:-g>
+        # using O2 or O3 cuts runtime by over half.
+	)
+endif ()
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
