@@ -6,14 +6,11 @@ set(PROJECT_URL "https://github.com/bertiniteam/b2")
 set(PROJECT_USE_CMAKE_EXPORT TRUE)
 set(PROJECT_USE_KEYWORD_LINK_LIBRARIES TRUE)
 set(PROJECT_CUSTOM_HEADER_EXTENSION "hpp")
-
+set(PROJECT_COMPATIBILITY_VERSION AnyNewerVersion)
+# To enable jrl-cmakemodules compatibility with workspace we must define the two
+# following lines
 set(PROJECT_AUTO_RUN_FINALIZE FALSE)
 set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Check if the submodule cmake have been initialized
 set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -46,6 +43,30 @@ else()
   endif()
 endif()
 
+function(set_standard_output_directory target)
+  set_target_properties(
+    ${target}
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin
+               LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+               ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+endfunction()
+
+# Disable -Werror on Unix for now.
+set(CXX_DISABLE_WERROR True)
+set(CMAKE_VERBOSE_MAKEFILE True)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# ----------------------------------------------------
+# --- OPTIONS  ---------------------------------------
+# Need to be set before including base.cmake
+# ----------------------------------------------------
+option(INSTALL_DOCUMENTATION "Generate and install the documentation" OFF)
+option(SUFFIX_SO_VERSION "Suffix library name with its version" OFF)
+option(BUILD_TESTING_SCIPY
+       "Build the SciPy tests (scipy should be installed on the machine)" ON)
+
 # ----------------------------------------------------
 # --- Policy -----------------------------------------
 # CMake Policy setup
@@ -76,17 +97,21 @@ include("${JRL_CMAKE_MODULES}/python.cmake")
 include("${JRL_CMAKE_MODULES}/ide.cmake")
 include("${JRL_CMAKE_MODULES}/apple.cmake")
 
+option(GENERATE_PYTHON_STUBS
+       "Generate the Python stubs associated to the Python library" OFF)
 
-include(CMakePrintHelpers) # so we can print cmake variable values
-
-include(GNUInstallDirs)  # so that `CMAKE_INSTALL_LIBDIR` is not blank. eg
+option(BUILD_WITH_CHOLMOD_SUPPORT "Build EigenPy with the Cholmod support" OFF)
 
 
-# conda doesn't have 3.13 compatible eigenpy yet and build module needs 3.11
-find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+
+if(APPLE)
+  option(BUILD_WITH_ACCELERATE_SUPPORT
+         "Build EigenPy with the Accelerate support" OFF)
+else(APPLE)
+  set(BUILD_WITH_ACCELERATE_SUPPORT FALSE)
+endif(APPLE)
 
 string(REPLACE "-pedantic" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-
 
 # If needed, fix CMake policy for APPLE systems
 apply_default_apple_configuration()
@@ -129,12 +154,28 @@ set_boost_default_options()
 export_boost_default_options()
 find_package(Boost REQUIRED)
 search_for_boost_python(REQUIRED)
+find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 ############################
 # the core builds a library and an executable depending on that library
 #
 
-add_library(bertini2)
+add_library(bertini2 SHARED ${${PROJECT_NAME}_SOURCES}
+                            ${${PROJECT_NAME}_HEADERS})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+set_standard_output_directory(${PROJECT_NAME})
+
+if(NOT WIN32)
+  target_compile_options(
+    ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
+                            "-Wno-conversion")
+else()
+  target_compile_options(${PROJECT_NAME}
+                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_SNPRINTF")
+endif()
+
+target_link_boost_python(${PROJECT_NAME} PUBLIC)
 
 add_executable(bertini2_exe)
 set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)

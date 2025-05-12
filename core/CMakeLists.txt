@@ -412,14 +412,56 @@ if(WIN32)
   target_compile_definitions(bertini2 PUBLIC "HAVE_SNPRINTF")
 endif()
 
+modernize_target_link_libraries(
+  bertini2
+  SCOPE
+  PUBLIC
+  TARGETS
+  Python${PYTHON_VERSION_MAJOR}::NumPy
+  INCLUDE_DIRS
+  ${NUMPY_INCLUDE_DIRS}
+  ${PYTHON_INCLUDE_DIR})
 
-target_link_libraries(bertini2 ${GMP_LIBRARIES})
-target_link_libraries(bertini2 ${MPFR_LIBRARIES})
-target_link_libraries(bertini2 ${MPC_LIBRARIES})
-target_link_libraries(bertini2 Eigen3::Eigen)
-target_link_libraries(bertini2 ${Boost_LIBRARIES})
-
-
+modernize_target_link_libraries(
+  bertini2
+  SCOPE
+  PUBLIC
+  TARGETS
+  ${GMP_LIBRARIES}
+  INCLUDE_DIRS
+  ${GMP_INCLUDE_DIRS})
+modernize_target_link_libraries(
+  bertini2
+  SCOPE
+  PUBLIC
+  TARGETS
+  ${MPFR_LIBRARIES}
+  INCLUDE_DIRS
+  ${MPFR_INCLUDE_DIRS})
+modernize_target_link_libraries(
+  bertini2
+  SCOPE
+  PUBLIC
+  TARGETS
+  ${MPC_LIBRARIES}
+  INCLUDE_DIRS
+  ${MPC_INCLUDE_DIRS})
+modernize_target_link_libraries(
+  bertini2
+  SCOPE
+  PUBLIC
+  TARGETS
+  Eigen3::Eigen
+  INCLUDE_DIRS
+  ${EIGEN3_INCLUDE_DIR})
+modernize_target_link_libraries(
+  bertini2
+  SCOPE
+  PUBLIC
+  TARGETS
+  ${Boost_LIBRARIES}
+  INCLUDE_DIRS
+  ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 
