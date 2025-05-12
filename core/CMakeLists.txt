@@ -30,6 +30,8 @@ message(STATUS "ENABLE_UNIT_TESTING: ${ENABLE_UNIT_TESTING}")
 
 if (MSVC)
     add_compile_options(/bigobj)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+    set(BUILD_SHARED_LIBS TRUE)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
     add_compile_options(
@@ -373,21 +375,16 @@ set(BERTINI2_EXE_HEADERS
     include/bertini2/blackbox/user_homotopy.hpp
 )
 
-if(PROJECT_IS_TOP_LEVEL)
-    add_library(bertini2)
-
-    add_executable(bertini2_exe)
-    set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
-endif()
 
 # this is correct if run from core, but not if from a higher level...
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_sources(bertini2_exe PUBLIC ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
-
-
 # see https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source
 # for more on these generator expressions, $<INSTALL_INTERFACE, etc.
+add_library(bertini2 SHARED ${BERTINI2_LIBRARY_SOURCES}
+                            ${BERTINI2_LIBRARY_HEADERS})
+add_library(bertini2::bertini2 ALIAS bertini2)
+
 
 target_include_directories(bertini2 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -395,10 +392,8 @@ target_include_directories(bertini2 PUBLIC
     )
 
 
-
-
 # All library files
-target_sources(bertini2 PRIVATE
+target_sources(bertini2 PUBLIC
     ${BERTINI2_LIBRARY_SOURCES}
     ${BERTINI2_LIBRARY_HEADERS}
 )
@@ -407,6 +402,8 @@ target_sources(bertini2 PRIVATE
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
 if(WIN32)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+  set(BUILD_SHARED_LIBS TRUE)
   target_compile_options(bertini2
                          PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
   target_compile_definitions(bertini2 PUBLIC "HAVE_SNPRINTF")
@@ -463,6 +460,10 @@ modernize_target_link_libraries(
   INCLUDE_DIRS
   ${Boost_INCLUDE_DIRS})
 
+add_executable(bertini2_exe)
+set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
+
+target_sources(bertini2_exe PUBLIC ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
 target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 
 # todo: this should be made a devmode thing

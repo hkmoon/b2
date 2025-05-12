@@ -100,8 +100,6 @@ include("${JRL_CMAKE_MODULES}/apple.cmake")
 option(GENERATE_PYTHON_STUBS
        "Generate the Python stubs associated to the Python library" OFF)
 
-option(BUILD_WITH_CHOLMOD_SUPPORT "Build EigenPy with the Cholmod support" OFF)
-
 
 
 if(APPLE)
@@ -160,27 +158,30 @@ find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumP
 # the core builds a library and an executable depending on that library
 #
 
-add_library(bertini2 SHARED ${${PROJECT_NAME}_SOURCES}
-                            ${${PROJECT_NAME}_HEADERS})
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-set_standard_output_directory(${PROJECT_NAME})
+#add_library(bertini2 SHARED ${${PROJECT_NAME}_SOURCES}
+#                            ${${PROJECT_NAME}_HEADERS})
+#add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+#set_standard_output_directory(${PROJECT_NAME})
 
-if(NOT WIN32)
-  target_compile_options(
-    ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
-                            "-Wno-conversion")
-else()
-  target_compile_options(${PROJECT_NAME}
-                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_SNPRINTF")
-endif()
+#set_standard_output_directory(${PROJECT_NAME})
 
-target_link_boost_python(${PROJECT_NAME} PUBLIC)
+#if(NOT WIN32)
+#  target_compile_options(
+#    ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
+#                            "-Wno-conversion")
+#else()
+#  target_compile_options(${PROJECT_NAME}
+#                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
+#  target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_SNPRINTF")
+#endif()
 
-add_executable(bertini2_exe)
-set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
-
+#target_link_boost_python(${PROJECT_NAME} PUBLIC)
 add_subdirectory(core)
+
+#add_executable(bertini2_exe)
+#set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
+
+
 
 
 
