@@ -19,9 +19,9 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 if (MSVC)
     add_compile_options(/bigobj)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-    # set(BUILD_SHARED_LIBS TRUE)
+    set(BUILD_SHARED_LIBS FALSE)
     set(Boost_USE_MULTITHREAD ON)
-    # set(Boost_USE_STATIC_LIBS ON)
+    set(Boost_USE_STATIC_LIBS ON)
     set(Boost_NO_SYSTEM_PATHS ON)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
@@ -46,20 +46,7 @@ find_package(MPC REQUIRED)
 include_directories(${GMP_INCLUDES})
 include_directories(${MPC_INCLUDES})
 
-find_package(Boost 1.82 REQUIRED
-                COMPONENTS
-                    serialization
-                    unit_test_framework
-                    filesystem
-                    graph
-                    system
-                    chrono
-                    regex
-                    timer
-                    log
-                    log_setup
-                    thread
-)
+find_package(Boost 1.82 CONFIG)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
