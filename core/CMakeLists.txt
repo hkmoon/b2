@@ -61,7 +61,6 @@ include_directories(${MPC_INCLUDES})
 
 find_package(Boost REQUIRED
                 COMPONENTS
-                    unit_test_framework
                     filesystem
                     graph
                     system
