@@ -32,9 +32,9 @@ if (MSVC)
     add_compile_options(/bigobj)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
     set(BUILD_SHARED_LIBS FALSE)
-    set(Boost_USE_MULTITHREAD OFF)
+    set(Boost_USE_MULTITHREAD ON)
     set(Boost_USE_STATIC_LIBS ON)
-    set(Boost_NO_SYSTEM_PATHS ON)
+    # set(Boost_NO_SYSTEM_PATHS ON)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
     add_compile_options(
@@ -59,6 +59,8 @@ find_package(MPC REQUIRED)
 include_directories(${GMP_INCLUDES})
 include_directories(${MPC_INCLUDES})
 
+set_boost_default_options()
+export_boost_default_options()
 find_package(Boost REQUIRED
                 COMPONENTS
                     serialization
