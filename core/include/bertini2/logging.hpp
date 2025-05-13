@@ -33,7 +33,7 @@
 #define BERTINI_LOGGING_HPP
 
 
-//#define BOOST_LOG_DYN_LINK 1
+//#define BOOST_LOG_DYN_LINK
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
