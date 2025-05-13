@@ -59,6 +59,21 @@ find_package(MPC REQUIRED)
 include_directories(${GMP_INCLUDES})
 include_directories(${MPC_INCLUDES})
 
+find_package(Boost REQUIRED
+                COMPONENTS
+                    serialization
+                    unit_test_framework
+                    filesystem
+                    graph
+                    system
+                    chrono
+                    regex
+                    timer
+                    log
+                    log_setup
+                    thread
+)
+
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 # This was from a makemodule.am, take the lists and define them in seperate blocks with the variables they already have, then add the variable name to library_headrs
