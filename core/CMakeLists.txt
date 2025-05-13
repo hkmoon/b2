@@ -61,7 +61,6 @@ include_directories(${MPC_INCLUDES})
 
 find_package(Boost 1.82 REQUIRED
                 COMPONENTS
-                    container
                     serialization
                     unit_test_framework
                     filesystem
