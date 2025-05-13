@@ -61,7 +61,6 @@ include_directories(${MPC_INCLUDES})
 
 find_package(Boost REQUIRED
                 COMPONENTS
-                    serialization
                     unit_test_framework
                     filesystem
                     graph
