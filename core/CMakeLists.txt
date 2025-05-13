@@ -58,9 +58,11 @@ include_directories(${MPC_INCLUDES})
 
 find_package(Boost 1.82 REQUIRED
                 COMPONENTS
+                    container
                     serialization
                     unit_test_framework
                     filesystem
+                    graph
                     system
                     chrono
                     regex
@@ -665,7 +667,7 @@ set(B2_CLASS_TEST_SOURCES
     )
 
     add_executable(test_classic ${B2_CLASSIC_TEST})
-    target_include_directories(test_classic PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(test_classic PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
     target_link_libraries(test_classic ${Boost_LIBRARIES} bertini2)
     add_test(NAME test_classic COMMAND ${CMAKE_BINARY_DIR}/test_classic)
 

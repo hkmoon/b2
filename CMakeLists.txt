@@ -191,9 +191,9 @@ add_subdirectory(core)
 #
 
 
-python_add_library(_pybertini MODULE WITH_SOABI)
+#python_add_library(_pybertini MODULE WITH_SOABI)
 
-add_subdirectory(python_bindings)
+#add_subdirectory(python_bindings)
 
 
 
@@ -201,4 +201,4 @@ add_subdirectory(python_bindings)
 # finally, the pure-python part of the project.
 #
 
-add_subdirectory(python)
+#add_subdirectory(python)
