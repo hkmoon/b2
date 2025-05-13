@@ -59,7 +59,20 @@ find_package(MPC REQUIRED)
 include_directories(${GMP_INCLUDES})
 include_directories(${MPC_INCLUDES})
 
-find_package(Boost 1.82 REQUIRED)
+find_package(Boost 1.82 REQUIRED
+                COMPONENTS
+                    serialization
+                    unit_test_framework
+                    filesystem
+                    graph
+                    system
+                    chrono
+                    regex
+                    timer
+                    log
+                    log_setup
+                    thread
+)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
