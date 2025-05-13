@@ -33,7 +33,7 @@ if (MSVC)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
     set(BUILD_SHARED_LIBS FALSE)
     set(Boost_USE_MULTITHREAD ON)
-    set(Boost_USE_STATIC_LIBS ON)
+    #set(Boost_USE_STATIC_LIBS ON)
     set(Boost_NO_SYSTEM_PATHS ON)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
@@ -61,6 +61,8 @@ include_directories(${MPC_INCLUDES})
 
 find_package(Boost REQUIRED
                 COMPONENTS
+                    serialization
+                    unit_test_framework
                     filesystem
                     graph
                     system
