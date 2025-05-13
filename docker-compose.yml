@@ -1,0 +1,15 @@
+services:
+  manylinux:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: manylinux_2_34_x86_64
+    volumes:
+      - ./dist:/app/dist
+      - ./core:/app/core
+      - ./cmake:/app/cmake
+      - ./python:/app/python
+      - ./python_bindings:/app/python_bindings
+      - ./CMakeLists.txt:/app/CMakeLists.txt
+      - ./pyproject.toml:/app/pyproject.toml
+

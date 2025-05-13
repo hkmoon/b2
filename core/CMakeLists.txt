@@ -5,8 +5,8 @@ include(CMakePrintHelpers) # so we can print cmake variable values
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(BUILD_SHARED_LIBS ON)
-#  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# set(BUILD_SHARED_LIBS ON)
+# set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # In order to find conda, run 'conda activate' and then use 'cmake .. -DCMAKE_PREFIX_PATH=$CONDA_PREFIX' when cmaking
 
@@ -31,7 +31,10 @@ message(STATUS "ENABLE_UNIT_TESTING: ${ENABLE_UNIT_TESTING}")
 if (MSVC)
     add_compile_options(/bigobj)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-    set(BUILD_SHARED_LIBS TRUE)
+    # set(BUILD_SHARED_LIBS TRUE)
+    set(Boost_USE_MULTITHREAD ON)
+    set(Boost_USE_STATIC_LIBS ON)
+    set(Boost_NO_SYSTEM_PATHS ON)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
     add_compile_options(
@@ -383,7 +386,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # see https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source
 # for more on these generator expressions, $<INSTALL_INTERFACE, etc.
-add_library(bertini2 SHARED ${BERTINI2_LIBRARY_SOURCES}
+add_library(bertini2 ${BERTINI2_LIBRARY_SOURCES}
                             ${BERTINI2_LIBRARY_HEADERS})
 add_library(bertini2::bertini2 ALIAS bertini2)
 
@@ -405,7 +408,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
 if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-  set(BUILD_SHARED_LIBS TRUE)
+  # set(BUILD_SHARED_LIBS TRUE)
   target_compile_options(bertini2
                          PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
   target_compile_definitions(bertini2 PUBLIC "HAVE_SNPRINTF")
