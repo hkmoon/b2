@@ -59,8 +59,6 @@ find_package(MPC REQUIRED)
 include_directories(${GMP_INCLUDES})
 include_directories(${MPC_INCLUDES})
 
-find_package(Boost 1.82 CONFIG)
-
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 # This was from a makemodule.am, take the lists and define them in seperate blocks with the variables they already have, then add the variable name to library_headrs
