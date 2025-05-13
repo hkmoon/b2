@@ -420,7 +420,7 @@ target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 #target_compile_options(bertini2 PRIVATE -Wall -Wextra)
 
 install(
-  TARGETS ${PROJECT_NAME}
+  TARGETS bertini2
   EXPORT ${TARGETS_EXPORT_NAME}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   INCLUDES
