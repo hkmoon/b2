@@ -7,10 +7,10 @@ dependencies:
   - gmp
   - mpfr
   - mpc
-  - libboost
+  - libboost-devel
   - eigen
   - eigenpy
-  - libboost-python
+  - libboost-python-devel
   - scipy
   - wheel
   - build
