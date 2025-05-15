@@ -101,14 +101,6 @@ option(GENERATE_PYTHON_STUBS
        "Generate the Python stubs associated to the Python library" OFF)
 
 
-
-if(APPLE)
-  option(BUILD_WITH_ACCELERATE_SUPPORT
-         "Build EigenPy with the Accelerate support" OFF)
-else(APPLE)
-  set(BUILD_WITH_ACCELERATE_SUPPORT FALSE)
-endif(APPLE)
-
 string(REPLACE "-pedantic" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
 # If needed, fix CMake policy for APPLE systems
@@ -146,13 +138,442 @@ endif(WIN32)
 # ----------------------------------------------------
 # --- DEPENDENCIES -----------------------------------
 # ----------------------------------------------------
-add_project_dependency(Eigen3 REQUIRED PKG_CONFIG_REQUIRES "eigen3 >= 3.0.5")
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+find_package(GMP REQUIRED)
+find_package(MPFR REQUIRED)
+find_package(MPC REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+include_directories(${GMP_INCLUDES})
+include_directories(${MPC_INCLUDES})
+include_directories(${EIGEN3_INCLUDES})
 
 set_boost_default_options()
 export_boost_default_options()
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED
+                COMPONENTS
+                    serialization
+                    unit_test_framework
+                    filesystem
+                    graph
+                    system
+                    chrono
+                    regex
+                    timer
+                    log
+                    log_setup
+                    thread
+)
 search_for_boost_python(REQUIRED)
-find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+
+# This was from a makemodule.am, take the lists and define them in seperate blocks with the variables they already have, then add the variable name to library_headrs
+set(endgames_headers
+	core/include/${PROJECT_NAME}/endgames/amp_endgame.hpp
+	core/include/${PROJECT_NAME}/endgames/base_endgame.hpp
+	core/include/${PROJECT_NAME}/endgames/cauchy.hpp
+	core/include/${PROJECT_NAME}/endgames/config.hpp
+	core/include/${PROJECT_NAME}/endgames/events.hpp
+	core/include/${PROJECT_NAME}/endgames/fixed_prec_endgame.hpp
+	core/include/${PROJECT_NAME}/endgames/interpolation.hpp
+	core/include/${PROJECT_NAME}/endgames/observers.hpp
+	core/include/${PROJECT_NAME}/endgames/powerseries.hpp
+	core/include/${PROJECT_NAME}/endgames/prec_base.hpp
+)
+
+set(basics_rootinclude_headers
+    core/include/${PROJECT_NAME}/have_bertini.hpp
+    core/include/${PROJECT_NAME}/mpfr_extensions.hpp
+    core/include/${PROJECT_NAME}/mpfr_complex.hpp
+    core/include/${PROJECT_NAME}/forbid_mixed_arithmetic.hpp
+    core/include/${PROJECT_NAME}/double_extensions.hpp
+    core/include/${PROJECT_NAME}/random.hpp
+    core/include/${PROJECT_NAME}/num_traits.hpp
+    core/include/${PROJECT_NAME}/classic.hpp
+    core/include/${PROJECT_NAME}/eigen_extensions.hpp
+    core/include/${PROJECT_NAME}/eigen_serialization_addon.hpp
+    core/include/${PROJECT_NAME}/logging.hpp
+    core/include/${PROJECT_NAME}/endgames.hpp
+    core/include/${PROJECT_NAME}/bertini.hpp
+    core/include/${PROJECT_NAME}/version.hpp
+)
+
+set(common_headers
+    core/include/${PROJECT_NAME}/common/config.hpp
+    core/include/${PROJECT_NAME}/common/stream_enum.hpp
+)
+
+set(detail_headers
+    core/include/${PROJECT_NAME}/detail/configured.hpp
+    core/include/${PROJECT_NAME}/detail/events.hpp
+    core/include/${PROJECT_NAME}/detail/visitable.hpp
+    core/include/${PROJECT_NAME}/detail/visitor.hpp
+    core/include/${PROJECT_NAME}/detail/observer.hpp
+    core/include/${PROJECT_NAME}/detail/observable.hpp
+    core/include/${PROJECT_NAME}/detail/is_template_parameter.hpp
+    core/include/${PROJECT_NAME}/detail/enable_permuted_arguments.hpp
+    core/include/${PROJECT_NAME}/detail/typelist.hpp
+)
+
+set(function_tree_headers
+    core/include/${PROJECT_NAME}/function_tree.hpp
+    core/include/${PROJECT_NAME}/function_tree/node.hpp
+    core/include/${PROJECT_NAME}/function_tree/forward_declares.hpp
+    core/include/${PROJECT_NAME}/function_tree/simplify.hpp
+    core/include/${PROJECT_NAME}/function_tree/operators/operator.hpp
+    core/include/${PROJECT_NAME}/function_tree/symbols/symbol.hpp
+    core/include/${PROJECT_NAME}/function_tree/symbols/variable.hpp
+    core/include/${PROJECT_NAME}/function_tree/symbols/differential.hpp
+    core/include/${PROJECT_NAME}/function_tree/symbols/special_number.hpp
+    core/include/${PROJECT_NAME}/function_tree/symbols/number.hpp
+    core/include/${PROJECT_NAME}/function_tree/symbols/linear_product.hpp
+    core/include/${PROJECT_NAME}/function_tree/roots/function.hpp
+    core/include/${PROJECT_NAME}/function_tree/roots/jacobian.hpp
+    core/include/${PROJECT_NAME}/function_tree/operators/arithmetic.hpp
+    core/include/${PROJECT_NAME}/function_tree/operators/trig.hpp
+)
+
+set(function_tree_headers_rootinclude_HEADERS
+	core/include/${PROJECT_NAME}/function_tree.hpp
+)
+
+set(settings_headers
+    core/include/${PROJECT_NAME}/settings/configIni_parse.hpp
+)
+
+set(functiontreeinclude_HEADERS
+	core/include/${PROJECT_NAME}/function_tree/node.hpp
+	core/include/${PROJECT_NAME}/function_tree/factory.hpp
+	core/include/${PROJECT_NAME}/function_tree/forward_declares.hpp
+	core/include/${PROJECT_NAME}/function_tree/simplify.hpp
+)
+
+set(functiontree_operators_HEADERS
+	core/include/${PROJECT_NAME}/function_tree/operators/operator.hpp
+	core/include/${PROJECT_NAME}/function_tree/operators/arithmetic.hpp
+	core/include/${PROJECT_NAME}/function_tree/operators/trig.hpp
+)
+
+set(functiontree_symbols_HEADERS
+	core/include/${PROJECT_NAME}/function_tree/symbols/symbol.hpp
+	core/include/${PROJECT_NAME}/function_tree/symbols/variable.hpp
+	core/include/${PROJECT_NAME}/function_tree/symbols/differential.hpp
+	core/include/${PROJECT_NAME}/function_tree/symbols/special_number.hpp
+	core/include/${PROJECT_NAME}/function_tree/symbols/number.hpp
+    core/include/${PROJECT_NAME}/function_tree/symbols/linear_product.hpp
+)
+
+set(functiontree_roots_HEADERS
+	core/include/${PROJECT_NAME}/function_tree/roots/function.hpp
+	core/include/${PROJECT_NAME}/function_tree/roots/jacobian.hpp
+)
+
+set(io_headers
+    core/include/${PROJECT_NAME}/io/file_utilities.hpp
+    core/include/${PROJECT_NAME}/io/generators.hpp
+    core/include/${PROJECT_NAME}/io/parsing.hpp
+    core/include/${PROJECT_NAME}/io/splash.hpp
+)
+
+set(io_parsing_headers
+    core/include/${PROJECT_NAME}/io/parsing/classic_utilities.hpp
+    core/include/${PROJECT_NAME}/io/parsing/function_parsers.hpp
+    core/include/${PROJECT_NAME}/io/parsing/function_rules.hpp
+    core/include/${PROJECT_NAME}/io/parsing/number_parsers.hpp
+    core/include/${PROJECT_NAME}/io/parsing/number_rules.hpp
+    core/include/${PROJECT_NAME}/io/parsing/qi_files.hpp
+    core/include/${PROJECT_NAME}/io/parsing/settings_parsers.hpp
+    core/include/${PROJECT_NAME}/io/parsing/settings_rules.hpp
+    core/include/${PROJECT_NAME}/io/parsing/system_parsers.hpp
+    core/include/${PROJECT_NAME}/io/parsing/system_rules.hpp
+)
+
+set(io_parsing_settings_headers
+    core/include/${PROJECT_NAME}/io/parsing/settings_parsers/algorithm.hpp
+    core/include/${PROJECT_NAME}/io/parsing/settings_parsers/base.hpp
+    core/include/${PROJECT_NAME}/io/parsing/settings_parsers/endgames.hpp
+    core/include/${PROJECT_NAME}/io/parsing/settings_parsers/tracking.hpp
+)
+
+set(nag_algorithms_headers
+	core/include/${PROJECT_NAME}/nag_algorithms/midpath_check.hpp
+	core/include/${PROJECT_NAME}/nag_algorithms/numerical_irreducible_decomposition.hpp
+	core/include/${PROJECT_NAME}/nag_algorithms/output.hpp
+	core/include/${PROJECT_NAME}/nag_algorithms/sharpen.hpp
+	core/include/${PROJECT_NAME}/nag_algorithms/trace.hpp
+	core/include/${PROJECT_NAME}/nag_algorithms/zero_dim_solve.hpp
+)
+
+set(nag_algorithms_common_headers
+    core/include/${PROJECT_NAME}/nag_algorithms/common/algorithm_base.hpp
+    core/include/${PROJECT_NAME}/nag_algorithms/common/config.hpp
+    core/include/${PROJECT_NAME}/nag_algorithms/common/policies.hpp
+)
+
+set(nag_datatypes_headers
+	core/include/${PROJECT_NAME}/nag_datatypes/numerical_irreducible_decomposition.hpp
+	core/include/${PROJECT_NAME}/nag_datatypes/witness_set.hpp
+)
+
+set(nag_datatypes_common_headers
+	core/include/${PROJECT_NAME}/nag_datatypes/common/policies.hpp
+)
+
+set(parallel_headers
+    core/include/${PROJECT_NAME}/parallel/initialize_finalize.hpp
+)
+
+set(parallel_rootinclude_HEADERS
+    core/include/${PROJECT_NAME}/parallel.hpp
+)
+
+set(pool_headers
+    core/include/${PROJECT_NAME}/pool/pool.hpp
+    core/include/${PROJECT_NAME}/pool/system.hpp
+)
+
+set(system_headers
+	core/include/${PROJECT_NAME}/system/patch.hpp
+	core/include/${PROJECT_NAME}/system/precon.hpp
+	core/include/${PROJECT_NAME}/system/slice.hpp
+	core/include/${PROJECT_NAME}/system/start_base.hpp
+	core/include/${PROJECT_NAME}/system/start_systems.hpp
+	core/include/${PROJECT_NAME}/system/straight_line_program.hpp
+	core/include/${PROJECT_NAME}/system/system.hpp
+)
+
+set(system_start_headers
+	core/include/${PROJECT_NAME}/system/start/total_degree.hpp
+	core/include/${PROJECT_NAME}/system/start/mhom.hpp
+	core/include/${PROJECT_NAME}/system/start/user.hpp
+	core/include/${PROJECT_NAME}/system/start/utility.hpp
+)
+
+set(system_rootinclude_HEADERS
+	core/include/${PROJECT_NAME}/system.hpp
+)
+
+set(trackers_HEADERS
+	core/include/${PROJECT_NAME}/trackers/adaptive_precision_utilities.hpp
+	core/include/${PROJECT_NAME}/trackers/amp_criteria.hpp
+	core/include/${PROJECT_NAME}/trackers/amp_tracker.hpp
+	core/include/${PROJECT_NAME}/trackers/base_predictor.hpp
+	core/include/${PROJECT_NAME}/trackers/base_tracker.hpp
+	core/include/${PROJECT_NAME}/trackers/config.hpp
+	core/include/${PROJECT_NAME}/trackers/events.hpp
+	core/include/${PROJECT_NAME}/trackers/explicit_predictors.hpp
+	core/include/${PROJECT_NAME}/trackers/fixed_precision_tracker.hpp
+	core/include/${PROJECT_NAME}/trackers/fixed_precision_utilities.hpp
+	core/include/${PROJECT_NAME}/trackers/newton_correct.hpp
+	core/include/${PROJECT_NAME}/trackers/newton_corrector.hpp
+	core/include/${PROJECT_NAME}/trackers/observers.hpp
+	core/include/${PROJECT_NAME}/trackers/ode_predictors.hpp
+	core/include/${PROJECT_NAME}/trackers/predict.hpp
+	core/include/${PROJECT_NAME}/trackers/step.hpp
+	core/include/${PROJECT_NAME}/trackers/tracker.hpp
+)
+
+set(tracking_rootinclude_HEADERS
+	core/include/${PROJECT_NAME}/tracking.hpp
+)
+
+set(BERTINI2_LIBRARY_HEADERS
+    ${endgames_headers}
+    ${basics_headers}
+    ${common_headers}
+    ${details_headers}
+    ${function_tree_headers}
+    ${io_headers}
+    ${io_parsing_headers}
+    ${io_parsing_settings_headers}
+    ${nag_algorithms_headers}
+    ${nag_algorithms_common_headers}
+    ${nag_datatypes_headers}
+    ${nag_datatypes_common_headers}
+    ${parallel_headers}
+    ${parallel_rootinclude_HEADERS}
+    ${pool_headers}
+    ${system_headers}
+    ${system_start_headers}
+    ${system_rootinclude_HEADERS}
+    ${systeminclude_HEADERS}
+    ${startinclude_HEADERS}
+    ${trackers_HEADERS}
+    ${tracking_header_files}
+    ${tracking_rootinclude_HEADERS}
+    ${trackersinclude_HEADERS}
+)
+
+set(basics_sources
+    core/src/basics/random.cpp
+    core/src/basics/have_bertini.cpp
+)
+
+set(function_tree_sources
+    core/src/function_tree/node.cpp
+    core/src/function_tree/simplify.cpp
+    core/src/function_tree/operators/arithmetic.cpp
+    core/src/function_tree/operators/trig.cpp
+    core/src/function_tree/linear_product.cpp
+    core/src/function_tree/operators/operator.cpp
+    core/src/function_tree/symbols/special_number.cpp
+    core/src/function_tree/symbols/differential.cpp
+    core/src/function_tree/symbols/symbol.cpp
+    core/src/function_tree/symbols/variable.cpp
+    core/src/function_tree/symbols/number.cpp
+    core/src/function_tree/roots/jacobian.cpp
+    core/src/function_tree/roots/function.cpp
+)
+
+set(parallel_sources
+    core/src/parallel/parallel.cpp
+    core/src/parallel/initialize_finalize.cpp
+)
+
+set(system_source_files
+    core/src/system/precon.cpp
+    core/src/system/slice.cpp
+    core/src/system/start_base.cpp
+    core/src/system/system.cpp
+    core/src/system/straight_line_program.cpp
+    core/src/system/start/total_degree.cpp
+    core/src/system/start/mhom.cpp
+    core/src/system/start/user.cpp
+)
+
+set(tracking_source_files
+    core/src/tracking/explicit_predictors.cpp
+)
+
+set(BERTINI2_LIBRARY_SOURCES
+    ${basics_sources}
+    ${libbertini2_la_SOURCES}
+    ${function_tree_sources}
+    ${parallel_sources}
+    ${system_source_files}
+    ${tracking_source_files}
+)
+
+set(BERTINI2_EXE_SOURCES
+    core/src/blackbox/bertini.cpp
+    core/src/blackbox/main_mode_switch.cpp
+    core/src/blackbox/argc_argv.cpp
+)
+
+set(BERTINI2_EXE_HEADERS
+    core/include/${PROJECT_NAME}/blackbox/main_mode_switch.hpp
+    core/include/${PROJECT_NAME}/blackbox/argc_argv.hpp
+    core/include/${PROJECT_NAME}/blackbox/config.hpp
+    core/include/${PROJECT_NAME}/blackbox/algorithm_builder.hpp
+    core/include/${PROJECT_NAME}/blackbox/global_configs.hpp
+    core/include/${PROJECT_NAME}/blackbox/switches_zerodim.hpp
+    core/include/${PROJECT_NAME}/blackbox/user_homotopy.hpp
+)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/core/include)
+
+#add_library(${PROJECT_NAME} SHARED ${BERTINI2_LIBRARY_SOURCES} ${BERTINI2_LIBRARY_HEADERS})
+#add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} SHARED ${BERTINI2_LIBRARY_SOURCES} ${BERTINI2_LIBRARY_HEADERS})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+set_standard_output_directory(${PROJECT_NAME})
+target_include_directories(
+  ${PROJECT_NAME} SYSTEM
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+
+modernize_target_link_libraries(
+  ${PROJECT_NAME}
+  SCOPE
+  PUBLIC
+  TARGETS
+  ${GMP_LIBRARIES}
+  INCLUDE_DIRS
+  ${GMP_INCLUDE_DIR})
+
+modernize_target_link_libraries(
+  ${PROJECT_NAME}
+  SCOPE
+  PUBLIC
+  TARGETS
+  ${MPFR_LIBRARIES}
+  INCLUDE_DIRS
+  ${MPFR_INCLUDE_DIR})
+
+modernize_target_link_libraries(
+  ${PROJECT_NAME}
+  SCOPE
+  PUBLIC
+  TARGETS
+  Eigen3::Eigen
+  INCLUDE_DIRS
+  ${EIGEN3_INCLUDE_DIR})
+
+modernize_target_link_libraries(
+  ${PROJECT_NAME}
+  SCOPE
+  PUBLIC
+  TARGETS
+  Python${PYTHON_VERSION_MAJOR}::NumPy
+  INCLUDE_DIRS
+  ${NUMPY_INCLUDE_DIRS}
+  ${PYTHON_INCLUDE_DIR})
+
+if(SUFFIX_SO_VERSION)
+  set_target_properties(bertini2 PROPERTIES SOVERSION ${PROJECT_VERSION})
+endif(SUFFIX_SO_VERSION)
+
+if(NOT WIN32)
+  target_compile_options(
+    ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
+                            "-Wno-conversion")
+else()
+  target_compile_options(${PROJECT_NAME}
+                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_SNPRINTF")
+endif()
+
+target_link_boost_python(${PROJECT_NAME} PUBLIC)
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT ${TARGETS_EXPORT_NAME}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  INCLUDES
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+add_header_group(${PROJECT_NAME}_HEADERS)
+add_source_group(${PROJECT_NAME}_SOURCES)
+
+add_executable(bertini2_exe)
+set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME ${PROJECT_NAME})
+
+target_sources(bertini2_exe PUBLIC ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
+target_link_libraries(bertini2_exe ${Boost_LIBRARIES} ${PROJECT_NAME})
+
+# ----------------------------------------------------
+# --- PYTHON LIBRARY ---------------------------------
+# ----------------------------------------------------
+#add_subdirectory(python_bindings)
+add_subdirectory(python)
+
+# ----------------------------------------------------
+# --- UNIT TEST --------------------------------------
+# ----------------------------------------------------
+add_subdirectory(unittest)
+
+pkg_config_append_libs(${PROJECT_NAME})
+pkg_config_append_cflags("-I${PYTHON_INCLUDE_DIRS}")
+pkg_config_append_cflags("-I${NUMPY_INCLUDE_DIRS}")
+pkg_config_append_boost_libs(${BOOST_COMPONENTS})
+
+setup_project_finalize()
+
 
 ############################
 # the core builds a library and an executable depending on that library
@@ -176,7 +597,7 @@ find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumP
 #endif()
 
 #target_link_boost_python(${PROJECT_NAME} PUBLIC)
-add_subdirectory(core)
+#add_subdirectory(core)
 
 #add_executable(bertini2_exe)
 #set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
