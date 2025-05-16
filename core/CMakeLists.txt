@@ -21,11 +21,8 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 
 if (MSVC)
-    add_compile_options(/bigobj)
     set(CMAKE_BUILD_TYPE Release)
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-    set(BUILD_SHARED_LIBS TRUE)
-    add_definitions(-DBERTINI_DISABLE_PRECISION_CHECKS)
+    add_compile_options(/bigobj)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
     add_compile_options(
@@ -411,9 +408,6 @@ target_link_libraries(bertini2 ${Boost_LIBRARIES})
 if(SUFFIX_SO_VERSION)
   set_target_properties(bertini2 PROPERTIES SOVERSION ${PROJECT_VERSION})
 endif(SUFFIX_SO_VERSION)
-
-add_executable(bertini2_exe)
-set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
 
 target_sources(bertini2_exe PUBLIC ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
 target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
