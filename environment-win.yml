@@ -15,6 +15,7 @@ dependencies:
   - eigen
   - eigenpy
   - libboost-python-devel
+  - vs2022_win-64
   - scipy
   - python
   - scipy
