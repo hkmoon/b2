@@ -15,6 +15,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 include(CMakePrintHelpers) # so we can print cmake variable values
 
 if (MSVC)
+    set(CMAKE_BUILD_TYPE Release)
     add_compile_options(/bigobj)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
