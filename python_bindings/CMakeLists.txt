@@ -16,6 +16,7 @@ include(CMakePrintHelpers) # so we can print cmake variable values
 
 if (MSVC)
     add_compile_options(/bigobj)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
     add_compile_options(
