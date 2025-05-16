@@ -27,7 +27,6 @@ message(STATUS "ENABLE_UNIT_TESTING: ${ENABLE_UNIT_TESTING}")
 
 
 if (MSVC)
-    set(CMAKE_BUILD_TYPE Release)
     add_compile_options(/bigobj)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
