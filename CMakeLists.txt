@@ -40,6 +40,9 @@ find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumP
 ############################
 # the core builds a library and an executable depending on that library
 #
+if (MSVC)
+    set(CMAKE_BUILD_TYPE Release)
+endif ()
 
 add_executable(bertini2_exe)
 

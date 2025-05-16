@@ -21,7 +21,6 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 
 if (MSVC)
-    set(CMAKE_BUILD_TYPE Release)
     add_compile_options(/bigobj)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
