@@ -176,24 +176,20 @@ find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumP
 #endif()
 
 #target_link_boost_python(${PROJECT_NAME} PUBLIC)
+add_library(bertini2)
+
+add_executable(bertini2_exe)
+set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
+
 add_subdirectory(core)
-
-#add_executable(bertini2_exe)
-#set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
-
-
-
-
 
 
 ###########
 # next, in `python_bindings`, build a shared python library, and a pure-python library that wraps around that.
 #
+python_add_library(_pybertini MODULE WITH_SOABI)
 
-
-#python_add_library(_pybertini MODULE WITH_SOABI)
-
-#add_subdirectory(python_bindings)
+add_subdirectory(python_bindings)
 
 
 
@@ -201,4 +197,4 @@ add_subdirectory(core)
 # finally, the pure-python part of the project.
 #
 
-#add_subdirectory(python)
+add_subdirectory(python)

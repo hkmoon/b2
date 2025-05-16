@@ -30,11 +30,9 @@ message(STATUS "ENABLE_UNIT_TESTING: ${ENABLE_UNIT_TESTING}")
 
 if (MSVC)
     add_compile_options(/bigobj)
+    set(CMAKE_BUILD_TYPE Release)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-    set(BUILD_SHARED_LIBS FALSE)
-    set(Boost_USE_MULTITHREAD ON)
-    set(Boost_USE_STATIC_LIBS ON)
-    # set(Boost_NO_SYSTEM_PATHS ON)
+    set(BUILD_SHARED_LIBS TRUE)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
     add_compile_options(
@@ -409,7 +407,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
 if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-  # set(BUILD_SHARED_LIBS TRUE)
+  set(BUILD_SHARED_LIBS TRUE)
   target_compile_options(bertini2
                          PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
   target_compile_definitions(bertini2 PUBLIC "HAVE_SNPRINTF")
