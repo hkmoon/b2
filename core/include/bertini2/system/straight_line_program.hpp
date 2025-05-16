@@ -313,7 +313,7 @@ namespace bertini {
 		\tparam NumT numeric type
 
 		uses a switch to find different operations from memory to make sure its performing the correct evaluations
-	
+
 		todo: implement a compile-time version of this using Boost.Hana
 		 */
 		template<typename NumT>
@@ -383,7 +383,7 @@ namespace bertini {
 				this->EvalJacobian<NumT>();
 
 			auto& memory =  std::get<std::vector<NumT>>(memory_);
-		
+
 			// copy content
 			for (int jj =0; jj < number_of_.Variables; ++jj) {
 				for (int ii = 0; ii < number_of_.Functions; ++ii) {
@@ -505,7 +505,7 @@ namespace bertini {
 		void SetVariableValues(Eigen::MatrixBase<Derived> const& variable_values) const{
 			using NumT = typename Derived::Scalar;
 
-#ifndef BERTINI_DISABLE_PRECISION_CHECKS
+#ifndef BERTINI_DISABLE_PRECISION_CHECKS && _WIN32
 			if (!std::is_same<NumT,dbl_complex>::value && Precision(variable_values)!=this->precision_){
 				std::stringstream err_msg;
 				err_msg << "variable_values and SLP must be of same precision.  respective precisions: " << Precision(variable_values) << " " << this->precision_ << std::endl;
@@ -534,7 +534,7 @@ namespace bertini {
 		template<typename ComplexT>
 		void SetPathVariable(ComplexT const& time) const{
 
-#ifndef BERTINI_DISABLE_PRECISION_CHECKS
+#ifndef BERTINI_DISABLE_PRECISION_CHECKS && _WIN32
 			if (Precision(time)!= DoublePrecision() && Precision(time)!=this->precision_){
 				std::stringstream err_msg;
 				err_msg << "time value and SLP must be of same precision.  respective precisions: " << Precision(time) << " " << this->precision_ << std::endl;
@@ -628,7 +628,7 @@ namespace bertini {
 			ar & std::get<std::vector<dbl_complex>>(memory_);
 			ar & std::get<std::vector<mpfr_complex>>(memory_);
 			ar & integers_;
-			
+
 			ar & instructions_;
 			ar & true_values_of_numbers_;
 
@@ -711,7 +711,7 @@ namespace bertini {
 			virtual void Visit(node::ExpOperator const& n);
 			virtual void Visit(node::LogOperator const& n);
 			virtual void Visit(node::NegateOperator const& n);
-			virtual void Visit(node::SqrtOperator const& n); 
+			virtual void Visit(node::SqrtOperator const& n);
 
 
 			// the trig operators
