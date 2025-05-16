@@ -389,7 +389,6 @@ add_library(bertini2 ${BERTINI2_LIBRARY_SOURCES}
                             ${BERTINI2_LIBRARY_HEADERS})
 add_library(bertini2::bertini2 ALIAS bertini2)
 
-
 target_include_directories(bertini2 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>  # <prefix>/include
