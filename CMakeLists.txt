@@ -176,7 +176,6 @@ find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumP
 #endif()
 
 #target_link_boost_python(${PROJECT_NAME} PUBLIC)
-add_library(bertini2)
 
 add_executable(bertini2_exe)
 set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
