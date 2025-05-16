@@ -22,8 +22,10 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 if (MSVC)
     add_compile_options(/bigobj)
+    set(CMAKE_BUILD_TYPE Release)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
     set(BUILD_SHARED_LIBS TRUE)
+    add_definitions(-DBERTINI_DISABLE_PRECISION_CHECKS)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
     add_compile_options(
