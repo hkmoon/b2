@@ -83,7 +83,7 @@ jobs:
           $env:CMAKE_PREFIX_PATH='C:\Miniconda\envs\b2-windows\Library'
           
           cmake -G Ninja ..
-          cmake --build .
+          cmake --build . --target all --config Release
                
           cd ..
           python -m build --wheel --no-isolation
