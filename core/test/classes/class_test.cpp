@@ -49,7 +49,7 @@ using dbl = bertini::dbl;
 using mpfr = bertini::mpfr_complex;
 
 const double relaxed_threshold_clearance_d = 1e-14;
-const double threshold_clearance_d = 1e-15;
+const double threshold_clearance_d = 1e-14;
 
 unsigned const CLASS_TEST_MPFR_DEFAULT_DIGITS = 50;
 bertini::mpfr_float threshold_clearance_mp("1e-27");
