@@ -35,7 +35,7 @@ include(GNUInstallDirs)  # so that `CMAKE_INSTALL_LIBDIR` is not blank. eg
 
 
 # conda doesn't have 3.13 compatible eigenpy yet and build module needs 3.11
-find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 
 
