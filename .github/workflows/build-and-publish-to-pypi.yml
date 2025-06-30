@@ -47,7 +47,7 @@ jobs:
           python3 -m build --wheel
           
           for whl in dist/*.whl; do
-            auditwheel -v repair $whl -w dist/ --plat manylinux_2_39_x86_64
+            auditwheel -v repair $whl -w dist/
             rm $whl
           done
           
