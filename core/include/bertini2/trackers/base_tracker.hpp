@@ -181,8 +181,8 @@ namespace bertini{
 
 				path_truncation_threshold_ = path_truncation_threshold;
 
-				this->template Set(stepping);
-				this->template Set(newton);
+				this->template Set<SteppingConfig>(stepping);
+				this->template Set<NewtonConfig>(newton);
 
 				current_stepsize_ = BaseRealType(stepping.initial_step_size);
 			}

@@ -64,7 +64,7 @@ namespace bertini{
 		template<class PyClass>
 		void FunctionVisitor<NodeBaseT>::visit(PyClass& cl) const
 		{
-			cl
+			//cl // nothing to do in the base clas for functions
 			;
 		}
 
