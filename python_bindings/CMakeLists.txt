@@ -161,9 +161,7 @@ set(PYBERTINI_SOURCES
 add_project_dependency(Eigen3 REQUIRED PKG_CONFIG_REQUIRES "eigen3 >= 3.4.0")
 
 
-if(PROJECT_IS_TOP_LEVEL)
-    python_add_library(_pybertini MODULE WITH_SOABI)
-endif()
+python_add_library(_pybertini MODULE WITH_SOABI)
 
 target_include_directories(_pybertini PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_sources(_pybertini PRIVATE ${PYBERTINI_SOURCES} ${PYBERTINI_HEADERS})
