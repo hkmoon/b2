@@ -152,7 +152,7 @@ endif(WIN32)
 #export_boost_default_options()
 #find_package(Boost REQUIRED)
 #search_for_boost_python(REQUIRED)
-#find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 ############################
 # the core builds a library and an executable depending on that library
