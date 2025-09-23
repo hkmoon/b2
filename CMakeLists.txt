@@ -152,7 +152,7 @@ endif(WIN32)
 #export_boost_default_options()
 #find_package(Boost REQUIRED)
 #search_for_boost_python(REQUIRED)
-find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+#find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 ############################
 # the core builds a library and an executable depending on that library
@@ -186,7 +186,7 @@ add_subdirectory(core)
 # next, in `python_bindings`, build a shared python library, and a pure-python library that wraps around that.
 #
 
-python_add_library(_pybertini MODULE WITH_SOABI)
+#python_add_library(_pybertini MODULE WITH_SOABI)
 
 add_subdirectory(python_bindings)
 
