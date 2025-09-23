@@ -14,7 +14,7 @@ This document provides instructions for building the project on Windows. It cove
 
 - Install [Micromamba](https://mamba.readthedocs.io/en/latest/installation.html#micromamba).
 
-- Use `Developer PowerShhell for VS 2022` to have access to `cl` and `clang-cl`.
+- Use `Developer PowerShell for VS 2022` to have access to `cl` and `clang-cl`.
 
   ![img/powershell.png](img/powershell.png)
 
@@ -33,19 +33,24 @@ micromamba activate b2-windows
 
 2. Install additional dependencies:
 
-- Replace `public virtual std::exception` with `public std::exception` in `b2-windows\Library\include\boost\archive\archive_exception.hpp`.
+- Replace `public virtual std::exception` with `public std::exception` in the boost archive exception header:
 
 ```powershell
-(Get-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp).Replace('public virtual std::exception', 'public std::exception') | Set-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp
+# Find your micromamba environment path
+$envPath = micromamba info | Select-String "envs directories" | ForEach-Object { ($_ -split ":", 2)[1].Trim() }
+$boostFile = "$envPath\b2-windows\Library\include\boost\archive\archive_exception.hpp"
+(Get-Content $boostFile).Replace('public virtual std::exception', 'public std::exception') | Set-Content $boostFile
 ```
 
-- set `CMAKE_PREFIX_PATH` environment variable:
+- Set `CMAKE_PREFIX_PATH` environment variable to your micromamba environment:
 
 ```powershell
-$env:CMAKE_PREFIX_PATH='C:\Users\bertini\micromamba\envs\b2-windows\Library'
+# Automatically detect micromamba environment path
+$envPath = micromamba info | Select-String "envs directories" | ForEach-Object { ($_ -split ":", 2)[1].Trim() }
+$env:CMAKE_PREFIX_PATH="$envPath\b2-windows\Library"
 ```
 
-- set `CC` and `CXX` environment variables to use clang:
+- Set `CC` and `CXX` environment variables to use clang:
 
 ```powershell
 $env:CC='clang-cl'
@@ -59,7 +64,7 @@ $env:CXX='clang-cl'
 ```powershell
 cmake -DENABLE_UNIT_TESTING=ON -G Ninja -B bld .
 cmake --build bld --target all --config Release
-ctest --test-dir build/core
+ctest --test-dir bld/core
 ```
 
 ## Changes to Note
