@@ -21,7 +21,6 @@ dependencies:
   - python
   - scipy
   - wheel
-  - build
   - scikit-build-core
   - pkg-config
   - git
