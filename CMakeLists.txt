@@ -185,6 +185,7 @@ add_subdirectory(core)
 ###########
 # next, in `python_bindings`, build a shared python library, and a pure-python library that wraps around that.
 #
+find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 python_add_library(_pybertini MODULE WITH_SOABI)
 
