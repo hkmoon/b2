@@ -15,8 +15,8 @@
 //
 // Copyright(C) 2016-2018 by Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
@@ -40,10 +40,10 @@ namespace bertini
 {
 	namespace python
 	{
-		
 
 
-		BOOST_PYTHON_MODULE(_pybertini) // this name must match the name of the generated .so file.
+
+		BOOST_PYTHON_MODULE(pybertini) // this name must match the name of the generated .so file.
 		{
 			// see https://stackoverflow.com/questions/6114462/how-to-override-the-automatically-created-docstring-data-for-boostpython
 			// docstring_options d(true, true, false); // local_
@@ -52,31 +52,31 @@ namespace bertini
 			// docopt.disable_cpp_signatures();
 
 			object package = scope();
-		    package.attr("__path__") = "_pybertini";
+		    package.attr("__path__") = "pybertini";
 
 		    // do this one first, so that the later calls into EigenPy work :)
 		    EnableEigenPy();
 
 
 			ExportContainers();
-			
+
 			ExportDetails();
 
 			ExportMpfr();
-			
+
 			ExportRandom();
 
 			SetupFunctionTree();
 
 			{
 				scope current_scope;
-				
+
 
 				std::string new_submodule_name(extract<const char*>(current_scope.attr("__name__")));
 				new_submodule_name.append(".function_tree");
 				object new_submodule(borrowed(PyImport_AddModule(new_submodule_name.c_str())));
 				current_scope.attr("function_tree") = new_submodule;
-				
+
 
 				scope new_submodule_scope = new_submodule;
 				new_submodule_scope.attr("__doc__") = "The symbolics for Bertini2.  Operator overloads let you write arithmetic do form your system, after making variables, etc.";
@@ -87,7 +87,7 @@ namespace bertini
 			}
 
 			ExportAllSystems();
-			
+
 			ExportParsers();
 
 			ExportTrackers();
@@ -97,10 +97,10 @@ namespace bertini
 			ExportEndgameObservers();
 
 			ExportLogging();
-			
+
 			ExportZeroDim();
 		}
-	
+
 	}
 }
 
