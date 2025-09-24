@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(_pybertini)
+project(pybertini)
 
 
 set(CMAKE_CXX_STANDARD 17)
@@ -65,7 +65,7 @@ include_directories(${MPC_INCLUDES})
 
 
 
-find_package(eigenpy 3.12 REQUIRED CONFIG)
+find_package(eigenpy 3.3 REQUIRED CONFIG)
 # Eigenpy finds Boostpython, having our call to find boost libraries before the eigenpy call erases our call, so our call for boost libraries is after this line
 
 
