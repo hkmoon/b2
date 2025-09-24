@@ -57,6 +57,12 @@ $env:CC='clang-cl'
 $env:CXX='clang-cl'
 ```
 
+- Install `build` package for building python wheels:
+
+```powershell
+pip install build
+```
+
 ## Building the Project
 
 1. Create a build directory and run CMake:
@@ -105,6 +111,18 @@ Output from these tests are in: C:/Users/bertini/projects/b2/bld/core/Testing/Te
 Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.
 (b2-windows) PS C:\users\bertini\projects\b2>
 ```
+
+3. Install python bindings (after core is built):
+
+```powershell
+cmake --install bld --prefix $env:CMAKE_PREFIX_PATH
+
+python -m build --wheel --no-isolation
+
+pip install .\dist\pybertini-1.0.5-cp313-cp313-win_amd64.whl
+```
+
+** REMARK: There is an issue of .pyd file. Importing bertini in python gives an error. Please have a look **
 
 ## Changes to Note
 
