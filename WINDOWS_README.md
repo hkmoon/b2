@@ -54,11 +54,11 @@ $env:CXX='clang-cl'
 
 ```powershell
 # To build only the core:
-cmake -G Ninja -B bld .
+cmake -D CMAKE_BUILD_TYPE=Release -G Ninja -B bld .
 cmake --build bld --target all --config Release
 
 # To build and test the full project (core + python bindings):
-cmake -DENABLE_UNIT_TESTING=ON -G Ninja -B bld .
+cmake -D CMAKE_BUILD_TYPE=Release -DENABLE_UNIT_TESTING=ON -G Ninja -B bld .
 cmake --build bld --target all --config Release
 ctest --test-dir bld/core
 ```
