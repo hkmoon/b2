@@ -115,7 +115,7 @@ python -m build --wheel --no-isolation
 pip install .\dist\pybertini-1.0.5-cp313-cp313-win_amd64.whl
 ```
 
-** REMARK: There is an issue of .pyd file. Importing bertini in python gives an error. Please have a look **
+**REMARK: There is an issue of .pyd file. Importing bertini in python gives an error. Please have a look**
 
 ## Changes to Note
 
