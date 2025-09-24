@@ -33,15 +33,6 @@ micromamba activate b2-windows
 
 2. Install additional dependencies:
 
-- Replace `public virtual std::exception` with `public std::exception` in the boost archive exception header:
-
-```powershell
-# Find your micromamba environment path
-$envPath = micromamba info | Select-String "envs directories" | ForEach-Object { ($_ -split ":", 2)[1].Trim() }
-$boostFile = "$envPath\b2-windows\Library\include\boost\archive\archive_exception.hpp"
-(Get-Content $boostFile).Replace('public virtual std::exception', 'public std::exception') | Set-Content $boostFile
-```
-
 - Set `CMAKE_PREFIX_PATH` environment variable to your micromamba environment:
 
 ```powershell
@@ -55,12 +46,6 @@ $env:CMAKE_PREFIX_PATH="$envPath\b2-windows\Library"
 ```powershell
 $env:CC='clang-cl'
 $env:CXX='clang-cl'
-```
-
-- Install `build` package for building python wheels:
-
-```powershell
-pip install build
 ```
 
 ## Building the Project
@@ -113,6 +98,14 @@ Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.
 ```
 
 3. Install python bindings (after core is built):
+
+- Install `build` package for building python wheels:
+
+```powershell
+pip install build
+```
+
+- Build and install the python package:
 
 ```powershell
 cmake --install bld --prefix $env:CMAKE_PREFIX_PATH
