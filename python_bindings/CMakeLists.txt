@@ -161,19 +161,21 @@ set(PYBERTINI_SOURCES
 add_project_dependency(Eigen3 REQUIRED PKG_CONFIG_REQUIRES "eigen3 >= 3.4.0")
 
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_sources(${PROJECT_NAME} PRIVATE ${PYBERTINI_SOURCES} ${PYBERTINI_HEADERS})
+python_add_library(_pybertini MODULE WITH_SOABI)
+
+target_include_directories(_pybertini PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_sources(_pybertini PRIVATE ${PYBERTINI_SOURCES} ${PYBERTINI_HEADERS})
 
 if(NOT PROJECT_IS_TOP_LEVEL)
-    target_link_libraries(${PROJECT_NAME} PUBLIC bertini2)
+    target_link_libraries(_pybertini PUBLIC bertini2)
 else()
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${Bertini2_LIBRARIES})
+    target_link_libraries(_pybertini PUBLIC ${Bertini2_LIBRARIES})
 endif()
 
 # which libraries are needed
-target_link_libraries(${PROJECT_NAME} PUBLIC ${GMP_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${MPFR_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${MPC_LIBRARIES})
+target_link_libraries(_pybertini PUBLIC ${GMP_LIBRARIES})
+target_link_libraries(_pybertini PUBLIC ${MPFR_LIBRARIES})
+target_link_libraries(_pybertini PUBLIC ${MPC_LIBRARIES})
 
 
 # which directories contain headers we need
@@ -183,26 +185,26 @@ include_directories(${Python3_NumPy_INCLUDE_DIRS})
 include_directories(${Bertini2_INCLUDES})
 
 if(WIN32)
-  target_compile_options(pybertini
+  target_compile_options(_pybertini
                          PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
-  target_compile_definitions(pybertini PUBLIC "HAVE_SNPRINTF")
+  target_compile_definitions(_pybertini PUBLIC "HAVE_SNPRINTF")
 endif()
 
 # which libraries do we need to link to
-target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
-target_link_libraries(${PROJECT_NAME} PUBLIC eigenpy::eigenpy)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${Boost_LIBRARIES})
-target_link_boost_python(${PROJECT_NAME} PUBLIC)
+target_link_libraries(_pybertini PUBLIC Eigen3::Eigen)
+target_link_libraries(_pybertini PUBLIC eigenpy::eigenpy)
+target_link_libraries(_pybertini PUBLIC ${Boost_LIBRARIES})
+target_link_boost_python(_pybertini PUBLIC)
 
 if(NOT WIN32)
-  target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-conversion")
+  target_compile_options(_pybertini PRIVATE "-Wno-conversion")
 endif()
 
 cmake_print_variables(SKBUILD)
 if(${SKBUILD})
     # see https://stackoverflow.com/questions/1242904/finding-python-site-packages-directory-with-cmake
-    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION .)
+    install(TARGETS _pybertini LIBRARY DESTINATION .)
 else()
-    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${Python_SITELIB}/bertini)
+    install(TARGETS _pybertini LIBRARY DESTINATION ${Python_SITELIB}/bertini)
 endif()
 
