@@ -53,7 +53,11 @@ $env:CXX='clang-cl'
 1. Create a build directory and run CMake:
 
 ```powershell
-# To build and test only the core:
+# To build only the core:
+cmake -G Ninja -B bld .
+cmake --build bld --target all --config Release
+
+# To build and test the full project (core + python bindings):
 cmake -DENABLE_UNIT_TESTING=ON -G Ninja -B bld .
 cmake --build bld --target all --config Release
 ctest --test-dir bld/core
