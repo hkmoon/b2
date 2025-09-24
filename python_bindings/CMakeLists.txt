@@ -65,7 +65,7 @@ include_directories(${MPC_INCLUDES})
 
 
 
-find_package(eigenpy 3.3 REQUIRED CONFIG)
+find_package(eigenpy 3.12 REQUIRED CONFIG)
 # Eigenpy finds Boostpython, having our call to find boost libraries before the eigenpy call erases our call, so our call for boost libraries is after this line
 
 
@@ -74,7 +74,7 @@ find_package(eigenpy 3.3 REQUIRED CONFIG)
 
 # Find python and Boost - both are required dependencies
 # so that we can `python_add_library`
-find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
