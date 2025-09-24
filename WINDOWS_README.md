@@ -119,7 +119,6 @@ pip install .\dist\pybertini-1.0.5-cp313-cp313-win_amd64.whl
 
 ## Changes to Note
 
-* requires-python = ">= 3.13" -> requires-python = ">= 3.11"
 * For Windows convention: uint -> unsigned int due to `error: unknown type name 'uint'; did you mean 'int'?`
 * All the python bindings are commented out because core needs to be compiled first
 * Generating dlls for windows binaries
