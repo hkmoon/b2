@@ -119,14 +119,14 @@ pip install .\dist\pybertini-1.0.5-cp313-cp313-win_amd64.whl
 
 ## Changes to Note
 
-* For Windows convention: uint -> unsigned int due to `error: unknown type name 'uint'; did you mean 'int'?`
+* For Windows convention: `uint` -> `unsigned int` due to `error: unknown type name 'uint'; did you mean 'int'?`
 * All the python bindings are commented out because core needs to be compiled first
 * Generating dlls for windows binaries
-* Add _WIN32 in #ifndef BERTINI_DISABLE_PRECISION_CHECKS otherwise it causes precision errors
-* this->template Set(stepping); -> this->template Set<SteppingConfig>(stepping);
-* this->template Set(newton); -> this->template Set<NewtonConfig>(newton);
-* Remove #define BOOST_TEST_DYN_LINK 1
-* const double threshold_clearance_d = 1e-15; -> const double threshold_clearance_d = 1e-14;
-* use size_t index = 0; for tests
-* remove scikit-build 
+* Add `#ifndef _WIN32` in `#ifndef BERTINI_DISABLE_PRECISION_CHECKS` otherwise it causes precision errors
+* `this->template Set(stepping);` -> `this->template Set<SteppingConfig>(stepping);`
+* `this->template Set(newton);` -> `this->template Set<NewtonConfig>(newton);`
+* Remove `#define BOOST_TEST_DYN_LINK 1`
+* `const double threshold_clearance_d = 1e-15;` -> `const double threshold_clearance_d = 1e-14;`
+* use `size_t index = 0;` for tests
+
 
