@@ -8,120 +8,101 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build:
-    name: Build Binaries for ${{ matrix.os }}-${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest ]
-        python-version: ["3.8", "3.10", "3.11"]
-        exclude:
-          - os: macos-latest
-            python-version: '3.9'
+  build-linux:
+    name: Build manylinux wheels
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Install necessary dependencies (Posix)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev
-      - name: conda-ubuntu
-        uses: conda-incubator/setup-miniconda@v3
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          activate-environment: b2-ubuntu
-          environment-file: environment.yml
-          python-version: ${{ matrix.python-version }}
-          auto-activate-base: false
-      - name: Build (Posix)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-        shell: bash -el {0}
-        run: |
-          conda info
-          conda list
-                   
-          cd ${{github.workspace}}
-          mkdir bld
-          python3 -m build --wheel
-          
-          for whl in dist/*.whl; do
-            auditwheel -v repair $whl -w dist/ --plat manylinux_2_28_x86_64
-            rm $whl
-          done
-          
-          ls -alF dist/
-      - name: conda-windows
-        uses: conda-incubator/setup-miniconda@v3
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
-        with:
-          activate-environment: b2-windows
-          environment-file: environment-win.yml
-          python-version: ${{ matrix.python-version }}
-          auto-activate-base: false
-      - name: Build Windows
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
-        shell: powershell
-        #          https://stackoverflow.com/questions/79073953/clang-undefined-symbol-boostarchivearchive-exception
-        run: |
-          conda info
-          conda list
+          python-version: '3.11'
 
-          cd ${{github.workspace}}
-          mkdir bld
-          cd bld
-          pip3 install build
-          $env:CC='clang-cl'
-          $env:CXX='clang-cl'
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.16.5
 
-          (Get-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp).Replace('public virtual std::exception', 'public std::exception') | Set-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp
-          
-          $env:CMAKE_PREFIX_PATH='C:\Miniconda\envs\b2-windows\Library'
-          
-          cmake -G Ninja ..
-          cmake --build . --target all --config Release
-               
-          cd ..
-          python -m build --wheel --no-isolation
-      - name: Build MacOS
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
-        run: |
-          brew install gmp
-          brew install mpfr
-          brew install libmpc
-          brew install eigen
-          brew install eigenpy
-          brew install boost
-          brew install boost-python3
-          brew install python-setuptools
-          
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install numpy scipy wheel build
-          cd ${{github.workspace}}
-          mkdir build
-          cd build
-          cmake ..
-          make -j 4
+      - name: Build wheels
+        env:
+          # Build for Python 3.8, 3.10, 3.11 on x86_64 with manylinux_2_28 and manylinux2014
+          CIBW_BUILD: cp38-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_BEFORE_ALL_LINUX: |
+            # Install system dependencies
+            yum install -y gmp-devel mpfr-devel libmpc-devel wget tar make gcc-c++
 
-          cd ..
-          python3 -m build --wheel
+            # Install Eigen3
+            wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+            tar xzf eigen-3.4.0.tar.gz
+            cd eigen-3.4.0
+            mkdir build && cd build
+            cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
+            make install
+            cd ../..
+
+            # Install Boost with Python support
+            wget https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.tar.gz
+            tar xzf boost_1_83_0.tar.gz
+            cd boost_1_83_0
+            ./bootstrap.sh --with-python=python3
+            ./b2 install --prefix=/usr/local --with-python variant=release link=shared threading=multi
+            cd ..
+          CIBW_BEFORE_BUILD: |
+            pip install numpy eigenpy scikit-build-core
+          CIBW_ENVIRONMENT: CMAKE_PREFIX_PATH=/usr/local LD_LIBRARY_PATH=/usr/local/lib
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair --plat manylinux_2_28_x86_64 -w {dest_dir} {wheel}"
+          CIBW_SKIP: "*-musllinux_* pp* *-manylinux_i686"
+        run: python -m cibuildwheel --output-dir dist
+
       - name: Upload Builds
         uses: actions/upload-artifact@v4
         with:
-          name: built-binary-${{ matrix.os }}
-          path: |
-            ${{github.workspace}}/dist/*.whl
-            ${{github.workspace}}/dist/*.tar.gz
-            ${{github.workspace}}/dist/*.zip
-            ${{github.workspace}}/build/*.exe
-            ${{github.workspace}}/build/*.bin
+          name: built-binary-linux
+          path: dist/*.whl
+
+  build-macos:
+    name: Build macOS wheels
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          brew install gmp mpfr libmpc eigen eigenpy boost boost-python3
+          pip install numpy scipy wheel build
+
+      - name: Build wheel
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          make -j 4
+          cd ..
+          python -m build --wheel
+
+      - name: Upload Builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-binary-macos-${{ matrix.python-version }}
+          path: dist/*.whl
 
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
     needs:
-      - build
+      - build-linux
+      - build-macos
     runs-on: ubuntu-latest
 
     environment:
@@ -136,6 +117,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           merge-multiple: true
+          path: dist
       - name: Publish distribution 📦 to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
@@ -148,7 +130,8 @@ jobs:
       Publish Python 🐍 distribution 📦 to PyPI
     if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     needs:
-      - build
+      - build-linux
+      - build-macos
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -161,6 +144,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           merge-multiple: true
+          path: dist
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
@@ -188,6 +172,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           merge-multiple: true
+          path: dist
 
       - name: Sign the dists with Sigstore
         uses: sigstore/gh-action-sigstore-python@v3.0.0

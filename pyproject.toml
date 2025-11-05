@@ -30,3 +30,28 @@ wheel.expand-macos-universal-tags = true
 wheel.install-dir = "bertini"
 build-dir = "bld/"
 
+[tool.cibuildwheel]
+# Build for CPython 3.8, 3.10, 3.11
+build = "cp38-* cp310-* cp311-*"
+skip = "*-musllinux_* pp* *-manylinux_i686 *-win32"
+
+# Use manylinux_2_28 for x86_64 Linux builds
+manylinux-x86_64-image = "manylinux_2_28"
+
+# Test the wheels
+test-requires = "pytest numpy"
+test-command = "pytest {project}/python/tests -v"
+test-skip = "*"  # Skip tests for now due to complex dependencies
+
+[tool.cibuildwheel.linux]
+before-all = [
+    "yum install -y gmp-devel mpfr-devel libmpc-devel wget tar make gcc-c++",
+]
+before-build = "pip install numpy eigenpy scikit-build-core"
+environment = { CMAKE_PREFIX_PATH="/usr/local", LD_LIBRARY_PATH="/usr/local/lib" }
+repair-wheel-command = "auditwheel repair --plat manylinux_2_28_x86_64 -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.macos]
+before-all = "brew install gmp mpfr libmpc eigen boost boost-python3"
+before-build = "pip install numpy eigenpy scikit-build-core"
+
