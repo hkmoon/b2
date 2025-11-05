@@ -1,4 +1,4 @@
-name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
+name: Build Linux manylinux wheels and publish to PyPI
 
 on:
   push:
@@ -9,114 +9,47 @@ on:
 
 jobs:
   build:
-    name: Build Binaries for ${{ matrix.os }}-${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}
+    name: Build Linux manylinux Binaries for Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
         python-version: ["3.8", "3.10", "3.11"]
-        exclude:
-          - os: macos-latest
-            python-version: '3.9'
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Install necessary dependencies (Posix)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+      - name: Install necessary dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev
-      - name: conda-ubuntu
+      - name: Setup Conda environment
         uses: conda-incubator/setup-miniconda@v3
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
         with:
           activate-environment: b2-ubuntu
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
-      - name: Build (Posix)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+      - name: Build Linux manylinux wheel
         shell: bash -el {0}
         run: |
           conda info
           conda list
-                   
+
           cd ${{github.workspace}}
           mkdir bld
           python3 -m build --wheel
-          
+
           for whl in dist/*.whl; do
             auditwheel -v repair $whl -w dist/ --plat manylinux_2_28_x86_64
             rm $whl
           done
-          
+
           ls -alF dist/
-      - name: conda-windows
-        uses: conda-incubator/setup-miniconda@v3
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
-        with:
-          activate-environment: b2-windows
-          environment-file: environment-win.yml
-          python-version: ${{ matrix.python-version }}
-          auto-activate-base: false
-      - name: Build Windows
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
-        shell: powershell
-        #          https://stackoverflow.com/questions/79073953/clang-undefined-symbol-boostarchivearchive-exception
-        run: |
-          conda info
-          conda list
-
-          cd ${{github.workspace}}
-          mkdir bld
-          cd bld
-          pip3 install build
-          $env:CC='clang-cl'
-          $env:CXX='clang-cl'
-
-          (Get-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp).Replace('public virtual std::exception', 'public std::exception') | Set-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp
-          
-          $env:CMAKE_PREFIX_PATH='C:\Miniconda\envs\b2-windows\Library'
-          
-          cmake -G Ninja ..
-          cmake --build . --target all --config Release
-               
-          cd ..
-          python -m build --wheel --no-isolation
-      - name: Build MacOS
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
-        run: |
-          brew install gmp
-          brew install mpfr
-          brew install libmpc
-          brew install eigen
-          brew install eigenpy
-          brew install boost
-          brew install boost-python3
-          brew install python-setuptools
-          
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install numpy scipy wheel build
-          cd ${{github.workspace}}
-          mkdir build
-          cd build
-          cmake ..
-          make -j 4
-
-          cd ..
-          python3 -m build --wheel
-      - name: Upload Builds
+      - name: Upload Linux manylinux wheels
         uses: actions/upload-artifact@v4
         with:
-          name: built-binary-${{ matrix.os }}
-          path: |
-            ${{github.workspace}}/dist/*.whl
-            ${{github.workspace}}/dist/*.tar.gz
-            ${{github.workspace}}/dist/*.zip
-            ${{github.workspace}}/build/*.exe
-            ${{github.workspace}}/build/*.bin
+          name: linux-manylinux-wheel-python-${{ matrix.python-version }}
+          path: ${{github.workspace}}/dist/*.whl
 
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
