@@ -103,15 +103,11 @@ jobs:
           
           python3 -m venv venv
           source venv/bin/activate
-          pip install numpy scipy wheel build
+          pip install numpy scipy wheel build scikit_build_core ninja
           cd ${{github.workspace}}
-          mkdir build
-          cd build
-          cmake ..
-          make -j 4
-
-          cd ..
-          python3 -m build --wheel
+          cmake -DENABLE_UNIT_TESTING=ON -G Ninja -B bld .
+          cmake --build bld --target all --config Release
+          python -m build --wheel --no-isolation
       - name: Upload Builds
         uses: actions/upload-artifact@v4
         with:
