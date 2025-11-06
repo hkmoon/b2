@@ -13,16 +13,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
-        python-version: [
-          '3.11.12',
-          'pypy-3.11.12',
-        ]
+        os: [ ubuntu-latest, macos-latest ]
+        python-version: ["3.8", "3.10", "3.11"]
         exclude:
-          - os: windows-latest
-            python-version: 'pypy-3.11.12'
           - os: macos-latest
-            python-version: 'pypy-3.11.12'
+            python-version: '3.9'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +47,7 @@ jobs:
           python3 -m build --wheel
           
           for whl in dist/*.whl; do
-            auditwheel -v repair $whl -w dist/ --plat manylinux_2_39_x86_64
+            auditwheel -v repair $whl -w dist/ --plat manylinux_2_28_x86_64
             rm $whl
           done
           
@@ -85,7 +80,7 @@ jobs:
           $env:CMAKE_PREFIX_PATH='C:\Miniconda\envs\b2-windows\Library'
           
           cmake -G Ninja ..
-          cmake --build .
+          cmake --build . --target all --config Release
                
           cd ..
           python -m build --wheel --no-isolation
