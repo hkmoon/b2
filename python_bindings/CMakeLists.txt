@@ -157,7 +157,7 @@ set(PYBERTINI_SOURCES
 
 
 ######   set up some stuff about the project
-
+add_project_dependency(Eigen3 REQUIRED PKG_CONFIG_REQUIRES "eigen3 >= 3.4.0")
 
 
 if(PROJECT_IS_TOP_LEVEL)
@@ -195,6 +195,7 @@ endif()
 target_link_libraries(_pybertini PUBLIC Eigen3::Eigen)
 target_link_libraries(_pybertini PUBLIC eigenpy::eigenpy)
 target_link_libraries(_pybertini PUBLIC ${Boost_LIBRARIES})
+target_link_boost_python(${PROJECT_NAME} PUBLIC)
 
 if(NOT WIN32)
   target_compile_options(_pybertini PRIVATE "-Wno-conversion")
