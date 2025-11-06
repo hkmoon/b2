@@ -3,15 +3,24 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - cmake
+  - ccache
+  - cxx-compiler
+  - ninja
   - numpy
   - gmp
   - mpfr
   - mpc
-  - libboost
+  - libboost-devel
   - eigen
   - eigenpy
-  - libboost-python
+  - libboost-python-devel
+  - vs2022_win-64
+  - scipy
+  - python
   - scipy
   - wheel
   - build
   - scikit-build-core
+  - pkg-config
+  - git

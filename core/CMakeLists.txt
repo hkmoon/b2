@@ -5,23 +5,22 @@ include(CMakePrintHelpers) # so we can print cmake variable values
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(BUILD_SHARED_LIBS ON)
-#  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# set(BUILD_SHARED_LIBS ON)
+# set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # In order to find conda, run 'conda activate' and then use 'cmake .. -DCMAKE_PREFIX_PATH=$CONDA_PREFIX' when cmaking
 
 # All source files to be compiled
 # We can either explicitly list all files or use glob, we chose to explicitly list files and not to glob
 #file(GLOB SOURCES src/*.cpp)
-
-
-
-
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 
 if (MSVC)
     add_compile_options(/bigobj)
+    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+    set(BUILD_SHARED_LIBS TRUE)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
     add_compile_options(
@@ -45,18 +44,21 @@ find_package(MPC REQUIRED)
 include_directories(${GMP_INCLUDES})
 include_directories(${MPC_INCLUDES})
 
-find_package(Boost 1.82 REQUIRED
+set_boost_default_options()
+export_boost_default_options()
+find_package(Boost REQUIRED
                 COMPONENTS
                     serialization
                     unit_test_framework
                     filesystem
+                    graph
                     system
                     chrono
                     regex
                     timer
                     log
-                    thread
                     log_setup
+                    thread
 )
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
@@ -364,21 +366,15 @@ set(BERTINI2_EXE_HEADERS
     include/bertini2/blackbox/user_homotopy.hpp
 )
 
-if(PROJECT_IS_TOP_LEVEL)
-    add_library(bertini2)
-
-    add_executable(bertini2_exe)
-    set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
-endif()
 
 # this is correct if run from core, but not if from a higher level...
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_sources(bertini2_exe PUBLIC ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
-
-
 # see https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source
 # for more on these generator expressions, $<INSTALL_INTERFACE, etc.
+add_library(bertini2 ${BERTINI2_LIBRARY_SOURCES}
+                            ${BERTINI2_LIBRARY_HEADERS})
+add_library(bertini2::bertini2 ALIAS bertini2)
 
 target_include_directories(bertini2 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -386,23 +382,19 @@ target_include_directories(bertini2 PUBLIC
     )
 
 
-
-
 # All library files
-target_sources(bertini2 PRIVATE
+target_sources(bertini2 PUBLIC
     ${BERTINI2_LIBRARY_SOURCES}
     ${BERTINI2_LIBRARY_HEADERS}
 )
 
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
-
 if(WIN32)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+  set(BUILD_SHARED_LIBS TRUE)
   target_compile_options(bertini2
                          PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
   target_compile_definitions(bertini2 PUBLIC "HAVE_SNPRINTF")
 endif()
-
 
 target_link_libraries(bertini2 ${GMP_LIBRARIES})
 target_link_libraries(bertini2 ${MPFR_LIBRARIES})
@@ -410,13 +402,29 @@ target_link_libraries(bertini2 ${MPC_LIBRARIES})
 target_link_libraries(bertini2 Eigen3::Eigen)
 target_link_libraries(bertini2 ${Boost_LIBRARIES})
 
+if(SUFFIX_SO_VERSION)
+  set_target_properties(bertini2 PROPERTIES SOVERSION ${PROJECT_VERSION})
+endif(SUFFIX_SO_VERSION)
 
-
+add_executable(bertini2_exe)
+target_sources(bertini2_exe PUBLIC ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
 target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 
 # todo: this should be made a devmode thing
 #target_compile_options(bertini2 PRIVATE -Wall -Wextra)
 
+install(
+  TARGETS bertini2
+  EXPORT ${TARGETS_EXPORT_NAME}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  INCLUDES
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+add_header_group(${PROJECT_NAME}_HEADERS)
+add_source_group(${PROJECT_NAME}_SOURCES)
 
 install(
     TARGETS bertini2
@@ -570,19 +578,6 @@ install(
     DESTINATION "include/bertini2/tracking"
 )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ###################
 #
 #
@@ -590,20 +585,6 @@ install(
 #
 #
 #############
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 set(B2_CLASS_TEST_SOURCES
     test/classes/boost_multiprecision_test.cpp
     test/classes/fundamentals_test.cpp
@@ -625,13 +606,8 @@ set(B2_CLASS_TEST_SOURCES
 )
 
 
-# todo here
-
-
-
 add_executable(test_classes ${B2_CLASS_TEST_SOURCES})
-target_include_directories(test_classes PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-
+target_include_directories(test_classes PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_classes ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_classes COMMAND ${CMAKE_BINARY_DIR}/core/test_classes)
 
@@ -655,7 +631,7 @@ set(B2_CLASSIC_TEST
 )
 
 add_executable(test_classic ${B2_CLASSIC_TEST})
-target_include_directories(test_classic PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(test_classic PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(test_classic ${Boost_LIBRARIES} bertini2)
 add_test(NAME test_classic COMMAND ${CMAKE_BINARY_DIR}/core/test_classic)
 

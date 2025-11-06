@@ -15,8 +15,8 @@
 //
 // Copyright(C) 2017-2021 by Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
@@ -27,8 +27,8 @@
 //
 
 
- 
-#define BOOST_TEST_DYN_LINK 1
+
+//#define BOOST_TEST_DYN_LINK 1
 
 //this #define MUST appear before #include <boost/test/unit_test.hpp>
 #define BOOST_TEST_MODULE "Bertini 2 Blackbox Testing"
