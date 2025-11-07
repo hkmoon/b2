@@ -103,8 +103,8 @@ jobs:
           brew install libmpc
           brew install eigen
           brew install eigenpy
-          brew install boost@1.87
-          brew install boost-python3@1.87
+          brew install boost@1.85
+          brew install boost-python3@1.85
           brew install python-setuptools
           
           python3 -m venv venv
