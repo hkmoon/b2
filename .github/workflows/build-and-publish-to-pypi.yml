@@ -113,7 +113,7 @@ jobs:
           cd ${{github.workspace}}
           mkdir build
           cd build
-          cmake ..
+          cmake .. -DCMAKE_PREFIX_PATH=/opt/homebrew/opt/boost
           make -j 4
 
           cd ..
