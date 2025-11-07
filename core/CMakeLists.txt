@@ -75,7 +75,7 @@ if(Boost_VERSION_STRING VERSION_LESS "1.89.0")
     find_package(Boost REQUIRED COMPONENTS system)
 endif()
 
-find_package(Eigen3 REQUIRED NO_MODULE)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 # This was from a makemodule.am, take the lists and define them in seperate blocks with the variables they already have, then add the variable name to library_headrs
 set(endgames_headers
