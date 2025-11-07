@@ -15,10 +15,6 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         python-version: [
-          '3.8',
-          '3.9',
-          '3.10',
-          '3.11',
           '3.12'
         ]
     steps:
@@ -26,7 +22,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Build manylinux wheels
-        if: ${{ !startsWith(matrix.python-version, '3.12') && startsWith(matrix.os, 'ubuntu') }}
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
         run: |
           docker run --rm --network=host -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 bash -c "
           # Install dependencies
@@ -100,7 +96,7 @@ jobs:
           cd ..
           python -m build --wheel --no-isolation
       - name: Build MacOS
-        if: ${{ !startsWith(matrix.python-version, '3.11') && startsWith(matrix.os, 'macos') }}
+        if: ${{ startsWith(matrix.os, 'macos') }}
         run: |
           brew install gmp
           brew install mpfr
