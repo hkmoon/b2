@@ -104,7 +104,7 @@ jobs:
           brew install eigen
           brew install eigenpy
           brew install boost@1.85
-          brew install boost-python3@1.85
+          brew install boost-python3
           brew install python-setuptools
           
           python3 -m venv venv
