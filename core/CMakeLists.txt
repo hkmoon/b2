@@ -52,7 +52,6 @@ find_package(Boost REQUIRED
                     unit_test_framework
                     filesystem
                     graph
-                    system
                     chrono
                     regex
                     timer
@@ -60,6 +59,11 @@ find_package(Boost REQUIRED
                     log_setup
                     thread
 )
+
+# Boost 1.89.0 removed the boost_system library (it's header-only now).
+if(Boost_VERSION_STRING VERSION_LESS "1.89.0")
+    find_package(Boost REQUIRED COMPONENTS system)
+endif()
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
