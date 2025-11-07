@@ -101,7 +101,7 @@ jobs:
           brew install gmp
           brew install mpfr
           brew install libmpc
-          brew install eigen
+          brew install eigen@3
           brew install eigenpy
           brew install boost
           brew install boost-python3
