@@ -103,8 +103,8 @@ jobs:
           brew install libmpc
           brew install eigen
           brew install eigenpy
-          brew install boost
-          brew install boost-python3
+          brew install boost@1.87
+          brew install boost-python3@1.87
           brew install python-setuptools
           
           python3 -m venv venv
@@ -113,7 +113,7 @@ jobs:
           cd ${{github.workspace}}
           mkdir build
           cd build
-          cmake .. -DCMAKE_PREFIX_PATH=/opt/homebrew/opt/boost
+          cmake ..
           make -j 4
 
           cd ..
