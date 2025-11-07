@@ -13,55 +13,70 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
-        python-version: ["3.8", "3.10", "3.11"]
-        exclude:
-          - os: macos-latest
-            python-version: '3.9'
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        python-version: [
+          '3.8',
+          '3.9',
+          '3.10',
+          '3.11',
+          '3.12'
+        ]
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Install necessary dependencies (Posix)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
+      - name: Build manylinux wheels
+        if: ${{ !startsWith(matrix.python-version, '3.12') && startsWith(matrix.os, 'ubuntu') }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libgmp3-dev libmpfr-dev libmpc-dev libeigen3-dev
-      - name: conda-ubuntu
-        uses: conda-incubator/setup-miniconda@v3
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-        with:
-          activate-environment: b2-ubuntu
-          environment-file: environment.yml
-          python-version: ${{ matrix.python-version }}
-          auto-activate-base: false
-      - name: Build (Posix)
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'ubuntu') }}
-        shell: bash -el {0}
-        run: |
-          conda info
-          conda list
-                   
-          cd ${{github.workspace}}
+          docker run --rm --network=host -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 bash -c "
+          # Install dependencies
+          cd /io
+          yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool
+          
+          # Build for multiple Python versions
+          for PYBIN in /opt/python/cp{38,39,310,311,312}-*/bin; do
+          
+          # Upgrade pip and install build tools
+          \${PYBIN}/pip install scikit-build-core numpy scipy
+          
+          # Install boost and eigenpy
+          cd /tmp
+          wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2
+          bunzip2 boost_1_87_0.tar.bz2
+          tar xvf boost_1_87_0.tar
+          cd boost_1_87_0
+          ./bootstrap.sh --prefix=/usr/local --with-python=\${PYBIN}
+          ./b2 install
+          
+          cd /tmp
+          wget https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz
+          tar zxvf eigenpy-3.11.0.tar.gz
+          cd eigenpy-3.11.0
           mkdir bld
-          python3 -m build --wheel
+          cd bld
+          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}
+          make install
           
-          for whl in dist/*.whl; do
-            auditwheel -v repair $whl -w dist/ --plat manylinux_2_28_x86_64
-            rm $whl
+          # Get Python version info
+          DIR=$(dirname ${PYBIN})           # /opt/python/cp39-cp39-manylinux2014_x86_64
+          PYVER=${DIR##*/}                  # cp39-cp39-manylinux2014_x86_64
+          
+          # Build wheels & bundle external shared libraries into wheels
+          export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
+          \${PYBIN}/pip wheel /io -w /io/wheelhouse/
+          auditwheel repair pybertini-1.0a8-\${PYVER}.whl --plat manylinux2014_x86_64 -w /io/dist/
           done
-          
-          ls -alF dist/
+          "
       - name: conda-windows
         uses: conda-incubator/setup-miniconda@v3
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows') }}
+        if: ${{ startsWith(matrix.os, 'windows') }}
         with:
           activate-environment: b2-windows
           environment-file: environment-win.yml
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
       - name: Build Windows
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'windows')}}
+        if: ${{ startsWith(matrix.os, 'windows') }}
         shell: powershell
         #          https://stackoverflow.com/questions/79073953/clang-undefined-symbol-boostarchivearchive-exception
         run: |
@@ -85,7 +100,7 @@ jobs:
           cd ..
           python -m build --wheel --no-isolation
       - name: Build MacOS
-        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(matrix.os, 'macos') }}
+        if: ${{ !startsWith(matrix.python-version, '3.11') && startsWith(matrix.os, 'macos') }}
         run: |
           brew install gmp
           brew install mpfr
