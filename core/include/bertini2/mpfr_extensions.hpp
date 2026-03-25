@@ -222,20 +222,8 @@ BOOST_SERIALIZATION_SPLIT_FREE(::boost::multiprecision::backends::gmp_rational)
 BOOST_SERIALIZATION_SPLIT_FREE(::boost::multiprecision::backends::gmp_int)
 
 
-// if you wish to use et_on with Boost.Multiprecision with Eigen 3.2.x or earlier, you must apply a patch to Boost.MP related to bug 11149, and use the following non-standard lines.
-// https://svn.boost.org/trac/boost/ticket/11149
-
-#define EIGEN_DEVICE_FUNC // to make Eigen 3.3 happy... ugh, this is likely to break CUDA usage with Bertini2, if that ever happens.
-#include <Eigen/src/Core/util/Macros.h>
-
-#ifdef BMP_EXPRESSION_TEMPLATES
-	#if (!EIGEN_VERSION_AT_LEAST(3,2,92)) // version of 3.3-beta1 is 3,2,92.
-		namespace std{ 
-using boost::multiprecision::min; //error receiver: please see https://svn.boost.org/trac/boost/ticket/11149 for information about these using statements in std namespace.  
-using boost::multiprecision::max; //3 options: ./configure --disable-expression_templates, use Boost 1.61, or patch earlier Boost versions to resolve this.
-		}
-	#endif
-#endif
+// Eigen 3.2.x workaround for Boost.Multiprecision expression templates
+// removed -- project now requires Eigen >= 3.3.
 
 
 
