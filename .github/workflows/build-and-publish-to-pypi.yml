@@ -81,6 +81,7 @@ jobs:
 
           $env:CC='clang-cl'
           $env:CXX='clang-cl'
+          $env:CMAKE_GENERATOR='Ninja'
           $env:CMAKE_PREFIX_PATH="$env:CONDA_PREFIX\Library"
 
           # Patch boost header to fix clang-cl linker error
