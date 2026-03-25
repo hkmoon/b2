@@ -73,27 +73,22 @@ jobs:
           auto-activate-base: false
       - name: Build Windows
         if: ${{ startsWith(matrix.os, 'windows') }}
-        shell: powershell
+        shell: pwsh
         #          https://stackoverflow.com/questions/79073953/clang-undefined-symbol-boostarchivearchive-exception
         run: |
           conda info
           conda list
 
-          cd ${{github.workspace}}
-          mkdir bld
-          cd bld
-          pip3 install build
           $env:CC='clang-cl'
           $env:CXX='clang-cl'
+          $env:CMAKE_PREFIX_PATH="$env:CONDA_PREFIX\Library"
 
-          (Get-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp).Replace('public virtual std::exception', 'public std::exception') | Set-Content C:\Miniconda\envs\b2-windows\Library\include\boost\archive\archive_exception.hpp
-          
-          $env:CMAKE_PREFIX_PATH='C:\Miniconda\envs\b2-windows\Library'
-          
-          cmake -G Ninja ..
-          cmake --build . --target all --config Release
-               
-          cd ..
+          # Patch boost header to fix clang-cl linker error
+          $boostHeader = "$env:CONDA_PREFIX\Library\include\boost\archive\archive_exception.hpp"
+          (Get-Content $boostHeader).Replace('public virtual std::exception', 'public std::exception') | Set-Content $boostHeader
+
+          cd ${{github.workspace}}
+          pip install build
           python -m build --wheel --no-isolation
       - name: Build MacOS
         if: ${{ startsWith(matrix.os, 'macos') }}
