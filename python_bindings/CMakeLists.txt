@@ -67,7 +67,7 @@ find_package(eigenpy 3.3 REQUIRED CONFIG)
 # so that we can `python_add_library`
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
-find_package(Eigen3 3.3...3.4 REQUIRED NO_MODULE)
+find_package(Eigen3 REQUIRED NO_MODULE)
 
 
 
