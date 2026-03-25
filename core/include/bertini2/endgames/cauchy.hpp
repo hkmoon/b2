@@ -321,7 +321,7 @@ public:
 	*/
 	void SetCauchySettings(CauchyConfig const& new_cauchy_settings)
 	{
-		this->template Set(new_cauchy_settings);
+		this->template Set<CauchyConfig>(new_cauchy_settings);
 	}
 
 	/**
