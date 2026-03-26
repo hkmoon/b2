@@ -31,6 +31,6 @@ wheel.install-dir = "bertini"
 build-dir = "bld/"
 
 [tool.scikit-build.cmake]
-args = ["-DINSTALL_DOCUMENTATION=OFF"]
+args = ["-DINSTALL_DOCUMENTATION=OFF", "-DCMAKE_DISABLE_FIND_PACKAGE_Doxygen=ON"]
 build-type = "Release"
 
