@@ -25,42 +25,44 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         run: |
           docker run --rm --network=host -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 bash -c "
-          # Install dependencies
-          cd /io
+          set -e
+
+          # Install system dependencies
           yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool
-          
-          # Build for multiple Python versions
-          for PYBIN in /opt/python/cp{38,39,310,311,312}-*/bin; do
-          
-          # Upgrade pip and install build tools
-          \${PYBIN}/pip install scikit-build-core numpy scipy
-          
-          # Install boost and eigenpy
+
+          # Use first matching Python for building C++ deps (they are Python-independent)
+          PYBIN=/opt/python/\$(ls /opt/python/ | grep cp311 | head -1)/bin
+
+          # Build and install Boost (once)
           cd /tmp
-          wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2
+          wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2
           bunzip2 boost_1_87_0.tar.bz2
           tar xf boost_1_87_0.tar
           cd boost_1_87_0
           ./bootstrap.sh --prefix=/usr/local --with-python=\${PYBIN}
-          ./b2 install
-          
+          ./b2 -j\$(nproc) install
+
+          # Build and install eigenpy (once)
           cd /tmp
-          wget https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz
+          wget -q https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz
           tar zxf eigenpy-3.11.0.tar.gz
           cd eigenpy-3.11.0
-          mkdir -p bld
-          cd bld
+          mkdir bld && cd bld
           cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}
-          make install
-          
-          # Get Python version info
-          DIR=$(dirname ${PYBIN})           # /opt/python/cp39-cp39-manylinux2014_x86_64
-          PYVER=${DIR##*/}                  # cp39-cp39-manylinux2014_x86_64
-          
-          # Build wheels & bundle external shared libraries into wheels
-          export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
-          \${PYBIN}/pip wheel /io --no-deps -w /io/wheelhouse/
-          auditwheel repair pybertini-1.0a8-\${PYVER}.whl --plat manylinux2014_x86_64 -w /io/dist/
+          make -j\$(nproc) install
+
+          export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:\$LD_LIBRARY_PATH
+
+          # Build wheel for each Python version
+          for PYBIN in /opt/python/cp{311,312}-*/bin; do
+            \${PYBIN}/pip install scikit-build-core numpy scipy
+
+            \${PYBIN}/pip wheel /io --no-deps -w /io/wheelhouse/
+
+            # Repair the wheel just built (glob to avoid hardcoding version)
+            for WHL in /io/wheelhouse/pybertini-*-\$(basename \$(dirname \${PYBIN}))*.whl; do
+              auditwheel repair \${WHL} --plat manylinux2014_x86_64 -w /io/dist/
+            done
           done
           "
       - name: conda-windows
