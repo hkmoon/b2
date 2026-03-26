@@ -50,7 +50,7 @@ jobs:
           cd eigenpy-3.11.0
           mkdir -p bld
           cd bld
-          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}
+          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}/python
           make install
           
           # Get Python version info
