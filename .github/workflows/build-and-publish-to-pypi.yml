@@ -39,16 +39,16 @@ jobs:
           cd /tmp
           wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2
           bunzip2 boost_1_87_0.tar.bz2
-          tar xvf boost_1_87_0.tar
+          tar xf boost_1_87_0.tar
           cd boost_1_87_0
           ./bootstrap.sh --prefix=/usr/local --with-python=\${PYBIN}
           ./b2 install
           
           cd /tmp
           wget https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz
-          tar zxvf eigenpy-3.11.0.tar.gz
+          tar zxf eigenpy-3.11.0.tar.gz
           cd eigenpy-3.11.0
-          mkdir bld
+          mkdir -p bld
           cd bld
           cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}
           make install
