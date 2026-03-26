@@ -46,23 +46,26 @@ include_directories(${MPC_INCLUDES})
 
 set_boost_default_options()
 export_boost_default_options()
-find_package(Boost REQUIRED
-                COMPONENTS
-                    serialization
-                    unit_test_framework
-                    filesystem
-                    graph
-                    chrono
-                    regex
-                    timer
-                    log
-                    log_setup
-                    thread
+
+set(_BOOST_REQUIRED_COMPONENTS
+    serialization
+    unit_test_framework
+    filesystem
+    graph
+    chrono
+    regex
+    timer
+    log
+    log_setup
+    thread
 )
 
+find_package(Boost REQUIRED COMPONENTS ${_BOOST_REQUIRED_COMPONENTS})
+
 # Boost 1.89.0 removed the boost_system library (it's header-only now).
+# Re-find with ALL components so Boost_LIBRARIES is not overwritten.
 if(Boost_VERSION_STRING VERSION_LESS "1.89.0")
-    find_package(Boost REQUIRED COMPONENTS system)
+    find_package(Boost REQUIRED COMPONENTS ${_BOOST_REQUIRED_COMPONENTS} system)
 endif()
 
 find_package(Eigen3 REQUIRED NO_MODULE)
