@@ -41,7 +41,7 @@ jobs:
           bunzip2 boost_1_87_0.tar.bz2
           tar xf boost_1_87_0.tar
           cd boost_1_87_0
-          ./bootstrap.sh --prefix=/usr/local --with-python=\${PYBIN}
+          ./bootstrap.sh --prefix=/usr/local --with-python=\${PYBIN}/python
           ./b2 install
           
           cd /tmp
@@ -50,7 +50,7 @@ jobs:
           cd eigenpy-3.11.0
           mkdir -p bld
           cd bld
-          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}
+          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}/python
           make install
           
           # Build wheels & bundle external shared libraries into wheels
