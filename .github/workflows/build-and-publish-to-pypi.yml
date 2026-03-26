@@ -33,14 +33,18 @@ jobs:
           # Use first matching Python for building C++ deps (they are Python-independent)
           PYBIN=/opt/python/\$(ls /opt/python/ | grep cp311 | head -1)/bin
 
+          # Pin Boost.Python to our target Python only (manylinux has Python 2.7 which b2 auto-detects)
+          PYVER=\$(\${PYBIN}/python -c 'import sys; print(f\"{sys.version_info.major}.{sys.version_info.minor}\")')
+          echo \"using python : \${PYVER} : \${PYBIN}/python ;\" > ~/user-config.jam
+
           # Build and install Boost (once)
           cd /tmp
           wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2
           bunzip2 boost_1_87_0.tar.bz2
           tar xf boost_1_87_0.tar
           cd boost_1_87_0
-          ./bootstrap.sh --prefix=/usr/local --with-python=\${PYBIN}
-          ./b2 -j\$(nproc) install
+          ./bootstrap.sh --prefix=/usr/local --with-python=\${PYBIN}/python
+          ./b2 -j\$(nproc) python=\${PYVER} install
 
           # Build and install eigenpy (once)
           cd /tmp
