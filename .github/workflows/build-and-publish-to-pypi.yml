@@ -59,7 +59,7 @@ jobs:
           
           # Build wheels & bundle external shared libraries into wheels
           export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
-          \${PYBIN}/pip wheel /io -w /io/wheelhouse/
+          \${PYBIN}/pip wheel /io --no-deps -w /io/wheelhouse/
           auditwheel repair pybertini-1.0a8-\${PYVER}.whl --plat manylinux2014_x86_64 -w /io/dist/
           done
           "
