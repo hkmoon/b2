@@ -27,7 +27,7 @@ jobs:
           docker run --rm --network=host -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 bash -c "
           # Install dependencies
           cd /io
-          yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool epel-release openblas-devel
+          yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool
           
           # Build for multiple Python versions
           for PYBIN in /opt/python/cp{38,39,310,311,312}-*/bin; do
