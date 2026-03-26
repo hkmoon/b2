@@ -29,8 +29,8 @@ wheel.packages = ["python/bertini"]
 wheel.expand-macos-universal-tags = true
 wheel.install-dir = "bertini"
 build-dir = "bld/"
-cmake.args = ["-DINSTALL_DOCUMENTATION=OFF"]
 
 [tool.scikit-build.cmake]
+args = ["-DINSTALL_DOCUMENTATION=OFF"]
 build-type = "Release"
 
