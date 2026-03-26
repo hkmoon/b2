@@ -50,17 +50,14 @@ jobs:
           cd eigenpy-3.11.0
           mkdir -p bld
           cd bld
-          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}/python
+          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}
           make install
           
-          # Get Python version info
-          DIR=$(dirname ${PYBIN})           # /opt/python/cp39-cp39-manylinux2014_x86_64
-          PYVER=${DIR##*/}                  # cp39-cp39-manylinux2014_x86_64
-          
           # Build wheels & bundle external shared libraries into wheels
-          export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
+          export LD_LIBRARY_PATH=/usr/local/lib64:\$LD_LIBRARY_PATH
           \${PYBIN}/pip wheel /io --no-deps -w /io/wheelhouse/
-          auditwheel repair pybertini-1.0a8-\${PYVER}.whl --plat manylinux2014_x86_64 -w /io/dist/
+          auditwheel repair /io/wheelhouse/pybertini-*.whl --plat manylinux2014_x86_64 -w /io/dist/
+          rm -f /io/wheelhouse/pybertini-*.whl
           done
           "
       - name: conda-windows
