@@ -23,43 +23,24 @@ jobs:
           persist-credentials: false
       - name: Build manylinux wheels
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        run: |
-          docker run --rm --network=host -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 bash -c '
-          set -e
-          cd /io
-          yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool
-
-          PYBIN=/opt/python/cp311-cp311/bin
-
-          # Install build tools
-          ${PYBIN}/pip install scikit-build-core numpy scipy
-
-          # Build and install Boost
-          cd /tmp
-          wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2
-          bunzip2 boost_1_87_0.tar.bz2
-          tar xf boost_1_87_0.tar
-          cd boost_1_87_0
-          ./bootstrap.sh --prefix=/usr/local --with-python=${PYBIN}/python
-          ./b2 install
-
-          # Build and install eigenpy
-          cd /tmp
-          wget -q https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz
-          tar zxf eigenpy-3.11.0.tar.gz
-          cd eigenpy-3.11.0
-          mkdir -p bld && cd bld
-          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local \
-            -DPython3_EXECUTABLE=${PYBIN}/python \
-            -DPython3_NumPy_INCLUDE_DIR=$(${PYBIN}/python -c "import numpy; print(numpy.get_include())")
-          make -j$(nproc) install
-
-          # Build pybertini wheel
-          export LD_LIBRARY_PATH=/usr/local/lib64:${LD_LIBRARY_PATH}
-          cd /io
-          ${PYBIN}/pip wheel /io --no-deps -w /io/wheelhouse/
-          auditwheel repair /io/wheelhouse/pybertini-*.whl --plat manylinux2014_x86_64 -w /io/dist/
-          '
+        uses: pypa/cibuildwheel@v2.23
+        env:
+          CIBW_BUILD: "cp39-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_BEFORE_ALL_LINUX: >
+            yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool &&
+            cd /tmp &&
+            wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 &&
+            bunzip2 boost_1_87_0.tar.bz2 && tar xf boost_1_87_0.tar && cd boost_1_87_0 &&
+            ./bootstrap.sh --prefix=/usr/local --with-python=$(which python3) &&
+            ./b2 install &&
+            cd /tmp &&
+            wget -q https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz &&
+            tar zxf eigenpy-3.11.0.tar.gz && cd eigenpy-3.11.0 && mkdir -p bld && cd bld &&
+            cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPython3_EXECUTABLE=$(which python3) -DPython3_NumPy_INCLUDE_DIR=$(python3 -c "import numpy; print(numpy.get_include())") &&
+            make -j$(nproc) install
+          CIBW_BEFORE_BUILD: "pip install scikit-build-core numpy scipy"
+          CIBW_ENVIRONMENT: "LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH"
       - name: conda-windows
         uses: conda-incubator/setup-miniconda@v3
         if: ${{ startsWith(matrix.os, 'windows') }}
@@ -117,11 +98,8 @@ jobs:
         with:
           name: built-binary-${{ matrix.os }}
           path: |
+            ${{github.workspace}}/wheelhouse/*.whl
             ${{github.workspace}}/dist/*.whl
-            ${{github.workspace}}/dist/*.tar.gz
-            ${{github.workspace}}/dist/*.zip
-            ${{github.workspace}}/build/*.exe
-            ${{github.workspace}}/build/*.bin
 
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
@@ -141,6 +119,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           merge-multiple: true
+          path: dist/
+      - name: Collect wheels into dist
+        run: |
+          find . -name '*.whl' -not -path './dist/*' -exec mv {} dist/ \;
       - name: Publish distribution 📦 to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
@@ -157,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/pybertini  # Replace <package-name> with your PyPI project name
+      url: https://pypi.org/p/pybertini
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -166,6 +148,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           merge-multiple: true
+          path: dist/
+      - name: Collect wheels into dist
+        run: |
+          find . -name '*.whl' -not -path './dist/*' -exec mv {} dist/ \;
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
