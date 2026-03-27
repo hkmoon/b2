@@ -2,8 +2,6 @@ name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
 on:
   push:
-    branches:
-      - 'develop'
     tags:
       - 'v*.*.*'
 
@@ -91,8 +89,9 @@ jobs:
 
           # Bundle all dependent DLLs (boost, gmp, eigenpy, etc.) into the wheel
           $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
-          delvewheel repair $wheel.FullName -w dist/ --add-path "$env:CONDA_PREFIX\Library\bin"
-          Remove-Item $wheel.FullName
+          delvewheel repair $wheel.FullName -w repaired/ --add-path "$env:CONDA_PREFIX\Library\bin"
+          Remove-Item dist/*.whl
+          Move-Item repaired/*.whl dist/
       - uses: actions/upload-artifact@v4
         with:
           name: wheels-windows-${{ matrix.python-version }}
