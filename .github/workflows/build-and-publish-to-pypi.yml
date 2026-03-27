@@ -26,6 +26,7 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_LINUX: >
             yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool &&
+            pip3 install numpy &&
             cd /tmp &&
             wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 &&
             bunzip2 boost_1_87_0.tar.bz2 && tar xf boost_1_87_0.tar && cd boost_1_87_0 &&
