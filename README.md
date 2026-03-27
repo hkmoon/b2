@@ -57,10 +57,12 @@ Please see [the Wiki compiling section](https://github.com/bertiniteam/b2/wiki/C
 
 # Other information
 
-The offical project repository is hosted on GitHub at [github.com/bertiniteam/b2](https://github.com/bertiniteam/b2).
+The official project repository is hosted on GitHub at [github.com/bertiniteam/b2](https://github.com/bertiniteam/b2).
 
 Please note that this is a long-term project, and is under active development.  If you want to help, please see [the wiki](https://github.com/bertiniteam/b2/wiki) for contact information.  We have opportinuties for all skill levels and interests.
 
 # License
 
 Bertini 2 is Free and Open Source Software.  Source is available under GPL Version 3, with additional terms as permitted under Section 7.
+
+
