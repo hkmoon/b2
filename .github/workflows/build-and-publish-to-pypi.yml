@@ -39,7 +39,7 @@ jobs:
             make -j$(nproc) install
           CIBW_BEFORE_ALL_MACOS: >
             brew install gmp mpfr libmpc eigen@3 eigenpy boost boost-python3
-          CIBW_BEFORE_BUILD: "pip install scikit-build-core numpy scipy"
+          CIBW_BEFORE_BUILD: "pip install scikit-build-core numpy"
           CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH"
           CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0"
 
