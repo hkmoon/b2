@@ -10,6 +10,14 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
 
 
+option(ENABLE_UNIT_TESTING "Turn on building and running of unit tests while compiling" OFF)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+  message(STATUS "Build type set to Release by default, since it was not specified.")
+endif(NOT CMAKE_BUILD_TYPE)
+
+
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 include(CMakePrintHelpers) # so we can print cmake variable values

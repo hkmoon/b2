@@ -268,7 +268,8 @@ namespace bertini{
 			def("polar",pooolar);
 			// def("norm",&T::norm);
 
-			def("conj",&ComplexVisitor::conj);
+			T (*conjjj)(const T&) = &boost::multiprecision::conj;
+			def("conj",conjjj);
 
 			mpfr_float (*aaaarg)(const T&) = &boost::multiprecision::arg;
 			def("arg",aaaarg);

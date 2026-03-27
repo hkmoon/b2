@@ -15,8 +15,8 @@
 //
 // Copyright(C) 2016-2018 by Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 //
 // individual authors of this file include:
@@ -41,12 +41,12 @@
 
 namespace bertini{
 	namespace python{
-		
+
 		using namespace boost::python;
-		
-		
+
+
 		void ExportMpfr();
-		
+
 		/**
 		 \brief Exposes  precision
 		*/
@@ -135,8 +135,8 @@ namespace bertini{
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T __add__(const T& a, const S& b){ return a+b; };
 			static T __radd__(const T& b, const S& a){ return a+b; };
@@ -150,7 +150,7 @@ namespace bertini{
 			static T __rmul__(const T& b, const S& a){ return a*b; };
 			static T __imul__(T& a, const S& b){ a*=b; return a; };
 		}; // RingVisitor
-		
+
 		/**
 		 \brief Exposes +, - and *
 		*/
@@ -161,8 +161,8 @@ namespace bertini{
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T __add__(const T& a, const T& b){ return a+b; };
 			static T __iadd__(T& a, const T& b){ a+=b; return a; };
@@ -175,7 +175,7 @@ namespace bertini{
 
 			static T __neg__(const T& a){ return -a; };
 		}; // RingSelfVisitor
-		
+
 		/**
 		 \brief Exposes +, - and *
 		*/
@@ -186,12 +186,12 @@ namespace bertini{
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T __abs__(T const& x){ return abs(x);}
 		}; // RingSelfVisitor
-		
+
 
 
 		/**
@@ -204,8 +204,8 @@ namespace bertini{
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T __div__(const T& a, const S& b){ return a/b; };
 			static T __rdiv__(const T& b, const S& a){ return a/b; };
@@ -219,8 +219,8 @@ namespace bertini{
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T div(const T& a, const T& b){ return a/b; };
 			static T idiv(T& a, const T& b){ a/=b; return a; };
@@ -253,7 +253,7 @@ namespace bertini{
 
 		};
 
-			
+
 		template<typename T>
 		class GreatLessSelfVisitor: public def_visitor<GreatLessSelfVisitor<T>>
 		{
@@ -277,19 +277,19 @@ namespace bertini{
 			void visit(PyClass& cl) const;
 
 		private:
-		
+
 			static T __log__(T const& x){ return log(x);}
 			static T __exp__(T const& x){ return exp(x);}
 			static T __sqrt__(T const& x){ return sqrt(x);}
-			
+
 			static T __sin__(T const& x){ return sin(x);}
 			static T __cos__(T const& x){ return cos(x);}
 			static T __tan__(T const& x){ return tan(x);}
-			
+
 			static T __asin__(T const& x){ return asin(x);}
 			static T __acos__(T const& x){ return acos(x);}
 			static T __atan__(T const& x){ return atan(x);}
-			
+
 			static T __sinh__(T const& x){ return sinh(x);}
 			static T __cosh__(T const& x){ return cosh(x);}
 			static T __tanh__(T const& x){ return tanh(x);}
@@ -306,23 +306,22 @@ namespace bertini{
 		class ComplexVisitor: public def_visitor<ComplexVisitor<T>>
 		{
 			friend class def_visitor_access;
-			
+
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
+
 			using RealT = typename NumTraits<T>::Real;
-			
+
 		private:
 			static void set_real(T &c, mpfr_float const& r) { c.real(r);}
 			static RealT get_real(T const&c) { return c.real();}
-			
+
 			static void set_imag(T &c, RealT const& r) { c.imag(r);}
 			static RealT get_imag(T const&c) { return c.imag();}
 
 			static RealT __abs__(T const& x){ return abs(x);}
-			
-			static T conj(T const& x){ return conj(x);}
+
 
 			static std::string __str__(const object& obj)
 			{
@@ -332,7 +331,7 @@ namespace bertini{
 				ss << self;
 				return ss.str();
 			}
-			
+
 			static std::string __repr__(const object& obj)
 			{
 				std::ostringstream oss;
