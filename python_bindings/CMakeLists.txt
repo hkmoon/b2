@@ -198,7 +198,7 @@ endif()
 target_link_libraries(_pybertini PUBLIC Eigen3::Eigen)
 target_link_libraries(_pybertini PUBLIC eigenpy::eigenpy)
 target_link_libraries(_pybertini PUBLIC ${Boost_LIBRARIES})
-target_link_boost_python(${PROJECT_NAME} PUBLIC)
+target_link_boost_python(_pybertini PUBLIC)
 
 if(NOT WIN32)
   target_compile_options(_pybertini PRIVATE "-Wno-conversion")
