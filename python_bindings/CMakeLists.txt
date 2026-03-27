@@ -83,21 +83,26 @@ if (PROJECT_IS_TOP_LEVEL)
     find_package(bertini2 REQUIRED)
 endif()
 
-find_package(Boost 1.82 REQUIRED
-                COMPONENTS
-                    serialization
-                    wserialization
-                    unit_test_framework
-                    filesystem
-                    system
-                    chrono
-                    regex
-                    timer
-                    log
-                    thread
-                    log_setup
-                    python${Python_VERSION_MAJOR}${Python_VERSION_MINOR} # uses the versions found by find_package(Python3 ...) above.
+set(_PB_BOOST_COMPONENTS
+    serialization
+    wserialization
+    unit_test_framework
+    filesystem
+    chrono
+    regex
+    timer
+    log
+    thread
+    log_setup
+    python${Python_VERSION_MAJOR}${Python_VERSION_MINOR}
 )
+
+find_package(Boost 1.82 REQUIRED COMPONENTS ${_PB_BOOST_COMPONENTS})
+
+# Boost 1.89.0 removed the boost_system library (it's header-only now).
+if(Boost_VERSION_STRING VERSION_LESS "1.89.0")
+    find_package(Boost REQUIRED COMPONENTS ${_PB_BOOST_COMPONENTS} system)
+endif()
 
 
 
