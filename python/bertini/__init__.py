@@ -50,6 +50,15 @@ See the source at https://github.com/bertiniteam/b2
 from ._version import __version__, __version_info__
 version = __version__
 
+import os
+import sys
+
+if sys.platform == "win32":
+    from .windows_dll_manager import get_dll_paths, build_directory_manager
+    _dll_manager = build_directory_manager()
+    _dll_manager.__enter__()
+    for p in get_dll_paths():
+        _dll_manager.add_dll_directory(p)
 
 # put stuff in the bertini namespace
 
