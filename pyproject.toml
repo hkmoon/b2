@@ -3,7 +3,7 @@ name = "pybertini"
 version = "1.0.8"
 requires-python = ">= 3.9, < 3.13"
 readme = "python/README.rst"
-dependencies = ["numpy","eigenpy"]
+dependencies = ["numpy"]
 authors = [
     {name="Bertini Team"}
 ]
