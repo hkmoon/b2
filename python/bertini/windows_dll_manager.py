@@ -4,21 +4,30 @@ import os
 
 def get_dll_paths():
     bertini_paths = os.getenv("BERTINI_WINDOWS_DLL_PATH")
-    if bertini_paths is None:
-        # From https://peps.python.org/pep-0250/#implementation
-        # lib/python-version/site-packages/package
-        RELATIVE_DLL_PATH1 = "..\\..\\..\\..\\bin"
-        # lib/site-packages/package
-        RELATIVE_DLL_PATH2 = "..\\..\\..\\bin"
-        # For unit test
-        RELATIVE_DLL_PATH3 = "..\\..\\bin"
-        return [
-            os.path.join(os.path.dirname(__file__), RELATIVE_DLL_PATH1),
-            os.path.join(os.path.dirname(__file__), RELATIVE_DLL_PATH2),
-            os.path.join(os.path.dirname(__file__), RELATIVE_DLL_PATH3),
-        ]
-    else:
+    if bertini_paths is not None:
         return bertini_paths.split(os.pathsep)
+
+    paths = []
+    pkg_dir = os.path.dirname(__file__)
+
+    # delvewheel bundles DLLs into bertini/.libs/
+    paths.append(os.path.join(pkg_dir, ".libs"))
+
+    # The package directory itself
+    paths.append(pkg_dir)
+
+    # Conda environment: CONDA_PREFIX/Library/bin
+    conda_prefix = os.getenv("CONDA_PREFIX")
+    if conda_prefix:
+        paths.append(os.path.join(conda_prefix, "Library", "bin"))
+
+    # Relative paths for when installed inside a conda environment
+    # lib/python-version/site-packages/package -> ../../../../Library/bin
+    paths.append(os.path.join(pkg_dir, "..", "..", "..", "..", "Library", "bin"))
+    # Lib/site-packages/package -> ../../../Library/bin
+    paths.append(os.path.join(pkg_dir, "..", "..", "..", "Library", "bin"))
+
+    return paths
 
 
 class DllDirectoryManager(contextlib.AbstractContextManager):
