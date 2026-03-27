@@ -24,42 +24,42 @@ jobs:
       - name: Build manylinux wheels
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         run: |
-          docker run --rm --network=host -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 bash -c "
-          # Install dependencies
+          docker run --rm --network=host -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 bash -c '
+          set -e
           cd /io
           yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool
-          
-          # Build for multiple Python versions
-          for PYBIN in /opt/python/cp{39,310,311,312}-*/bin; do
-          
-          # Upgrade pip and install build tools
-          \${PYBIN}/pip install scikit-build-core numpy scipy
-          
-          # Install boost and eigenpy
+
+          PYBIN=/opt/python/cp311-cp311/bin
+
+          # Install build tools
+          ${PYBIN}/pip install scikit-build-core numpy scipy
+
+          # Build and install Boost
           cd /tmp
-          wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2
+          wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2
           bunzip2 boost_1_87_0.tar.bz2
           tar xf boost_1_87_0.tar
           cd boost_1_87_0
-          ./bootstrap.sh --prefix=/usr/local --with-python=\${PYBIN}/python
+          ./bootstrap.sh --prefix=/usr/local --with-python=${PYBIN}/python
           ./b2 install
-          
+
+          # Build and install eigenpy
           cd /tmp
-          wget https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz
+          wget -q https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz
           tar zxf eigenpy-3.11.0.tar.gz
           cd eigenpy-3.11.0
-          mkdir -p bld
-          cd bld
-          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPYTHON_EXECUTABLE=\${PYBIN}/python
-          make install
-          
-          # Build wheels & bundle external shared libraries into wheels
-          export LD_LIBRARY_PATH=/usr/local/lib64:\$LD_LIBRARY_PATH
-          \${PYBIN}/pip wheel /io --no-deps -w /io/wheelhouse/
+          mkdir -p bld && cd bld
+          cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DPython3_EXECUTABLE=${PYBIN}/python \
+            -DPython3_NumPy_INCLUDE_DIR=$(${PYBIN}/python -c "import numpy; print(numpy.get_include())")
+          make -j$(nproc) install
+
+          # Build pybertini wheel
+          export LD_LIBRARY_PATH=/usr/local/lib64:${LD_LIBRARY_PATH}
+          cd /io
+          ${PYBIN}/pip wheel /io --no-deps -w /io/wheelhouse/
           auditwheel repair /io/wheelhouse/pybertini-*.whl --plat manylinux2014_x86_64 -w /io/dist/
-          rm -f /io/wheelhouse/pybertini-*.whl
-          done
-          "
+          '
       - name: conda-windows
         uses: conda-incubator/setup-miniconda@v3
         if: ${{ startsWith(matrix.os, 'windows') }}
