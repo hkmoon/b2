@@ -86,8 +86,13 @@ jobs:
           (Get-Content $boostHeader).Replace('public virtual std::exception', 'public std::exception') | Set-Content $boostHeader
 
           cd ${{github.workspace}}
-          pip install build
+          pip install build delvewheel
           python -m build --wheel --no-isolation
+
+          # Bundle all dependent DLLs (boost, gmp, eigenpy, etc.) into the wheel
+          $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
+          delvewheel repair $wheel.FullName -w dist/ --add-path "$env:CONDA_PREFIX\Library\bin"
+          Remove-Item $wheel.FullName
       - uses: actions/upload-artifact@v4
         with:
           name: wheels-windows-${{ matrix.python-version }}
