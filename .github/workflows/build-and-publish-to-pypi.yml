@@ -27,7 +27,7 @@ jobs:
         id: linux-deps-cache
         with:
           path: .b2-linux-deps
-          key: linux-deps-boost1.87.0-eigenpy3.11.0-v1
+          key: linux-deps-boost1.87.0-eigenpy3.11.0-v2
 
       - uses: pypa/cibuildwheel@v2.23
         env:
@@ -59,9 +59,11 @@ jobs:
               cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPython3_EXECUTABLE=$(which python3) -DPython3_NumPy_INCLUDE_DIR=$(python3 -c "import numpy; print(numpy.get_include())") &&
               make -j$(nproc) install &&
               echo "Saving to cache" &&
-              mkdir -p /project/.b2-linux-deps/boost/include /project/.b2-linux-deps/boost/lib &&
+              mkdir -p /project/.b2-linux-deps/boost/include /project/.b2-linux-deps/boost/lib/cmake &&
               cp -a /usr/local/include/boost /project/.b2-linux-deps/boost/include/ &&
               cp -a /usr/local/lib/libboost_* /project/.b2-linux-deps/boost/lib/ &&
+              cp -a /usr/local/lib/cmake/Boost* /project/.b2-linux-deps/boost/lib/cmake/ 2>/dev/null || true &&
+              cp -a /usr/local/lib/cmake/boost_* /project/.b2-linux-deps/boost/lib/cmake/ 2>/dev/null || true &&
               mkdir -p /project/.b2-linux-deps/eigenpy/include /project/.b2-linux-deps/eigenpy/lib /project/.b2-linux-deps/eigenpy/lib64 &&
               cp -a /usr/local/include/eigenpy /project/.b2-linux-deps/eigenpy/include/ &&
               cp -a /usr/local/lib/libeigenpy* /project/.b2-linux-deps/eigenpy/lib/ 2>/dev/null || true &&
