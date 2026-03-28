@@ -30,7 +30,7 @@ namespace bertini{
 
 namespace blackbox{
 
-int AlgoBuilder::ClassicBuild(std::filesystem::path const& input_file)
+int AlgoBuilder::ClassicBuild(Path const& input_file)
 {
 	std::string config, input;
 	std::tie(config, input) = SplitIntoConfigAndInput(input_file);

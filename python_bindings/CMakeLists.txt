@@ -153,6 +153,7 @@ set(PYBERTINI_SOURCES
     src/tracker_observers.cpp
     src/endgame_observers.cpp
     src/zero_dim_export.cpp
+    src/function_tree.cpp
     src/bertini_python.cpp
 )
 
