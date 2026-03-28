@@ -12,10 +12,10 @@ dependencies:
   - automake
   - autoconf
   - libtool
-  - libboost
+  - libboost=1.90.0
   - eigen
   - eigenpy
-  - libboost-python
+  - libboost-python=1.90.0
   - scipy
   - wheel
   - build

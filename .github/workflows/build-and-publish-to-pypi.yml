@@ -27,7 +27,7 @@ jobs:
         id: linux-deps-cache
         with:
           path: .b2-linux-deps
-          key: linux-deps-boost1.87.0-eigenpy3.11.0-v2
+          key: linux-deps-boost1.90.0-eigenpy3.11.0-v1
 
       - uses: pypa/cibuildwheel@v2.23
         env:
@@ -48,8 +48,8 @@ jobs:
             else
               echo "Building Boost from source" &&
               cd /tmp &&
-              wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 &&
-              bunzip2 boost_1_87_0.tar.bz2 && tar xf boost_1_87_0.tar && cd boost_1_87_0 &&
+              wget -q https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.bz2 &&
+              bunzip2 boost_1_90_0.tar.bz2 && tar xf boost_1_90_0.tar && cd boost_1_90_0 &&
               ./bootstrap.sh --prefix=/usr/local --with-python=$(which python3) &&
               ./b2 install -j$(nproc) &&
               echo "Building eigenpy from source" &&
