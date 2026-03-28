@@ -31,7 +31,7 @@
 
 
 """
-Parsing functions, taking strings and producing various other things
+Logging configuration and utilities
 """
 
 

@@ -21,6 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache Linux build dependencies
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/cache@v4
+        id: linux-deps-cache
+        with:
+          path: .b2-linux-deps
+          key: linux-deps-boost1.87.0-eigenpy3.11.0-v1
+
       - uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-*"
@@ -29,16 +37,37 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: >
             yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool &&
             pip3 install scikit-build-core numpy scipy &&
-            cd /tmp &&
-            wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 &&
-            bunzip2 boost_1_87_0.tar.bz2 && tar xf boost_1_87_0.tar && cd boost_1_87_0 &&
-            ./bootstrap.sh --prefix=/usr/local --with-python=$(which python3) &&
-            ./b2 install &&
-            cd /tmp &&
-            wget -q https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz &&
-            tar zxf eigenpy-3.11.0.tar.gz && cd eigenpy-3.11.0 && mkdir -p bld && cd bld &&
-            cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPython3_EXECUTABLE=$(which python3) -DPython3_NumPy_INCLUDE_DIR=$(python3 -c "import numpy; print(numpy.get_include())") &&
-            make -j$(nproc) install
+            if [ -d /project/.b2-linux-deps/boost ]; then
+              echo "Restoring cached Boost and eigenpy" &&
+              cp -a /project/.b2-linux-deps/boost/include/. /usr/local/include/ &&
+              cp -a /project/.b2-linux-deps/boost/lib/. /usr/local/lib/ &&
+              cp -a /project/.b2-linux-deps/eigenpy/include/. /usr/local/include/ &&
+              cp -a /project/.b2-linux-deps/eigenpy/lib/. /usr/local/lib/ &&
+              cp -a /project/.b2-linux-deps/eigenpy/lib64/. /usr/local/lib64/ 2>/dev/null || true &&
+              ldconfig;
+            else
+              echo "Building Boost from source" &&
+              cd /tmp &&
+              wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 &&
+              bunzip2 boost_1_87_0.tar.bz2 && tar xf boost_1_87_0.tar && cd boost_1_87_0 &&
+              ./bootstrap.sh --prefix=/usr/local --with-python=$(which python3) &&
+              ./b2 install -j$(nproc) &&
+              echo "Building eigenpy from source" &&
+              cd /tmp &&
+              wget -q https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz &&
+              tar zxf eigenpy-3.11.0.tar.gz && cd eigenpy-3.11.0 && mkdir -p bld && cd bld &&
+              cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPython3_EXECUTABLE=$(which python3) -DPython3_NumPy_INCLUDE_DIR=$(python3 -c "import numpy; print(numpy.get_include())") &&
+              make -j$(nproc) install &&
+              echo "Saving to cache" &&
+              mkdir -p /project/.b2-linux-deps/boost/include /project/.b2-linux-deps/boost/lib &&
+              cp -a /usr/local/include/boost /project/.b2-linux-deps/boost/include/ &&
+              cp -a /usr/local/lib/libboost_* /project/.b2-linux-deps/boost/lib/ &&
+              mkdir -p /project/.b2-linux-deps/eigenpy/include /project/.b2-linux-deps/eigenpy/lib /project/.b2-linux-deps/eigenpy/lib64 &&
+              cp -a /usr/local/include/eigenpy /project/.b2-linux-deps/eigenpy/include/ &&
+              cp -a /usr/local/lib/libeigenpy* /project/.b2-linux-deps/eigenpy/lib/ 2>/dev/null || true &&
+              cp -a /usr/local/lib64/libeigenpy* /project/.b2-linux-deps/eigenpy/lib64/ 2>/dev/null || true &&
+              cp -a /usr/local/lib/cmake/eigenpy /project/.b2-linux-deps/eigenpy/lib/cmake/ 2>/dev/null || true;
+            fi
           CIBW_BEFORE_ALL_MACOS: >
             brew install gmp mpfr libmpc eigen@3 eigenpy boost boost-python3
           CIBW_BEFORE_BUILD: "pip install scikit-build-core numpy"
@@ -56,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
     steps:
       - uses: actions/checkout@v4
         with:
@@ -97,11 +126,53 @@ jobs:
           name: wheels-windows-${{ matrix.python-version }}
           path: ./dist/*.whl
 
+  test_wheels:
+    name: Test wheel on ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    needs:
+      - build_wheels
+      - build_windows
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python-version: '3.11'
+          - os: macos-14
+            python-version: '3.11'
+          - os: windows-latest
+            python-version: '3.11'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: dist/
+
+      - name: Install wheel
+        shell: bash
+        run: |
+          pip install --find-links dist/ pybertini
+          pip install pytest numpy
+
+      - name: Run Python tests
+        shell: bash
+        run: |
+          cd python/test
+          python -m pytest -v --tb=short
+
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
     needs:
       - build_wheels
       - build_windows
+      - test_wheels
     runs-on: ubuntu-latest
 
     environment:
@@ -131,6 +202,7 @@ jobs:
     needs:
       - build_wheels
       - build_windows
+      - test_wheels
     runs-on: ubuntu-latest
     environment:
       name: pypi

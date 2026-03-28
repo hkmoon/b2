@@ -54,11 +54,13 @@ import os
 import sys
 
 if sys.platform == "win32":
+    import atexit
     from .windows_dll_manager import get_dll_paths, build_directory_manager
     _dll_manager = build_directory_manager()
     _dll_manager.__enter__()
     for p in get_dll_paths():
         _dll_manager.add_dll_directory(p)
+    atexit.register(_dll_manager.__exit__, None, None, None)
 
 # put stuff in the bertini namespace
 

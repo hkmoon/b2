@@ -33,7 +33,6 @@ import bertini as pb
 from bertini import multiprec as mp
 
 import unittest
-import pdb
 
 
 class TestFloat(unittest.TestCase):

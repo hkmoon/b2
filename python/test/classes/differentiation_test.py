@@ -37,7 +37,6 @@ from bertini.function_tree.root import *
 from bertini.function_tree import *
 import numpy as np;
 import unittest
-import pdb
 
 import bertini.multiprec as mp
 from bertini.multiprec import Float as mpfr_float

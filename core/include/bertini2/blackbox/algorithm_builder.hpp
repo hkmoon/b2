@@ -53,7 +53,7 @@ public:
 	/**
 	\brief Method for constructing an algorithm from a bertini classic input file
 	*/
-	int ClassicBuild(boost::filesystem::path const& input_file);
+	int ClassicBuild(std::filesystem::path const& input_file);
 
 	/**
 	\brief Returns a non-owning pointer to the built algorithm

@@ -43,7 +43,6 @@ from bertini.tracking.config import *
 
 import unittest
 import numpy as np
-import pdb
 
 import bertini.multiprec as mp
 from bertini.multiprec import Float as mpfr_float

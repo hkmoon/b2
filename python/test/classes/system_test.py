@@ -40,7 +40,6 @@ from bertini.function_tree.root import *
 from bertini.function_tree import *
 import unittest
 import numpy as np
-import pdb
 
 import bertini as pb
 

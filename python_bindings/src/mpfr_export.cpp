@@ -401,7 +401,7 @@ namespace bertini{
 			eigenpy::registerCast<T,long>(false);
 			eigenpy::registerCast<long,T>(true);
 			eigenpy::registerCast<T,int>(false);
-			eigenpy::registerCast<int,T>(true);;
+			eigenpy::registerCast<int,T>(true);
 			eigenpy::registerCast<T,int64_t>(false);
 			eigenpy::registerCast<int64_t,T>(true);
 

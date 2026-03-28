@@ -55,7 +55,5 @@ __all__ = [
 "ListOfInt",
 "ListOfSolutionMetaData_MultiPrec",
 "VariableGroup",
-"ListOfVectorComplexVariablePrecision", 
-"ListOfVectorComplexDoublePrecision"
 ]
 

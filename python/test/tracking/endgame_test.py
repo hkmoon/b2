@@ -35,10 +35,7 @@ __author__ = 'ofloveandhate'
 
 
 
-if __name__ == '__main__':
-    run_tests = True
-else:
-    run_tests = False
+run_tests = __name__ == '__main__'
 
 
 from bertini import *
@@ -52,7 +49,6 @@ from bertini.endgame.config import *
 
 import unittest
 import numpy as np
-import pdb
 
 import bertini.system.start_system as ss
 import bertini.multiprec as mp
@@ -160,7 +156,5 @@ class EndgameTest(unittest.TestCase):
 
 
 
-if run_tests:
-
-    pgnm = 'this_argument_is_ignored_but_necessary'
-    unittest.main(argv=[pgnm], exit=False)
+if __name__ == '__main__':
+    unittest.main()

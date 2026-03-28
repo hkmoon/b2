@@ -31,11 +31,11 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 namespace bertini{
 
-	namespace fs = boost::filesystem;
+	namespace fs = std::filesystem;
 
 	using Path = fs::path;
 
@@ -75,10 +75,10 @@ namespace bertini{
 				throw std::runtime_error(err_msg.str());
 			}
 		}
-		catch (const filesystem_error& ex)
+		catch (const std::filesystem::filesystem_error& ex)
 		{
 			std::stringstream err_msg;
-			err_msg << "boost::filesystem throw while attempting to open file '" << input_path.string() << "': '" << ex.what() << "'";
+			err_msg << "std::filesystem threw while attempting to open file '" << input_path.string() << "': '" << ex.what() << "'";
 			throw std::runtime_error(err_msg.str());
 		}
 	}

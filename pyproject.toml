@@ -1,6 +1,6 @@
 [project]
 name = "pybertini"
-version = "1.0.9"
+dynamic = ["version"]
 requires-python = ">= 3.9, < 3.13"
 readme = "python/README.rst"
 dependencies = ["numpy"]
@@ -33,4 +33,8 @@ build-dir = "bld/"
 [tool.scikit-build.cmake]
 args = ["-DINSTALL_DOCUMENTATION=OFF", "-DCMAKE_DISABLE_FIND_PACKAGE_Doxygen=ON"]
 build-type = "Release"
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.regex"
+input = "python/bertini/_version.py"
 

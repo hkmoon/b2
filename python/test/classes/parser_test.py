@@ -37,7 +37,6 @@ __author__ = 'jcollins'
 from bertini import *
 import unittest
 import numpy as np
-import pdb
 
 import bertini.parse as pp
 

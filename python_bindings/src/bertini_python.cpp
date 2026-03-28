@@ -34,13 +34,29 @@
 
 
 #include "bertini_python.hpp"
+#include <stdexcept>
 
 
 namespace bertini
 {
 	namespace python
 	{
-		
+
+
+void translate_runtime_error(std::runtime_error const& e)
+{
+	PyErr_SetString(PyExc_RuntimeError, e.what());
+}
+
+void translate_invalid_argument(std::invalid_argument const& e)
+{
+	PyErr_SetString(PyExc_ValueError, e.what());
+}
+
+void translate_out_of_range(std::out_of_range const& e)
+{
+	PyErr_SetString(PyExc_IndexError, e.what());
+}
 
 
 		BOOST_PYTHON_MODULE(_pybertini) // this name must match the name of the generated .so file.
@@ -50,6 +66,10 @@ namespace bertini
 			docstring_options docopt;
 			docopt.enable_all();
 			// docopt.disable_cpp_signatures();
+
+			boost::python::register_exception_translator<std::runtime_error>(&translate_runtime_error);
+			boost::python::register_exception_translator<std::invalid_argument>(&translate_invalid_argument);
+			boost::python::register_exception_translator<std::out_of_range>(&translate_out_of_range);
 
 			object package = scope();
 		    package.attr("__path__") = "_pybertini";

@@ -60,7 +60,6 @@ export_boost_default_options()
 set(_BOOST_REQUIRED_COMPONENTS
     serialization
     unit_test_framework
-    filesystem
     graph
     chrono
     regex
@@ -80,7 +79,6 @@ endif()
 
 find_package(Eigen3 REQUIRED NO_MODULE)
 
-# This was from a makemodule.am, take the lists and define them in seperate blocks with the variables they already have, then add the variable name to library_headrs
 set(endgames_headers
 	include/bertini2/endgames/amp_endgame.hpp
 	include/bertini2/endgames/base_endgame.hpp
@@ -146,39 +144,8 @@ set(function_tree_headers
     include/bertini2/function_tree/operators/trig.hpp
 )
 
-set(function_tree_headers_rootinclude_HEADERS
-	include/bertini2/function_tree.hpp
-)
-
 set(settings_headers
     include/bertini2/settings/configIni_parse.hpp
-)
-
-set(functiontreeinclude_HEADERS
-	include/bertini2/function_tree/node.hpp
-	include/bertini2/function_tree/factory.hpp
-	include/bertini2/function_tree/forward_declares.hpp
-	include/bertini2/function_tree/simplify.hpp
-)
-
-set(functiontree_operators_HEADERS
-	include/bertini2/function_tree/operators/operator.hpp
-	include/bertini2/function_tree/operators/arithmetic.hpp
-	include/bertini2/function_tree/operators/trig.hpp
-)
-
-set(functiontree_symbols_HEADERS
-	include/bertini2/function_tree/symbols/symbol.hpp
-	include/bertini2/function_tree/symbols/variable.hpp
-	include/bertini2/function_tree/symbols/differential.hpp
-	include/bertini2/function_tree/symbols/special_number.hpp
-	include/bertini2/function_tree/symbols/number.hpp
-    include/bertini2/function_tree/symbols/linear_product.hpp
-)
-
-set(functiontree_roots_HEADERS
-	include/bertini2/function_tree/roots/function.hpp
-	include/bertini2/function_tree/roots/jacobian.hpp
 )
 
 set(io_headers
@@ -292,10 +259,11 @@ set(tracking_rootinclude_HEADERS
 
 set(BERTINI2_LIBRARY_HEADERS
     ${endgames_headers}
-    ${basics_headers}
+    ${basics_rootinclude_headers}
     ${common_headers}
-    ${details_headers}
+    ${detail_headers}
     ${function_tree_headers}
+    ${settings_headers}
     ${io_headers}
     ${io_parsing_headers}
     ${io_parsing_settings_headers}
@@ -309,12 +277,8 @@ set(BERTINI2_LIBRARY_HEADERS
     ${system_headers}
     ${system_start_headers}
     ${system_rootinclude_HEADERS}
-    ${systeminclude_HEADERS}
-    ${startinclude_HEADERS}
     ${trackers_HEADERS}
-    ${tracking_header_files}
     ${tracking_rootinclude_HEADERS}
-    ${trackersinclude_HEADERS}
 )
 
 set(basics_sources
@@ -360,7 +324,6 @@ set(tracking_source_files
 
 set(BERTINI2_LIBRARY_SOURCES
     ${basics_sources}
-    ${libbertini2_la_SOURCES}
     ${function_tree_sources}
     ${parallel_sources}
     ${system_source_files}
@@ -383,12 +346,6 @@ set(BERTINI2_EXE_HEADERS
     include/bertini2/blackbox/user_homotopy.hpp
 )
 
-
-# this is correct if run from core, but not if from a higher level...
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-# see https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source
-# for more on these generator expressions, $<INSTALL_INTERFACE, etc.
 add_library(bertini2 ${BERTINI2_LIBRARY_SOURCES}
                             ${BERTINI2_LIBRARY_HEADERS})
 add_library(bertini2::bertini2 ALIAS bertini2)
@@ -397,13 +354,6 @@ target_include_directories(bertini2 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>  # <prefix>/include
     )
-
-
-# All library files
-target_sources(bertini2 PUBLIC
-    ${BERTINI2_LIBRARY_SOURCES}
-    ${BERTINI2_LIBRARY_HEADERS}
-)
 
 if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
@@ -427,9 +377,6 @@ add_executable(bertini2_exe)
 target_sources(bertini2_exe PUBLIC ${BERTINI2_EXE_SOURCES} ${BERTINI2_EXE_HEADERS})
 target_link_libraries(bertini2_exe ${Boost_LIBRARIES} bertini2)
 
-# todo: this should be made a devmode thing
-#target_compile_options(bertini2 PRIVATE -Wall -Wextra)
-
 install(
   TARGETS bertini2
   EXPORT ${TARGETS_EXPORT_NAME}
@@ -443,157 +390,7 @@ install(
 add_header_group(${PROJECT_NAME}_HEADERS)
 add_source_group(${PROJECT_NAME}_SOURCES)
 
-install(
-    TARGETS bertini2
-    ARCHIVE DESTINATION "lib"
-    LIBRARY DESTINATION "lib"
-    COMPONENT library
-)
-
-install(
-    FILES ${BERTINI2_EXE_HEADERS}
-    DESTINATION "include/bertini2/blackbox"
-)
-
-install(
-    FILES ${function_tree_headers_rootinclude_HEADERS} ${parallel_rootinclude_HEADERS} ${system_rootinclude_HEADERS} ${tracking_rootinclude_HEADERS} ${parallel_rootinclude_HEADERS} ${system_rootinclude_HEADERS} ${tracking_rootinclude_HEADERS}
-    DESTINATION "include/bertini2"
-)
-
-install(
-    FILES ${endgames_headers}
-    DESTINATION "include/bertini2/endgames"
-)
-
-install(
-    FILES ${trackers_headers}
-    DESTINATION "include/bertini2/trackers"
-)
-
-install(
-    FILES ${basics_rootinclude_headers}
-    DESTINATION "include/bertini2"
-)
-
-install(
-    FILES ${common_headers}
-    DESTINATION "include/bertini2/common"
-)
-
-install(
-    FILES ${detail_headers}
-    DESTINATION "include/bertini2/detail"
-)
-
-install(
-    FILES ${function_tree_headers}
-    DESTINATION "include/bertini2/function_tree"
-)
-
-install(
-    FILES ${function_tree_headers_rootinclude_HEADERS}#
-    DESTINATION "include/bertini2"
-)
-
-install(
-    FILES ${functiontree_operators_HEADERS}
-    DESTINATION "include/bertini2/function_tree/operators"
-)
-
-install(
-    FILES ${functiontree_symbols_HEADERS}
-    DESTINATION "include/bertini2/function_tree/symbols"
-)
-
-install(
-    FILES ${functiontree_roots_HEADERS}
-    DESTINATION "include/bertini2/function_tree/roots/"
-)
-
-install(
-    FILES ${io_headers}
-    DESTINATION "include/bertini2/io"
-)
-
-install(
-    FILES ${io_parsing_headers}
-    DESTINATION "include/bertini2/io/parsing"
-)
-
-install(
-    FILES ${io_parsing_settings_headers}
-    DESTINATION "include/bertini2/io/parsing/settings_parsers"
-)
-
-install(
-    FILES ${nag_algorithms_headers}
-    DESTINATION "include/bertini2/nag_algorithms"
-)
-
-install(
-    FILES ${nag_algorithms_common_headers}
-    DESTINATION "include/bertini2/nag_algorithms/common"
-)
-
-install(
-    FILES ${nag_datatypes_headers}
-    DESTINATION "include/bertini2/nag_datatypes"
-)
-
-install(
-    FILES ${nag_datatypes_common_headers}
-    DESTINATION "include/bertini2/nag_datatypes/common"
-)
-
-install(
-    FILES ${parallel_headers}
-    DESTINATION "include/bertini2/parallel"
-)
-
-install(
-    FILES ${parallel_rootinclude_HEADERS}
-    DESTINATION "include/bertini2"
-)
-
-install(
-    FILES ${pool_headers}
-    DESTINATION "include/bertini2/pool"
-)
-
-install(
-    FILES ${system_headers}
-    DESTINATION "include/bertini2/system"
-)
-
-install(
-    FILES ${system_start_headers}
-    DESTINATION "include/bertini2/system/start"
-)
-
-install(
-    FILES ${system_rootinclude_HEADERS}
-    DESTINATION "include/bertini2"
-)
-
-install(
-    FILES ${tracking_rootinclude_HEADERS}
-    DESTINATION "include/bertini2"
-)
-
-install(
-    FILES ${trackers_HEADERS}
-    DESTINATION "include/bertini2/trackers"
-)
-
-install(
-    FILES ${settings_headers}
-    DESTINATION "include/bertini2/settings"
-)
-
-install(
-    FILES ${tracking_header_files}
-    DESTINATION "include/bertini2/tracking"
-)
+install(DIRECTORY include/ DESTINATION "include" FILES_MATCHING PATTERN "*.hpp")
 
 ###################
 #
@@ -608,6 +405,8 @@ install(
 
 
 if (ENABLE_UNIT_TESTING)
+
+	enable_testing()
 
 	set(B2_CLASS_TEST_SOURCES
 		test/classes/boost_multiprecision_test.cpp
@@ -718,7 +517,7 @@ if (ENABLE_UNIT_TESTING)
 		test/pools/pool_test.cpp
 	)
 
-	add_executable(test_pool ${B2_NAG_DATATYPES_TEST})
+	add_executable(test_pool ${B2_POOLS_TEST})
 	target_include_directories(test_pool PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 	target_link_libraries(test_pool ${Boost_LIBRARIES} bertini2)
 	add_test(NAME test_pool COMMAND ${CMAKE_BINARY_DIR}/core/test_pool)
@@ -749,6 +548,15 @@ if (ENABLE_UNIT_TESTING)
 	target_link_libraries(test_tracking_basics ${Boost_LIBRARIES} bertini2)
 	add_test(NAME test_tracking_basics COMMAND ${CMAKE_BINARY_DIR}/core/test_tracking_basics)
 
-	enable_testing()
+	set(B2_UTILITY_TEST
+		test/utility/utility_test.cpp
+		test/utility/io_test.cpp
+		test/utility/observer_pattern_test.cpp
+	)
+
+	add_executable(test_utility ${B2_UTILITY_TEST})
+	target_include_directories(test_utility PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+	target_link_libraries(test_utility ${Boost_LIBRARIES} bertini2)
+	add_test(NAME test_utility COMMAND ${CMAKE_BINARY_DIR}/core/test_utility)
 
 endif (ENABLE_UNIT_TESTING)

@@ -48,9 +48,11 @@ extensions = ['sphinx.ext.autodoc',
 bibtex_bibfiles = ['../../../doc_resources/bertini2.bib']
 
 #    'sphinx.ext.autosectionlabel_prefix_document',
-autodoc_default_flags = ['members', 'undoc-members','show-inheritance'] 
-#, 'special-members'
-#, , 'inherited-members'
+autodoc_default_options = {
+    'members': True,
+    'undoc-members': True,
+    'show-inheritance': True,
+}
 
 # see http://www.sphinx-doc.org/en/stable/ext/autodoc.html#confval-autoclass_content
 autoclass_content = 'both'

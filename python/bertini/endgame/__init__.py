@@ -58,13 +58,13 @@ Fixed Double Precision Endgames
 ---------------------------------
 
 * :class:`~bertini.endgame.FixedDoublePSEG`
-* :class:`~bertini.endgame.FixedDoublePSEG`
+* :class:`~bertini.endgame.FixedDoubleCauchyEG`
 
 Fixed Multiple Precision  Endgames
 -------------------------------------
 
 * :class:`~bertini.endgame.FixedMultiplePSEG`
-* :class:`~bertini.endgame.FixedMultiplePSEG`
+* :class:`~bertini.endgame.FixedMultipleCauchyEG`
 
 """
 
@@ -78,10 +78,5 @@ __all__ = ['AMPCauchyEG',
  'FixedDoublePSEG',
  'FixedMultipleCauchyEG',
  'FixedMultiplePSEG',
- '__doc__',
- '__loader__',
- '__name__',
- '__package__',
- '__spec__',
  'config',
  'observers']

@@ -18,7 +18,6 @@ dependencies:
   - vs2022_win-64
   - scipy
   - python
-  - scipy
   - wheel
   - build
   - scikit-build-core

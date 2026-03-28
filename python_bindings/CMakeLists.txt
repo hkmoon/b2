@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 # set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_SHARED_LIBS ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_PHOENIX_STL_TUPLE_H_")
+add_compile_definitions(BOOST_PHOENIX_STL_TUPLE_H_)
 
 
 option(ENABLE_UNIT_TESTING "Turn on building and running of unit tests while compiling" OFF)
@@ -58,8 +58,7 @@ find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
 find_package(MPC REQUIRED)
 
-include_directories(${GMP_INCLUDES})
-include_directories(${MPC_INCLUDES})
+# GMP/MPC includes added via target_include_directories below
 
 
 
@@ -75,8 +74,6 @@ find_package(eigenpy 3.3 REQUIRED CONFIG)
 # so that we can `python_add_library`
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
-find_package(Eigen3 REQUIRED NO_MODULE)
-
 
 
 if (PROJECT_IS_TOP_LEVEL)
@@ -87,7 +84,6 @@ set(_PB_BOOST_COMPONENTS
     serialization
     wserialization
     unit_test_framework
-    filesystem
     chrono
     regex
     timer
@@ -97,12 +93,13 @@ set(_PB_BOOST_COMPONENTS
     python${Python_VERSION_MAJOR}${Python_VERSION_MINOR}
 )
 
-find_package(Boost 1.82 REQUIRED COMPONENTS ${_PB_BOOST_COMPONENTS})
-
 # Boost 1.89.0 removed the boost_system library (it's header-only now).
-if(Boost_VERSION_STRING VERSION_LESS "1.89.0")
-    find_package(Boost REQUIRED COMPONENTS ${_PB_BOOST_COMPONENTS} system)
+# Conditionally add system to the component list before the single find_package call.
+if(NOT Boost_VERSION_STRING OR Boost_VERSION_STRING VERSION_LESS "1.89.0")
+    list(APPEND _PB_BOOST_COMPONENTS system)
 endif()
+
+find_package(Boost 1.82 REQUIRED COMPONENTS ${_PB_BOOST_COMPONENTS})
 
 
 
@@ -183,10 +180,12 @@ target_link_libraries(_pybertini PUBLIC ${MPC_LIBRARIES})
 
 
 # which directories contain headers we need
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${PYTHON_INCLUDE_DIRS})
-include_directories(${Python3_NumPy_INCLUDE_DIRS})
-include_directories(${Bertini2_INCLUDES})
+target_include_directories(_pybertini PRIVATE ${GMP_INCLUDES})
+target_include_directories(_pybertini PRIVATE ${MPC_INCLUDES})
+target_include_directories(_pybertini PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(_pybertini PRIVATE ${PYTHON_INCLUDE_DIRS})
+target_include_directories(_pybertini PRIVATE ${Python3_NumPy_INCLUDE_DIRS})
+target_include_directories(_pybertini PRIVATE ${Bertini2_INCLUDES})
 
 if(WIN32)
   target_compile_options(_pybertini

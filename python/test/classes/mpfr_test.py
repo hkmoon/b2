@@ -35,7 +35,6 @@ import bertini as pb
 from bertini import multiprec as mp
 
 import unittest
-import pdb
 
 
 dbltol = 1e-15;

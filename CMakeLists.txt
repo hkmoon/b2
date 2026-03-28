@@ -109,11 +109,11 @@ else(APPLE)
   set(BUILD_WITH_ACCELERATE_SUPPORT FALSE)
 endif(APPLE)
 
-string(REPLACE "-pedantic" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+string(REPLACE "-pedantic" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 # If needed, fix CMake policy for APPLE systems
 apply_default_apple_configuration()
-check_minimal_cxx_standard(11 ENFORCE)
+check_minimal_cxx_standard(17 ENFORCE)
 
 
 if(WIN32)
@@ -136,64 +136,10 @@ endif()
 
 if(WIN32)
   link_directories(${PYTHON_LIBRARY_DIRS})
-  # # Set default Windows build paths SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY
-  # ${PROJECT_BINARY_DIR}/Bin CACHE PATH "Single directory for all libraries")
-  # SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Bin CACHE PATH
-  # "Single directory for all executables") SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-  # ${PROJECT_BINARY_DIR}/Bin CACHE PATH "Sing$le directory for all archives")
 endif(WIN32)
 
 # ----------------------------------------------------
 # --- DEPENDENCIES -----------------------------------
 # ----------------------------------------------------
-#add_project_dependency(Eigen3 REQUIRED PKG_CONFIG_REQUIRES "eigen3 >= 3.0.5")
-
-#set_boost_default_options()
-#export_boost_default_options()
-#find_package(Boost REQUIRED)
-#search_for_boost_python(REQUIRED)
-#find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
-
-############################
-# the core builds a library and an executable depending on that library
-#
-
-#add_library(bertini2 SHARED ${${PROJECT_NAME}_SOURCES}
-#                            ${${PROJECT_NAME}_HEADERS})
-#add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-#set_standard_output_directory(${PROJECT_NAME})
-
-#set_standard_output_directory(${PROJECT_NAME})
-
-#if(NOT WIN32)
-#  target_compile_options(
-#    ${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>
-#                            "-Wno-conversion")
-#else()
-#  target_compile_options(${PROJECT_NAME}
-#                         PRIVATE $<$<CXX_COMPILER_ID:MSVC>:-bigobj -MP>)
-#  target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_SNPRINTF")
-#endif()
-
-#target_link_boost_python(${PROJECT_NAME} PUBLIC)
-
-#set_property(TARGET bertini2_exe PROPERTY OUTPUT_NAME bertini2)
-
 add_subdirectory(core)
-
-
-###########
-# next, in `python_bindings`, build a shared python library, and a pure-python library that wraps around that.
-#
-
-#python_add_library(_pybertini MODULE WITH_SOABI)
-
 add_subdirectory(python_bindings)
-
-
-
-###########
-# finally, the pure-python part of the project.
-#
-
-#add_subdirectory(python)
