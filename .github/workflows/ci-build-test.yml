@@ -130,8 +130,8 @@ jobs:
       - name: Install wheel
         shell: bash
         run: |
-          pip install --no-index --find-links dist/ pybertini
-          pip install pytest numpy
+          pip install numpy pytest
+          pip install --no-index --no-deps --find-links dist/ pybertini
 
       - name: Run Python tests
         shell: bash
