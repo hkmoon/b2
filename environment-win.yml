@@ -11,10 +11,10 @@ dependencies:
   - gmp
   - mpfr
   - mpc
-  - libboost-devel=1.90.0
+  - libboost-devel
   - eigen
   - eigenpy
-  - libboost-python-devel=1.90.0
+  - libboost-python-devel
   - vs2022_win-64
   - scipy
   - python

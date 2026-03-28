@@ -30,7 +30,7 @@
 //  Spring 2018
 //
 
-#include "function_tree.hpp"
+#include "function_tree_export.hpp"
 
 using namespace boost::python;
 
