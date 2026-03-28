@@ -32,6 +32,7 @@
 #ifndef BERTINI_EXPLICIT_PREDICTORS_HPP
 #define BERTINI_EXPLICIT_PREDICTORS_HPP
 
+#include "bertini2/have_bertini.hpp"
 #include "bertini2/trackers/amp_criteria.hpp"
 
 #include "bertini2/system/system.hpp"
@@ -198,7 +199,7 @@ namespace bertini{
 			 success_code = euler.Predict( ... )
 			 \endcode
 			 */
-			class ExplicitRKPredictor
+			class BERTINI2_API ExplicitRKPredictor
 			{
 				friend LUSelector<dbl>;
 				friend LUSelector<mpfr_complex>;

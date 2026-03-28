@@ -27,23 +27,22 @@ jobs:
           CIBW_SKIP: "*-musllinux_* *-manylinux_i686"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_ALL_LINUX: >
-            dnf install -y gmp-devel mpfr-devel libmpc-devel eigen3-devel &&
-            curl -sL https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -o /tmp/miniforge.sh &&
-            bash /tmp/miniforge.sh -b -p /opt/conda && rm /tmp/miniforge.sh &&
-            /opt/conda/bin/conda install -y -c conda-forge libboost-devel libboost-python-devel eigenpy &&
-            /opt/conda/bin/conda clean -afy &&
-            ln -sf /opt/conda/lib/libboost_* /usr/local/lib/ &&
-            ln -sf /opt/conda/lib/libeigenpy* /usr/local/lib/ &&
-            cp -a /opt/conda/include/boost /usr/local/include/ &&
-            cp -a /opt/conda/include/eigenpy /usr/local/include/ &&
-            cp -a /opt/conda/lib/cmake/Boost* /usr/local/lib/cmake/ 2>/dev/null || true &&
-            cp -a /opt/conda/lib/cmake/boost_* /usr/local/lib/cmake/ 2>/dev/null || true &&
-            cp -a /opt/conda/lib/cmake/eigenpy /usr/local/lib/cmake/ 2>/dev/null || true &&
-            ldconfig
+            dnf install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel cmake &&
+            pip3 install scikit-build-core numpy scipy &&
+            cd /tmp &&
+            wget -q https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 &&
+            bunzip2 boost_1_87_0.tar.bz2 && tar xf boost_1_87_0.tar && cd boost_1_87_0 &&
+            ./bootstrap.sh --prefix=/usr/local --with-python=$(which python3) &&
+            ./b2 install -j$(nproc) &&
+            cd /tmp &&
+            wget -q https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz &&
+            tar zxf eigenpy-3.11.0.tar.gz && cd eigenpy-3.11.0 && mkdir -p bld && cd bld &&
+            cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPython3_EXECUTABLE=$(which python3) -DPython3_NumPy_INCLUDE_DIR=$(python3 -c "import numpy; print(numpy.get_include())") &&
+            make -j$(nproc) install
           CIBW_BEFORE_ALL_MACOS: >
             brew install gmp mpfr libmpc eigen@3 eigenpy boost boost-python3
           CIBW_BEFORE_BUILD: "pip install scikit-build-core numpy"
-          CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/opt/conda/lib:/usr/local/lib64:$LD_LIBRARY_PATH CMAKE_PREFIX_PATH=/opt/conda:/usr/local"
+          CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH"
           CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0"
 
       - uses: actions/upload-artifact@v4

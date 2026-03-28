@@ -34,6 +34,19 @@
 #define BERTINI2_HAVE_BERTINI_HPP
 
 
+// DLL export/import macro for Windows shared library builds.
+// CMake automatically defines bertini2_EXPORTS when building the bertini2 target.
+#ifdef _WIN32
+  #ifdef bertini2_EXPORTS
+    #define BERTINI2_API __declspec(dllexport)
+  #else
+    #define BERTINI2_API __declspec(dllimport)
+  #endif
+#else
+  #define BERTINI2_API
+#endif
+
+
 /**
 \brief Check for presence of the Bertini 2 library.
 
