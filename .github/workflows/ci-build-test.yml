@@ -23,59 +23,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Linux build dependencies
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/cache@v4
-        id: linux-deps-cache
-        with:
-          path: .b2-linux-deps
-          key: linux-deps-boost1.90.0-eigenpy3.11.0-v1
-
       - uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-*"
           CIBW_SKIP: "*-musllinux_* *-manylinux_i686"
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_LINUX: >
-            yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool &&
-            pip3 install scikit-build-core numpy scipy &&
-            if [ -d /project/.b2-linux-deps/boost ]; then
-              echo "Restoring cached Boost and eigenpy" &&
-              cp -a /project/.b2-linux-deps/boost/include/. /usr/local/include/ &&
-              cp -a /project/.b2-linux-deps/boost/lib/. /usr/local/lib/ &&
-              cp -a /project/.b2-linux-deps/eigenpy/include/. /usr/local/include/ &&
-              cp -a /project/.b2-linux-deps/eigenpy/lib/. /usr/local/lib/ &&
-              cp -a /project/.b2-linux-deps/eigenpy/lib64/. /usr/local/lib64/ 2>/dev/null || true &&
-              ldconfig;
-            else
-              echo "Building Boost from source" &&
-              cd /tmp &&
-              wget -q https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.bz2 &&
-              bunzip2 boost_1_90_0.tar.bz2 && tar xf boost_1_90_0.tar && cd boost_1_90_0 &&
-              ./bootstrap.sh --prefix=/usr/local --with-python=$(which python3) &&
-              ./b2 install -j$(nproc) &&
-              echo "Building eigenpy from source" &&
-              cd /tmp &&
-              wget -q https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz &&
-              tar zxf eigenpy-3.11.0.tar.gz && cd eigenpy-3.11.0 && mkdir -p bld && cd bld &&
-              cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPython3_EXECUTABLE=$(which python3) -DPython3_NumPy_INCLUDE_DIR=$(python3 -c "import numpy; print(numpy.get_include())") &&
-              make -j$(nproc) install &&
-              echo "Saving to cache" &&
-              mkdir -p /project/.b2-linux-deps/boost/include /project/.b2-linux-deps/boost/lib/cmake &&
-              cp -a /usr/local/include/boost /project/.b2-linux-deps/boost/include/ &&
-              cp -a /usr/local/lib/libboost_* /project/.b2-linux-deps/boost/lib/ &&
-              cp -a /usr/local/lib/cmake/Boost* /project/.b2-linux-deps/boost/lib/cmake/ 2>/dev/null || true &&
-              cp -a /usr/local/lib/cmake/boost_* /project/.b2-linux-deps/boost/lib/cmake/ 2>/dev/null || true &&
-              mkdir -p /project/.b2-linux-deps/eigenpy/include /project/.b2-linux-deps/eigenpy/lib /project/.b2-linux-deps/eigenpy/lib64 &&
-              cp -a /usr/local/include/eigenpy /project/.b2-linux-deps/eigenpy/include/ &&
-              cp -a /usr/local/lib/libeigenpy* /project/.b2-linux-deps/eigenpy/lib/ 2>/dev/null || true &&
-              cp -a /usr/local/lib64/libeigenpy* /project/.b2-linux-deps/eigenpy/lib64/ 2>/dev/null || true &&
-              cp -a /usr/local/lib/cmake/eigenpy /project/.b2-linux-deps/eigenpy/lib/cmake/ 2>/dev/null || true;
-            fi
+            dnf install -y gmp-devel mpfr-devel libmpc-devel eigen3-devel &&
+            curl -sL https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -o /tmp/miniforge.sh &&
+            bash /tmp/miniforge.sh -b -p /opt/conda && rm /tmp/miniforge.sh &&
+            /opt/conda/bin/conda install -y -c conda-forge
+              libboost-devel libboost-python-devel eigenpy &&
+            /opt/conda/bin/conda clean -afy &&
+            ln -sf /opt/conda/lib/libboost_* /usr/local/lib/ &&
+            ln -sf /opt/conda/lib/libeigenpy* /usr/local/lib/ &&
+            cp -a /opt/conda/include/boost /usr/local/include/ &&
+            cp -a /opt/conda/include/eigenpy /usr/local/include/ &&
+            cp -a /opt/conda/lib/cmake/Boost* /usr/local/lib/cmake/ 2>/dev/null || true &&
+            cp -a /opt/conda/lib/cmake/boost_* /usr/local/lib/cmake/ 2>/dev/null || true &&
+            cp -a /opt/conda/lib/cmake/eigenpy /usr/local/lib/cmake/ 2>/dev/null || true &&
+            ldconfig
           CIBW_BEFORE_ALL_MACOS: >
             brew install gmp mpfr libmpc eigen@3 eigenpy boost boost-python3
           CIBW_BEFORE_BUILD: "pip install scikit-build-core numpy"
-          CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH"
+          CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/opt/conda/lib:/usr/local/lib64:$LD_LIBRARY_PATH CMAKE_PREFIX_PATH=/opt/conda:/usr/local"
           CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0"
 
       - uses: actions/upload-artifact@v4
