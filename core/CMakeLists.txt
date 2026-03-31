@@ -51,11 +51,11 @@ find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
 find_package(MPC REQUIRED)
 
-include_directories(${GMP_INCLUDES})
-include_directories(${MPC_INCLUDES})
+# include_directories(${GMP_INCLUDES})
+# include_directories(${MPC_INCLUDES})
 
-set_boost_default_options()
-export_boost_default_options()
+# set_boost_default_options()
+# export_boost_default_options()
 
 set(_BOOST_REQUIRED_COMPONENTS
     serialization
@@ -393,6 +393,13 @@ add_library(bertini2 ${BERTINI2_LIBRARY_SOURCES}
                             ${BERTINI2_LIBRARY_HEADERS})
 add_library(bertini2::bertini2 ALIAS bertini2)
 
+target_include_directories(bertini2
+  SYSTEM PUBLIC
+    ${GMP_INCLUDES}
+    ${MPFR_INCLUDES}
+    ${MPC_INCLUDES}
+)
+
 target_include_directories(bertini2 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>  # <prefix>/include
@@ -413,11 +420,12 @@ if(WIN32)
   target_compile_definitions(bertini2 PUBLIC "HAVE_SNPRINTF")
 endif()
 
-target_link_libraries(bertini2 ${GMP_LIBRARIES})
-target_link_libraries(bertini2 ${MPFR_LIBRARIES})
-target_link_libraries(bertini2 ${MPC_LIBRARIES})
-target_link_libraries(bertini2 Eigen3::Eigen)
-target_link_libraries(bertini2 ${Boost_LIBRARIES})
+target_link_libraries(bertini2 PUBLIC ${GMP_LIBRARIES})
+target_link_libraries(bertini2 PUBLIC ${MPFR_LIBRARIES})
+target_link_libraries(bertini2 PUBLIC ${MPC_LIBRARIES})
+target_link_libraries(bertini2 PUBLIC Eigen3::Eigen)
+target_link_libraries(bertini2 PUBLIC ${Boost_LIBRARIES})
+
 
 if(SUFFIX_SO_VERSION)
   set_target_properties(bertini2 PROPERTIES SOVERSION ${PROJECT_VERSION})

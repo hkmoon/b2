@@ -58,8 +58,7 @@ find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
 find_package(MPC REQUIRED)
 
-include_directories(${GMP_INCLUDES})
-include_directories(${MPC_INCLUDES})
+
 
 
 
@@ -168,6 +167,14 @@ add_project_dependency(Eigen3 REQUIRED PKG_CONFIG_REQUIRES "eigen3 >= 3.4.0")
 python_add_library(_pybertini MODULE WITH_SOABI)
 
 target_include_directories(_pybertini PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_include_directories(_pybertini
+  SYSTEM PUBLIC
+    ${GMP_INCLUDES}
+    ${MPFR_INCLUDES}
+    ${MPC_INCLUDES}
+)
+
 target_sources(_pybertini PRIVATE ${PYBERTINI_SOURCES} ${PYBERTINI_HEADERS})
 
 if(NOT PROJECT_IS_TOP_LEVEL)
@@ -183,10 +190,10 @@ target_link_libraries(_pybertini PUBLIC ${MPC_LIBRARIES})
 
 
 # which directories contain headers we need
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${PYTHON_INCLUDE_DIRS})
-include_directories(${Python3_NumPy_INCLUDE_DIRS})
-include_directories(${Bertini2_INCLUDES})
+target_include_directories(_pybertini PUBLIC SYSTEM ${Boost_INCLUDE_DIRS})
+target_include_directories(_pybertini PUBLIC SYSTEM ${PYTHON_INCLUDE_DIRS})
+target_include_directories(_pybertini PUBLIC SYSTEM ${Python3_NumPy_INCLUDE_DIRS})
+target_include_directories(_pybertini PUBLIC ${Bertini2_INCLUDES})
 
 if(WIN32)
   target_compile_options(_pybertini
