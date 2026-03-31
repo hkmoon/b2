@@ -6,6 +6,7 @@ dependencies:
   - cmake
   - ccache
   - cxx-compiler
+  - compilers
   - ninja
   - numpy
   - gmp
