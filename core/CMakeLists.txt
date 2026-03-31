@@ -28,6 +28,7 @@ message(STATUS "ENABLE_UNIT_TESTING: ${ENABLE_UNIT_TESTING}")
 
 if (MSVC)
     add_compile_options(/bigobj)
+    add_compile_options(/EHsc)
     set(CMAKE_BUILD_TYPE Release)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
     set(BUILD_SHARED_LIBS TRUE)
