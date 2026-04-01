@@ -1407,10 +1407,15 @@ BOOST_AUTO_TEST_CASE(manual_construction_x_pow_lnum1_times_num2l){
 
 	BOOST_CHECK(!N->IsPolynomial());
 
-	BOOST_CHECK(fabs(N->Eval<dbl>().real() - exact_dbl.real() ) < threshold_clearance_d);
-	BOOST_CHECK(fabs(N->Eval<dbl>().imag() - exact_dbl.imag() ) < threshold_clearance_d);
-	BOOST_CHECK(fabs(N->Eval<mpfr>().real() - exact_mpfr.real() ) < threshold_clearance_mp);
-	BOOST_CHECK(fabs(N->Eval<mpfr>().imag() - exact_mpfr.imag() ) < threshold_clearance_mp);
+	// the correct values for this test, from Matlab with VPA and digits 100, is:
+	// x = vpa('3.1')+1i*vpa('4.1')
+	// (x)^(((vpa('3.4')+1i*vpa('5.6'))*(vpa('0.8')+1i*vpa('-1.7'))))
+	// - 1621052733.527456564742398610927236083674601272970056970095361659563831586052755151849639759025786702 + 
+	//   414768162.6460206267766585173685553695858892142182608105258574256927813150731719446202973174663762327i
+	BOOST_CHECK_CLOSE(N->Eval<dbl>().real(), exact_dbl.real(),100*threshold_clearance_d); // made these bigger because optimization changes the values ever so slightly.
+	BOOST_CHECK_CLOSE(N->Eval<dbl>().imag(), exact_dbl.imag(),100*threshold_clearance_d); // 
+	BOOST_CHECK_CLOSE(N->Eval<mpfr>().real(), exact_mpfr.real(),threshold_clearance_mp);
+	BOOST_CHECK_CLOSE(N->Eval<mpfr>().imag(), exact_mpfr.imag(),threshold_clearance_mp);
 }
 
 

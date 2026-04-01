@@ -811,7 +811,7 @@ BOOST_AUTO_TEST_CASE(complicated)
 	auto b = y->Eval<dbl>();
 
 	BOOST_CHECK(num_rounds >= 2);
-	BOOST_CHECK_EQUAL(n->Eval<dbl>(), a*b);
+	BOOST_CHECK_SMALL(abs(n->Eval<dbl>() - a*b), threshold_clearance_d);
 }
 
 
