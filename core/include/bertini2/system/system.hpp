@@ -286,12 +286,14 @@ namespace bertini {
 					for (auto iter=functions_.begin(); iter!=functions_.end(); iter++, counter++) {
 						(*iter)->EvalInPlace<T>(function_values(counter));
 					}
+					break;
 				}
 
 				case EvalMethod::SLP:
 					{
 						slp_.GetFuncValsInPlace<T>(function_values);
 					}
+					break;
 			}
 
 
