@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(AMP_criteriaB_double)
 	auto f = sys.Eval(current_space, current_time);
 	Mat<dbl> dh_dx = sys.Jacobian(current_space, current_time); 
 	Eigen::PartialPivLU<Mat<dbl>> LU = dh_dx.lu();
-	auto delta_z = LU.solve(-f);
+	Vec<dbl> delta_z = LU.solve(-f);
 
 	Vec<dbl> randy = Vec<dbl>::Random(sys.NumVariables());
 	Vec<dbl> temp_soln = LU.solve(randy);
