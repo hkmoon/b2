@@ -106,7 +106,7 @@ jobs:
 
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/pybertini
+      url: https://test.pypi.org/p/bertini
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -134,7 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/pybertini
+      url: https://pypi.org/p/bertini
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 

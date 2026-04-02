@@ -51,19 +51,19 @@ Users wanting a more developed implementation are recommended to use [Bertini 1]
 
 # Installation
 
-The Python package `pybertini` provides pre-built wheels for Linux, macOS, and Windows. Requires Python 3.9--3.12.
+The Python package `bertini` provides pre-built wheels for Linux, macOS, and Windows. Requires Python 3.9--3.12.
 The total number of wheels is 4 for Linux, 4 for macOS, and 3 for Windows excluding Python 3.12.
 
 ## Linux
 
 ```bash
-pip install pybertini
+pip install bertini
 ```
 
 ## macOS (Apple Silicon)
 
 ```bash
-pip install pybertini
+pip install bertini
 ```
 
 Wheels are built for macOS 14.0+ on arm64.
@@ -71,7 +71,7 @@ Wheels are built for macOS 14.0+ on arm64.
 ## Windows
 
 ```bash
-pip install pybertini
+pip install bertini
 ```
 Python 3.12 is excluded for Windows.
 Wheels are built for Windows as Boost, GMP, MPFR, MPC, eigenpy are bundled.
