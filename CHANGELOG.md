@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning][Semantic Versioning].
 <!--
 _______________________________________________________________________________
 
-## [1.0.2] - 2025-05-07
+## [1.0.0] - 2026-04-02
 
 Preparation for pypi release with github workflow
 
