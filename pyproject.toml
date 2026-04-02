@@ -2,7 +2,7 @@
 name = "bertini"
 version = "1.0.0"
 requires-python = ">= 3.9"
-readme = "python/README.rst"
+readme = "README.md"
 dependencies = ["numpy"]
 authors = [
     {name="Bertini Team"}
