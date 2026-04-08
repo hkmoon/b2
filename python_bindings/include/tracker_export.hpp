@@ -52,7 +52,7 @@ namespace bertini{
 		template<typename TrackerT>
 		class TrackerVisitor: public def_visitor<TrackerVisitor<TrackerT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -88,7 +88,7 @@ namespace bertini{
 		template<typename TrackerT>
 		class AMPTrackerVisitor: public def_visitor<AMPTrackerVisitor<TrackerT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -123,7 +123,7 @@ namespace bertini{
 		template<typename TrackerT>
 		class FixedDoubleTrackerVisitor: public def_visitor<FixedDoubleTrackerVisitor<TrackerT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -158,7 +158,7 @@ namespace bertini{
 		template<typename TrackerT>
 		class FixedMultipleTrackerVisitor: public def_visitor<FixedMultipleTrackerVisitor<TrackerT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -196,7 +196,7 @@ namespace bertini{
 		template<typename T>
 		class SteppingVisitor: public def_visitor<SteppingVisitor<T> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -210,7 +210,7 @@ namespace bertini{
 		// template<typename NumT>
 		// class TolerancesVisitor: public def_visitor<TolerancesVisitor<NumT> >
 		// {
-		// 	friend class def_visitor_access;
+		// 	friend class ::boost::python::def_visitor_access;
 
 		// public:
 		// 	template<class PyClass>

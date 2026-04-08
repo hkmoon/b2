@@ -38,7 +38,7 @@ namespace bertini{
 template <typename ObsT>
 class ObservableVisitor : public def_visitor<ObservableVisitor<ObsT>>
 {
-	friend class def_visitor_access;
+	friend class ::boost::python::def_visitor_access;
 
 	static void AddObserver(object& obj, object& obs)
 	{

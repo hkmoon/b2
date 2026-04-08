@@ -89,7 +89,7 @@ Adds functionality to iterable types
 template<typename ContT>
 class ListVisitor: public def_visitor<ListVisitor<ContT> >
 {
-	friend class def_visitor_access;
+	friend class ::boost::python::def_visitor_access;
 	
 public:
 	template<class PyClass>

@@ -96,7 +96,7 @@ namespace bertini{
 		template<typename NodeBaseT>
 		class SumMultOpVisitor: public def_visitor<SumMultOpVisitor<NodeBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -119,7 +119,7 @@ namespace bertini{
 		template<typename NodeBaseT>
 		class PowerOpVisitor: public def_visitor<PowerOpVisitor<NodeBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -134,7 +134,7 @@ namespace bertini{
 		template<typename NodeBaseT>
 		class IntPowOpVisitor: public def_visitor<IntPowOpVisitor<NodeBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>

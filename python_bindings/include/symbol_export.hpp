@@ -63,7 +63,7 @@ namespace bertini{
 		template<typename NodeBaseT>
 		class NamedSymbolVisitor: public def_visitor<NamedSymbolVisitor<NodeBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -83,7 +83,7 @@ namespace bertini{
 		template<typename NodeBaseT>
 		class IntegerVisitor: public def_visitor<IntegerVisitor<NodeBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -100,7 +100,7 @@ namespace bertini{
 		template<typename NodeBaseT>
 		class RationalVisitor: public def_visitor<RationalVisitor<NodeBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -117,7 +117,7 @@ namespace bertini{
 		template<typename NodeBaseT>
 		class VariableVisitor: public def_visitor<VariableVisitor<NodeBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -133,7 +133,7 @@ namespace bertini{
 		template<typename NodeBaseT>
 		class DifferentialVisitor: public def_visitor<DifferentialVisitor<NodeBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>

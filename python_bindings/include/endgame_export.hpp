@@ -45,7 +45,7 @@ namespace bertini{
 		template<typename EndgameT>
 		class EndgameBaseVisitor: public def_visitor<EndgameBaseVisitor<EndgameT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -91,7 +91,7 @@ namespace bertini{
 		template<typename PowerSeriesT>
 		class PowerSeriesVisitor: public def_visitor<PowerSeriesVisitor<PowerSeriesT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -114,7 +114,7 @@ namespace bertini{
 		template<typename CauchyT>
 		class CauchyVisitor: public def_visitor<CauchyVisitor<CauchyT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>

@@ -67,7 +67,7 @@ class ZDVisitor: public def_visitor<ZDVisitor<AlgoT> >
 
 
 
-	friend class def_visitor_access;
+	friend class ::boost::python::def_visitor_access;
 		
 	public:
 		template<class PyClass>

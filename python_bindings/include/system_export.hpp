@@ -78,7 +78,7 @@ namespace bertini{
 		template<typename SystemBaseT>
 		class SystemVisitor: public def_visitor<SystemVisitor<SystemBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>
@@ -194,7 +194,7 @@ namespace bertini{
 		template<typename SystemBaseT>
 		class StartSystemVisitor: public def_visitor<StartSystemVisitor<SystemBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 			
 		public:
 			template<class PyClass>

@@ -63,7 +63,7 @@ namespace bertini{
 		template<typename NodeBaseT>
 		class NodeVisitor: public def_visitor<NodeVisitor<NodeBaseT> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 
 		public:
 			template<class PyClass>

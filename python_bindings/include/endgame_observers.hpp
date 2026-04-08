@@ -48,7 +48,7 @@ using namespace bertini::endgame;
 template<typename ObsT>
 struct EndgameObserverVisitor: public def_visitor<EndgameObserverVisitor<ObsT> >
 {
-	friend class def_visitor_access;
+	friend class ::boost::python::def_visitor_access;
 
 public:
 

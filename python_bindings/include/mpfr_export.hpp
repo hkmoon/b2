@@ -53,7 +53,7 @@ namespace bertini{
 		template<typename T>
 		class PrecisionVisitor: public def_visitor<PrecisionVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -71,7 +71,7 @@ namespace bertini{
 		template<typename T>
 		class RealStrVisitor: public def_visitor<RealStrVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -104,7 +104,7 @@ namespace bertini{
 		template<typename T>
 		class EqualitySelfVisitor: public def_visitor<EqualitySelfVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -117,7 +117,7 @@ namespace bertini{
 		template<typename T, typename S>
 		class EqualityVisitor: public def_visitor<EqualityVisitor<T,S>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -131,7 +131,7 @@ namespace bertini{
 		class RingVisitor: public def_visitor<RingVisitor<T, S> >
 		{
 			static_assert(!std::is_same<T,S>::value, "RingVisitor is to define T-S operations.  for T-T operations, use RingSelfVisitor");
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -157,7 +157,7 @@ namespace bertini{
 		template<typename T>
 		class RingSelfVisitor: public def_visitor<RingSelfVisitor<T> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -182,7 +182,7 @@ namespace bertini{
 		template<typename T>
 		class RealFreeVisitor: public def_visitor<RealFreeVisitor<T> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -200,7 +200,7 @@ namespace bertini{
 		template<typename T, typename S>
 		class FieldVisitor: public def_visitor<FieldVisitor<T, S> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -215,7 +215,7 @@ namespace bertini{
 		template<typename T>
 		class FieldSelfVisitor: public def_visitor<FieldSelfVisitor<T> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -231,7 +231,7 @@ namespace bertini{
 		template<typename T, typename S>
 		class PowVisitor: public def_visitor<PowVisitor<T,S>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -244,7 +244,7 @@ namespace bertini{
 		template<typename T, typename S>
 		class GreatLessVisitor: public def_visitor<GreatLessVisitor<T,S>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -257,7 +257,7 @@ namespace bertini{
 		template<typename T>
 		class GreatLessSelfVisitor: public def_visitor<GreatLessSelfVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -271,7 +271,7 @@ namespace bertini{
 		template<typename T>
 		class TranscendentalVisitor: public def_visitor<TranscendentalVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -305,7 +305,7 @@ namespace bertini{
 		template<typename T>
 		class ComplexVisitor: public def_visitor<ComplexVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 
 		public:
 			template<class PyClass>
