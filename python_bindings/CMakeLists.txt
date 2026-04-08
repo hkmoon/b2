@@ -22,8 +22,11 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 include(CMakePrintHelpers) # so we can print cmake variable values
 
-if (MSVC)
+if (WIN32)
     add_compile_options(/bigobj)
+    add_compile_options(/EHsc)
+    set(CMAKE_BUILD_TYPE "Release")
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 else ()
     # add_compile_definitions(-DBMP_EXPRESSION_TEMPLATES=1)
     add_compile_options(
