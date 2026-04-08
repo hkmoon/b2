@@ -25,8 +25,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "ENABLE_UNIT_TESTING: ${ENABLE_UNIT_TESTING}")
 
-
-if (MSVC)
+if (WIN32)
     add_compile_options(/bigobj)
     add_compile_options(/EHsc)
     set(CMAKE_BUILD_TYPE Release)
@@ -295,7 +294,7 @@ set(BERTINI2_LIBRARY_HEADERS
     ${endgames_headers}
     ${basics_headers}
     ${common_headers}
-    ${details_headers}
+    ${detail_headers}
     ${function_tree_headers}
     ${io_headers}
     ${io_parsing_headers}
@@ -361,7 +360,6 @@ set(tracking_source_files
 
 set(BERTINI2_LIBRARY_SOURCES
     ${basics_sources}
-    ${libbertini2_la_SOURCES}
     ${function_tree_sources}
     ${parallel_sources}
     ${system_source_files}
@@ -727,7 +725,7 @@ if (ENABLE_UNIT_TESTING)
 		test/pools/pool_test.cpp
 	)
 
-	add_executable(test_pool ${B2_NAG_DATATYPES_TEST})
+	add_executable(test_pool ${B2_POOLS_TEST})
 	target_include_directories(test_pool PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 	target_link_libraries(test_pool ${Boost_LIBRARIES} bertini2)
 	add_test(NAME test_pool COMMAND ${CMAKE_BINARY_DIR}/core/test_pool)
