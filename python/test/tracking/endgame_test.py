@@ -70,9 +70,9 @@ class EndgameTest(unittest.TestCase):
         x = Variable("x");
         y = Variable("y");
         t = Variable("t");
-        
+
         sys = System();
-        
+
         var_grp = VariableGroup();
         var_grp.append(x);
         var_grp.append(y);
@@ -123,7 +123,7 @@ class EndgameTest(unittest.TestCase):
             final_system.precision(self.ambient_precision);
             start_point = td.start_point_mp(i);
 
-            bdry_pt = np.array( np.zeros( (3)).astype(np.int64),dtype=mpfr_complex)   
+            bdry_pt = np.array( np.zeros( (3)).astype(np.int64),dtype=mpfr_complex)
 
             track_success_code = tracker.track_path(bdry_pt,t_start, t_endgame_boundary, start_point);
             bdry_points.append(bdry_pt);
@@ -145,7 +145,7 @@ class EndgameTest(unittest.TestCase):
             bdry_time = mpfr_complex(t_endgame_boundary)
 
             track_success_code = my_endgame.run(bdry_time,bdry_points[i]); # should be bdry_pts[i], not XXX
-        
+
 
             final_homogenized_solutions[i] = my_endgame.final_approximation();
 
@@ -153,10 +153,10 @@ class EndgameTest(unittest.TestCase):
 
         dehomogenized_solns = [sys.dehomogenize_point(soln) for soln in final_homogenized_solutions]
 
-        exact_soln = np.array([1,1])
+        exact_soln = np.array([mpfr_complex(1), mpfr_complex(1)])
 
         for soln in dehomogenized_solns:
-            assert np.sqrt(np.sum((exact_soln - soln)**2)) < 1e-10
+            assert mp.abs(np.sqrt(np.sum((exact_soln - soln)**2))) < 1e-10
 
 
 
