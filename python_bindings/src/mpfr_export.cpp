@@ -404,10 +404,13 @@ namespace bertini{
 			eigenpy::registerCast<int,T>(true);;
 			eigenpy::registerCast<T,int64_t>(false);
 			eigenpy::registerCast<int64_t,T>(true);
+			eigenpy::registerCast<T,double>(false);
+			eigenpy::registerCast<double,T>(true);
 
 			IMPLICITLY_CONVERTIBLE(int,T);
 			IMPLICITLY_CONVERTIBLE(long,T);
 			IMPLICITLY_CONVERTIBLE(int64_t,T);
+			IMPLICITLY_CONVERTIBLE(double,T);
 
 			eigenpy::EigenToPyConverter<Vec<T>>::registration();
 			eigenpy::EigenToPyConverter<Mat<T>>::registration();
@@ -468,15 +471,13 @@ namespace bertini{
 			eigenpy::registerCast<int,T>(true);
 			// eigenpy::registerCast<T,int64_t>(false);
 			eigenpy::registerCast<int64_t,T>(true);
-
-			
-
+			// eigenpy::registerCast<T,double>(false);
+			eigenpy::registerCast<double,T>(true);
 
 			IMPLICITLY_CONVERTIBLE(int,T);
 			IMPLICITLY_CONVERTIBLE(long,T);
 			IMPLICITLY_CONVERTIBLE(int64_t,T);
-
-
+			IMPLICITLY_CONVERTIBLE(double,T);
 
 			eigenpy::EigenToPyConverter<Vec<T>>::registration();
 			eigenpy::EigenToPyConverter<Mat<T>>::registration();
