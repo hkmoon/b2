@@ -472,8 +472,36 @@ class OperatorTest(unittest.TestCase):
         self.assertTrue(f.is_homogeneous(vars))
 
 
+    def test_forbid_doubles(self):
+        """
+        make sure that we're correctly forbidding mixing in doubles to making symbolic expressions
+
+        you should get exceptions when you try to do it.
+        """
+        x = self.x
 
 
+
+        with self.assertRaises(TypeError):
+            0.1 + x
+
+        with self.assertRaises(TypeError):
+            0.1 - x
+
+        with self.assertRaises(TypeError):
+            0.1 * x
+            
+        with self.assertRaises(TypeError):
+            0.1 / x
+
+        with self.assertRaises(TypeError):
+            x / 0.1
+
+        with self.assertRaises(TypeError):
+            0.1**x
+
+        with self.assertRaises(TypeError):
+            x**0.1
 
 if __name__ == '__main__':
     unittest.main();
