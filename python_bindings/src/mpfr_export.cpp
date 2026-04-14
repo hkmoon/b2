@@ -398,24 +398,38 @@ namespace bertini{
 			eigenpy::registerNewType<T>();
 			eigenpy::registerCommonUfunc<T>();
 
-			eigenpy::registerCast<T,long>(false);
+			// you can convert from integer types with no fear
 			eigenpy::registerCast<long,T>(true);
-			eigenpy::registerCast<T,int>(false);
-			eigenpy::registerCast<int,T>(true);;
-			eigenpy::registerCast<T,int64_t>(false);
+			eigenpy::registerCast<int,T>(true);
 			eigenpy::registerCast<int64_t,T>(true);
+
+			// but you can never convert TO integer types.  so these are commented out.
+			// eigenpy::registerCast<T,long>(true);
+			// eigenpy::registerCast<T,int>(true);
+			// eigenpy::registerCast<T,int64_t>(true);
+
+			// unsafe.  so the argument is false.  
+			// you can ask for the conversions, but you probably shouldn't.  
+			// both directions are scary.
 			eigenpy::registerCast<T,double>(false);
 			eigenpy::registerCast<double,T>(false);
+
 
 			IMPLICITLY_CONVERTIBLE(int,T);
 			IMPLICITLY_CONVERTIBLE(long,T);
 			IMPLICITLY_CONVERTIBLE(int64_t,T);
-			IMPLICITLY_CONVERTIBLE(double,T);
+
+			// do not allow implicit conversion, because it is a potential source of problems.
+			// because 0.1 as a float64 does NOT convert to 0.1 as a variable precision number.
+			// the user should use strings to guarantee matching.
+			// that is, leave commented-out.  silviana, 2026.04.14
+			// IMPLICITLY_CONVERTIBLE(double,T); 
+
 
 			eigenpy::EigenToPyConverter<Vec<T>>::registration();
 			eigenpy::EigenToPyConverter<Mat<T>>::registration();
 			eigenpy::EigenFromPyConverter<Vec<T>>::registration();
-  		    eigenpy::EigenFromPyConverter<Mat<T>>::registration();
+			eigenpy::EigenFromPyConverter<Mat<T>>::registration();
 		}
 
 		size_t get_default_align(){return EIGENPY_DEFAULT_ALIGN_BYTES;}
@@ -464,19 +478,37 @@ namespace bertini{
 			eigenpy::registerUfunct_without_comparitors<T>();
 
 
-			// eigenpy::registerCast<T,long>(false);
+			// you can safely convert from integer types to Complex's, there's no loss possible
 			eigenpy::registerCast<long,T>(true);
-			// eigenpy::registerCast<T,int>(false);
 			eigenpy::registerCast<int,T>(true);
-			// eigenpy::registerCast<T,int64_t>(false);
 			eigenpy::registerCast<int64_t,T>(true);
-			// eigenpy::registerCast<T,double>(false);
+
+			// you can never convert TO integer types from Complex, so these are commented out.
+			// do not comment them in.
+			// eigenpy::registerCast<T,long>(false);
+			// eigenpy::registerCast<T,int>(false);
+			// eigenpy::registerCast<T,int64_t>(false);
+
+			// these conversions are unsafe.  you can, but you probably shouldn't
+			eigenpy::registerCast<T,double>(false);
 			eigenpy::registerCast<double,T>(false);
+
+			// it's ok to convert from variable precision Float to Complex, that's ok!
+			eigenpy::registerCast<mpfr_float,T>(true);
 
 			IMPLICITLY_CONVERTIBLE(int,T);
 			IMPLICITLY_CONVERTIBLE(long,T);
 			IMPLICITLY_CONVERTIBLE(int64_t,T);
-			IMPLICITLY_CONVERTIBLE(double,T);
+
+			// this is a general python conversion, not an eigenpy conversion.  it's ok to convert from reals to complexes.
+			IMPLICITLY_CONVERTIBLE(mpfr_float,T);
+
+			// BUT!!
+			// do not allow implicit conversion, because it is a potential source of problems.
+			// because 0.1 as a float64 does NOT convert to 0.1 as a variable precision number.
+			// the user should use strings to guarantee matching.
+			// that is, leave commented-out.  silviana, 2026.04.14
+			// IMPLICITLY_CONVERTIBLE(double,T);
 
 			eigenpy::EigenToPyConverter<Vec<T>>::registration();
 			eigenpy::EigenToPyConverter<Mat<T>>::registration();
