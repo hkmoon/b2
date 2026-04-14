@@ -15,8 +15,8 @@
 //
 // Copyright(C) 2016-2018 by Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
@@ -24,7 +24,7 @@
 //  silviana amethyst
 //  University of Wisconsin - Eau Claire
 //  Fall 2017, Spring 2018
-// 
+//
 //  James Collins
 //  West Texas A&M University
 //  Spring 2016
@@ -43,7 +43,7 @@
 
 namespace bertini{
 	namespace python{
-		
+
 		template<typename T>
 		template<typename PyClass>
 		void PrecisionVisitor<T>::visit(PyClass& cl) const
@@ -126,7 +126,7 @@ namespace bertini{
 			.def("__neg__",&RingSelfVisitor::__neg__)
 			;
 
-			
+
 		}
 
 
@@ -217,15 +217,15 @@ namespace bertini{
 			def("exp", &TranscendentalVisitor::__exp__);
 			def("log", &TranscendentalVisitor::__log__);
 			def("sqrt", &TranscendentalVisitor::__sqrt__);
-			
+
 			def("sin", &TranscendentalVisitor::__sin__);
 			def("cos", &TranscendentalVisitor::__cos__);
 			def("tan", &TranscendentalVisitor::__tan__);
-			
+
 			def("asin", &TranscendentalVisitor::__asin__);
 			def("acos", &TranscendentalVisitor::__acos__);
 			def("atan", &TranscendentalVisitor::__atan__);
-			
+
 			def("sinh", &TranscendentalVisitor::__sinh__);
 			def("cosh", &TranscendentalVisitor::__cosh__);
 			def("tanh", &TranscendentalVisitor::__tanh__);
@@ -241,16 +241,16 @@ namespace bertini{
 		void ComplexVisitor<T>::visit(PyClass& cl) const
 		{
 			// MPFRFloatBaseVisitor<T>().visit(cl);
-			
-			cl			
+
+			cl
 			.add_property("real", &ComplexVisitor::get_real, &ComplexVisitor::set_real)
 			.add_property("imag", &ComplexVisitor::get_imag, &ComplexVisitor::set_imag)
-			
+
 			.def("__str__", &ComplexVisitor::__str__)
 			.def("__repr__", &ComplexVisitor::__repr__)
 			;
-			
-			
+
+
 			// these complex-specific functions are free in python
 			using boost::multiprecision::real;
 			using boost::multiprecision::imag;
@@ -259,7 +259,7 @@ namespace bertini{
 			mpfr_float (*imaaag)(const T&) = &boost::multiprecision::real;
 			def("real",reeeal); //,return_value_policy<copy_const_reference>()
 			def("imag",imaaag); //,return_value_policy<copy_const_reference>()
-			
+
 			// and then a few more free functions
 			// def("abs2",&T::abs2);
 
@@ -273,7 +273,7 @@ namespace bertini{
 
 			mpfr_float (*aaaarg)(const T&) = &boost::multiprecision::arg;
 			def("arg",aaaarg);
-			
+
 			// def("square",&square);
 			// def("cube",&cube);
 			// def("inverse", &inverse);
@@ -329,9 +329,9 @@ namespace bertini{
 		}
 
 
-		
 
-		
+
+
 		void ExposeRational()
 		{
 			using T = mpq_rational;
@@ -345,7 +345,7 @@ namespace bertini{
 			.def(RealStrVisitor<T>())
 			.def(FieldSelfVisitor<T>())
 			.def(FieldVisitor<T, mpz_int>())
-			// .def(PowVisitor<T,int>()) // deliberately commented out... 
+			// .def(PowVisitor<T,int>()) // deliberately commented out...
 										 // pow(Q,Z) not defined...
 			.def(GreatLessSelfVisitor<T>())
 			.def(GreatLessVisitor<T,int>())
@@ -378,11 +378,11 @@ namespace bertini{
 			.def(PrecisionVisitor<T>())
 
 			.def(FieldSelfVisitor<T>())
-			
+
 			.def(FieldVisitor<T, int>())
 			.def(FieldVisitor<T, mpz_int>())
 			.def(FieldVisitor<T, mpq_rational>())
-			
+
 			.def(PowVisitor<T,T>())
 			.def(PowVisitor<T,int>())
 			.def(TranscendentalVisitor<T>())
@@ -405,7 +405,7 @@ namespace bertini{
 			eigenpy::registerCast<T,int64_t>(false);
 			eigenpy::registerCast<int64_t,T>(true);
 			eigenpy::registerCast<T,double>(false);
-			eigenpy::registerCast<double,T>(true);
+			eigenpy::registerCast<double,T>(false);
 
 			IMPLICITLY_CONVERTIBLE(int,T);
 			IMPLICITLY_CONVERTIBLE(long,T);
@@ -415,8 +415,7 @@ namespace bertini{
 			eigenpy::EigenToPyConverter<Vec<T>>::registration();
 			eigenpy::EigenToPyConverter<Mat<T>>::registration();
 			eigenpy::EigenFromPyConverter<Vec<T>>::registration();
-  		eigenpy::EigenFromPyConverter<Mat<T>>::registration();
-
+  		    eigenpy::EigenFromPyConverter<Mat<T>>::registration();
 		}
 
 		size_t get_default_align(){return EIGENPY_DEFAULT_ALIGN_BYTES;}
@@ -440,7 +439,7 @@ namespace bertini{
 
 			.def(init<mpz_int>())
 			.def(init<mpz_int, mpz_int>())
-			
+
 			.def(ComplexVisitor<T>())
 
 			.def(FieldSelfVisitor<T>())
@@ -472,7 +471,7 @@ namespace bertini{
 			// eigenpy::registerCast<T,int64_t>(false);
 			eigenpy::registerCast<int64_t,T>(true);
 			// eigenpy::registerCast<T,double>(false);
-			eigenpy::registerCast<double,T>(true);
+			eigenpy::registerCast<double,T>(false);
 
 			IMPLICITLY_CONVERTIBLE(int,T);
 			IMPLICITLY_CONVERTIBLE(long,T);
@@ -507,14 +506,14 @@ namespace bertini{
 			ExposeInt();
 			ExposeFloat();
 			ExposeRational();
-			ExposeComplex();	
+			ExposeComplex();
 
-			ExposeFreeNumFns();	
+			ExposeFreeNumFns();
 		};
 
 
 #undef IMPLICITLY_CONVERTIBLE
-		
+
 	} //namespace python
 } // namespace bertini
 
