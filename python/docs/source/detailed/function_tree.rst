@@ -1,7 +1,6 @@
 🌳 bertini.function_tree
 ===================================
 
-.. include:: common_doc_nav.incl
 
 Notes
 --------

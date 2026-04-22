@@ -1,7 +1,6 @@
 🎮 bertini.endgame
 ==========================
 
-.. include:: common_doc_nav.incl
 
 Notes
 --------

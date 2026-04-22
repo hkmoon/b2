@@ -1,8 +1,6 @@
 🔝 bertini
 ==================
 
-.. include:: common_doc_nav.incl
-
 Namespaces
 -------------
 

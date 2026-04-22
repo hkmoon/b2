@@ -1,7 +1,6 @@
-👩‍🔧 Detailed
+🔬 Detailed
 *******************
 
-.. include:: common_doc_nav.incl
 
 This page acts to point you to more specific places in the documentation.  Table of contents below 🔽.  
 

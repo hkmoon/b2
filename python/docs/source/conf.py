@@ -45,6 +45,8 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
     'sphinxcontrib.bibtex']
 
+autosectionlabel_prefix_document = True
+
 bibtex_bibfiles = ['../../../doc_resources/bertini2.bib']
 
 #    'sphinx.ext.autosectionlabel_prefix_document',

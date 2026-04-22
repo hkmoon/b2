@@ -1,7 +1,6 @@
 🎛 Configurations for algorithms, trackers, endgames, etc
 ===================================================================
 
-.. include:: common_doc_nav.incl
 
 🛤 Tracking configs
 ---------------------------

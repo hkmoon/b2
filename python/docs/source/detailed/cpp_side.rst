@@ -1,7 +1,6 @@
 🗡 C++-flavored gory-detail documentation
 ===============================================
 
-.. include:: common_doc_nav.incl
 
 _pybertini
 -------------------
