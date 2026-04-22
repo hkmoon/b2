@@ -2,8 +2,11 @@ name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
 on:
   push:
+    branches:
+      - '**'
     tags:
       - 'v*.*.*'
+  pull_request:
 
 concurrency:
   group: publish-${{ github.ref }}
@@ -20,7 +23,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+      - name: Cache cibuildwheel + pip + Homebrew
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/cibuildwheel
+            ~/Library/Caches/Homebrew
+          key: ${{ runner.os }}-cibw-${{ hashFiles('pyproject.toml', 'python/pyproject.toml', 'CMakeLists.txt', 'core/CMakeLists.txt', '.github/workflows/build-and-publish-to-pypi.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-cibw-
       - uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-*"
@@ -53,6 +65,8 @@ jobs:
   build_windows:
     name: Build wheel on windows-${{ matrix.python-version }}
     runs-on: windows-latest
+    env:
+      CONDA_PKGS_DIRS: ${{ github.workspace }}\conda_pkgs
     strategy:
       fail-fast: false
       matrix:
@@ -61,6 +75,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Cache conda packages + pip
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}\conda_pkgs
+            ~\AppData\Local\pip\Cache
+          key: windows-conda-${{ matrix.python-version }}-${{ hashFiles('environment-win.yml', '.github/workflows/build-and-publish-to-pypi.yml') }}
+          restore-keys: |
+            windows-conda-${{ matrix.python-version }}-
+            windows-conda-
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: b2-windows
@@ -97,11 +121,76 @@ jobs:
           name: wheels-windows-${{ matrix.python-version }}
           path: ./dist/*.whl
 
+  test_wheels_linux_macos:
+    name: Test wheels on ${{ matrix.os }}
+    needs: build_wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14]
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download wheels artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-${{ matrix.os }}-*
+          merge-multiple: true
+          path: dist/
+
+      - name: Install wheel
+        run: |
+          pip install --find-links dist/ bertini
+
+      - name: Run Python tests
+        run: |
+          pip install pytest
+          pytest python/test/ -v
+
+  test_wheels_windows:
+    name: Test wheel on windows-${{ matrix.python-version }}
+    needs: build_windows
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: b2-windows
+          environment-file: environment-win.yml
+          python-version: ${{ matrix.python-version }}
+          auto-activate-base: false
+
+      - name: Download wheels artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-windows-${{ matrix.python-version }}
+          path: dist/
+
+      - name: Install wheel and run tests
+        shell: pwsh
+        run: |
+          pip install --find-links dist/ bertini
+          pip install pytest
+          pytest python/test/ -v
+
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
     needs:
-      - build_wheels
-      - build_windows
+      - test_wheels_linux_macos
+      - test_wheels_windows
     runs-on: ubuntu-latest
 
     environment:
@@ -129,8 +218,8 @@ jobs:
       Publish Python 🐍 distribution 📦 to PyPI
     if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     needs:
-      - build_wheels
-      - build_windows
+      - test_wheels_linux_macos
+      - test_wheels_windows
     runs-on: ubuntu-latest
     environment:
       name: pypi
