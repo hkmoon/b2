@@ -13,7 +13,7 @@ PyBertini -- the Python bindings for Bertini
 .. toctree::
    :maxdepth: 2
 
-   intro
+   welcome
    tutorials/tutorials
 
 🏛 Reference materials
