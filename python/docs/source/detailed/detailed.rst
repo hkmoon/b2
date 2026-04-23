@@ -12,11 +12,12 @@ This page acts to point you to more specific places in the documentation.  Table
 
    configs
 
+
 ⚙️ Modules
 -------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    top_level
    multiprec

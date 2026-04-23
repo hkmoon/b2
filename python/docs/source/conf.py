@@ -43,19 +43,33 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
     'sphinx.ext.autosectionlabel',
-    'sphinxcontrib.bibtex']
+    'sphinx.ext.viewcode',
+    'sphinx.ext.napoleon',
+    'sphinxcontrib.bibtex',
+    'sphinx_rtd_theme'
+    ]
 
 autosectionlabel_prefix_document = True
 
 bibtex_bibfiles = ['../../../doc_resources/bertini2.bib']
 
 #    'sphinx.ext.autosectionlabel_prefix_document',
-autodoc_default_flags = ['members', 'undoc-members','show-inheritance'] 
+#autodoc_default_flags = ['members', 'undoc-members','show-inheritance'] 
 #, 'special-members'
 #, , 'inherited-members'
 
+autodoc_default_options = {
+    'members': True,
+    'member-order': 'bysource',
+    'special-members': '__init__',
+    'undoc-members': True,
+    'exclude-members': '__weakref__'
+}
+
 # see http://www.sphinx-doc.org/en/stable/ext/autodoc.html#confval-autoclass_content
 autoclass_content = 'both'
+
+toc_object_entries_show_parents = 'hide'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -116,7 +130,7 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'bizstyle'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -128,6 +142,12 @@ html_theme = 'bizstyle'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+
+# This tells Sphinx to include your custom CSS file
+html_css_files = [
+    'custom.css',  # This is the filename, not the full path
+]
 
 
 # -- Options for HTMLHelp output ------------------------------------------

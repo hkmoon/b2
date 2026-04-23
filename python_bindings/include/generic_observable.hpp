@@ -59,8 +59,8 @@ public:
 	template<class PyClass>
 	void visit(PyClass& cl) const{
 		cl
-		.def("add_observer", 	&ObservableVisitor::AddObserver)
-		.def("remove_observer", &ObservableVisitor::RemoveObserver)
+		.def("add_observer", 	&ObservableVisitor::AddObserver, (arg("self"),arg("observer")) , "Attach an observer to this observable object")
+		.def("remove_observer", &ObservableVisitor::RemoveObserver, (arg("self"),arg("observer")) , "Remove an observer to this observable object")
 		;
 	}
 };

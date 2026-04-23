@@ -49,8 +49,8 @@ namespace bertini{
 		void PrecisionVisitor<T>::visit(PyClass& cl) const
 		{
 			cl
-			.def("precision", get_prec)
-			.def("precision", set_prec)
+			.def("precision", get_prec, "get the precision of the number, in digits")
+			.def("precision", set_prec, "set the precision of the number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.")
 			;
 		}
 
@@ -93,17 +93,17 @@ namespace bertini{
 		void RingVisitor<T,S>::visit(PyClass& cl) const
 		{
 			cl
-			.def("__add__",&RingVisitor::__add__)
-			.def("__iadd__",&RingVisitor::__iadd__)
-			.def("__radd__",&RingVisitor::__radd__)
+			.def("__add__",&RingVisitor::__add__, "addition")
+			.def("__iadd__",&RingVisitor::__iadd__, "addition")
+			.def("__radd__",&RingVisitor::__radd__, "addition")
 
-			.def("__sub__",&RingVisitor::__sub__)
-			.def("__isub__",&RingVisitor::__isub__)
-			.def("__rsub__",&RingVisitor::__rsub__)
+			.def("__sub__",&RingVisitor::__sub__, "subtraction")
+			.def("__isub__",&RingVisitor::__isub__, "subtraction")
+			.def("__rsub__",&RingVisitor::__rsub__, "subtraction")
 
-			.def("__mul__",&RingVisitor::__mul__)
-			.def("__imul__",&RingVisitor::__imul__)
-			.def("__rmul__",&RingVisitor::__rmul__)
+			.def("__mul__",&RingVisitor::__mul__, "multiplication")
+			.def("__imul__",&RingVisitor::__imul__, "multiplication")
+			.def("__rmul__",&RingVisitor::__rmul__, "multiplication")
 			;
 		}
 
@@ -114,16 +114,16 @@ namespace bertini{
 		{
 			cl
 
-			.def("__add__",&RingSelfVisitor::__add__)
-			.def("__iadd__",&RingSelfVisitor::__iadd__)
+			.def("__add__",&RingSelfVisitor::__add__, "addition")
+			.def("__iadd__",&RingSelfVisitor::__iadd__, "in-place addition")
 
-			.def("__sub__",&RingSelfVisitor::__sub__)
-			.def("__isub__",&RingSelfVisitor::__isub__)
+			.def("__sub__",&RingSelfVisitor::__sub__, "subtraction")
+			.def("__isub__",&RingSelfVisitor::__isub__, "in-place subtraction")
 
-			.def("__mul__",&RingSelfVisitor::__mul__)
-			.def("__imul__",&RingSelfVisitor::__imul__)
+			.def("__mul__",&RingSelfVisitor::__mul__, "multiplication")
+			.def("__imul__",&RingSelfVisitor::__imul__, "in-place multiplication")
 
-			.def("__neg__",&RingSelfVisitor::__neg__)
+			.def("__neg__",&RingSelfVisitor::__neg__, "negation")
 			;
 
 
@@ -134,7 +134,7 @@ namespace bertini{
 		template<typename PyClass>
 		void RealFreeVisitor<T>::visit(PyClass& cl) const
 		{
-			def("abs", &RealFreeVisitor::__abs__); // free
+			def("abs", &RealFreeVisitor::__abs__, "absolute value"); // free
 		}
 
 
@@ -161,11 +161,11 @@ namespace bertini{
 		void FieldSelfVisitor<T>::visit(PyClass& cl) const
 		{
 			cl
-			.def("__div__",&FieldSelfVisitor::div)
-			.def("__idiv__",&FieldSelfVisitor::idiv)
+			.def("__div__",&FieldSelfVisitor::div, "division")
+			.def("__idiv__",&FieldSelfVisitor::idiv, "division")
 
-			.def("__truediv__",&FieldSelfVisitor::div)
-			.def("__itruediv__",&FieldSelfVisitor::idiv)
+			.def("__truediv__",&FieldSelfVisitor::div, "division")
+			.def("__itruediv__",&FieldSelfVisitor::idiv, "division")
 
 			.def(RingSelfVisitor<T>())
 			;
@@ -214,25 +214,25 @@ namespace bertini{
 		template<typename PyClass>
 		void TranscendentalVisitor<T>::visit(PyClass& cl) const
 		{
-			def("exp", &TranscendentalVisitor::__exp__);
-			def("log", &TranscendentalVisitor::__log__);
-			def("sqrt", &TranscendentalVisitor::__sqrt__);
+			def("exp", &TranscendentalVisitor::__exp__,"exponential, base e");
+			def("log", &TranscendentalVisitor::__log__,"natural log");
+			def("sqrt", &TranscendentalVisitor::__sqrt__,"square root");
 
-			def("sin", &TranscendentalVisitor::__sin__);
-			def("cos", &TranscendentalVisitor::__cos__);
-			def("tan", &TranscendentalVisitor::__tan__);
+			def("sin", &TranscendentalVisitor::__sin__,"sine");
+			def("cos", &TranscendentalVisitor::__cos__,"cosine");
+			def("tan", &TranscendentalVisitor::__tan__,"tangent");
 
-			def("asin", &TranscendentalVisitor::__asin__);
-			def("acos", &TranscendentalVisitor::__acos__);
-			def("atan", &TranscendentalVisitor::__atan__);
+			def("asin", &TranscendentalVisitor::__asin__,"arcsine");
+			def("acos", &TranscendentalVisitor::__acos__,"arccosine");
+			def("atan", &TranscendentalVisitor::__atan__,"arctangent");
 
-			def("sinh", &TranscendentalVisitor::__sinh__);
-			def("cosh", &TranscendentalVisitor::__cosh__);
-			def("tanh", &TranscendentalVisitor::__tanh__);
+			def("sinh", &TranscendentalVisitor::__sinh__,"hyperbolic sine");
+			def("cosh", &TranscendentalVisitor::__cosh__,"hyperbolic cosine");
+			def("tanh", &TranscendentalVisitor::__tanh__,"hyperbolic tangent");
 
-			def("asinh",&TranscendentalVisitor::__asinh__);
-			def("acosh",&TranscendentalVisitor::__acosh__);
-			def("atanh",&TranscendentalVisitor::__atanh__);
+			def("asinh",&TranscendentalVisitor::__asinh__,"hyperbolic arcsine");
+			def("acosh",&TranscendentalVisitor::__acosh__,"hyperbolic arccosine");
+			def("atanh",&TranscendentalVisitor::__atanh__,"hyperbolic arctangent");
 		}
 
 
@@ -243,11 +243,11 @@ namespace bertini{
 			// MPFRFloatBaseVisitor<T>().visit(cl);
 
 			cl
-			.add_property("real", &ComplexVisitor::get_real, &ComplexVisitor::set_real)
-			.add_property("imag", &ComplexVisitor::get_imag, &ComplexVisitor::set_imag)
+			.add_property("real", &ComplexVisitor::get_real, &ComplexVisitor::set_real,"the real part of the complex number")
+			.add_property("imag", &ComplexVisitor::get_imag, &ComplexVisitor::set_imag,"the imaginary part of the complex number")
 
-			.def("__str__", &ComplexVisitor::__str__)
-			.def("__repr__", &ComplexVisitor::__repr__)
+			.def("__str__", &ComplexVisitor::__str__,"convert to string")
+			.def("__repr__", &ComplexVisitor::__repr__,"convert to string")
 			;
 
 
@@ -257,28 +257,28 @@ namespace bertini{
 
 			mpfr_float (*reeeal)(const T&) = &boost::multiprecision::real;
 			mpfr_float (*imaaag)(const T&) = &boost::multiprecision::real;
-			def("real",reeeal); //,return_value_policy<copy_const_reference>()
-			def("imag",imaaag); //,return_value_policy<copy_const_reference>()
+			def("real",reeeal, "get the real part"); //,return_value_policy<copy_const_reference>()
+			def("imag",imaaag, "get the imaginary part"); //,return_value_policy<copy_const_reference>()
 
 			// and then a few more free functions
 			// def("abs2",&T::abs2);
 
 			mpfr_complex (*pooolar)(const mpfr_float&,const mpfr_float&) = &boost::multiprecision::polar;
 
-			def("polar",pooolar);
+			def("polar",pooolar, "construct from polar form");
 			// def("norm",&T::norm);
 
 			T (*conjjj)(const T&) = &boost::multiprecision::conj;
-			def("conj",conjjj);
+			def("conj",conjjj, "complex conjugate");
 
 			mpfr_float (*aaaarg)(const T&) = &boost::multiprecision::arg;
-			def("arg",aaaarg);
+			def("arg",aaaarg, "the argument, or the angle from 0.  beware the branch cut.");
 
 			// def("square",&square);
 			// def("cube",&cube);
 			// def("inverse", &inverse);
 
-			def("abs", &ComplexVisitor::__abs__); // free
+			def("abs", &ComplexVisitor::__abs__, "the magnitude of a complex number"); // free
 		}
 
 
@@ -300,8 +300,8 @@ namespace bertini{
 			unsigned (*def_prec1)() = &bertini::DefaultPrecision;
 			void (*def_prec2)(unsigned) = &bertini::DefaultPrecision;
 
-			def("default_precision", def_prec1);
-			def("default_precision", def_prec2);
+			def("default_precision", def_prec1, "get the default precision for variable-precision numbers.  is digits, not bits.");
+			def("default_precision", def_prec2, "set the default precision for variable-precision numbers.  should be a positive number.  is digits, not bits.");
 		}
 
 
@@ -312,9 +312,9 @@ namespace bertini{
 		{
 			using T = mpz_int;
 
-			class_<mpz_int>("Int", init<>())
-			.def(init<int>())
-			.def(init<T>())
+			class_<mpz_int>("Int", init<>("Default Construct an arbitrary-precision integer"))
+			.def(init<int>((arg("self"),arg("val")),"Construct an arbitrary-precision integer from an integer."))
+			.def(init<T>((arg("self"),arg("val")),"Construct an arbitrary-precision integer from another."))
 			.def(RealStrVisitor<T>())
 			.def(RingSelfVisitor<T>())
 			.def(PowVisitor<T,int>())
@@ -336,12 +336,12 @@ namespace bertini{
 		{
 			using T = mpq_rational;
 
-			class_<mpq_rational>("Rational", init<>())
-			.def(init<int>())
-			.def(init<int, int>())
-			.def(init<mpz_int>())
-			.def(init<mpz_int,mpz_int>())
-			.def(init<mpq_rational>())
+			class_<mpq_rational>("Rational", init<>("Default Construct an arbitrary-precision rational number"))
+			.def(init<int>((arg("self"),arg("val")),"Construct an arbitrary-precision rational number from an integer."))
+			.def(init<int, int>((arg("self"),arg("numerator"), arg("denominator")),"Construct an arbitrary-precision rational number from a pair of integers."))
+			.def(init<mpz_int>((arg("self"),arg("val")),"Construct an arbitrary-precision rational number from an arbitrary-precision integer."))
+			.def(init<mpz_int,mpz_int>((arg("self"),arg("numerator"),arg("denominator")),"Construct an arbitrary-precision rational number from a pair of arbitrary-precision integers."))
+			.def(init<mpq_rational>((arg("self"),arg("val")),"Construct an arbitrary-precision rational number from an arbitrary-precision integer."))
 			.def(RealStrVisitor<T>())
 			.def(FieldSelfVisitor<T>())
 			.def(FieldVisitor<T, mpz_int>())
@@ -366,13 +366,13 @@ namespace bertini{
 		{
 			using T = mpfr_float;
 
-			class_<T>("Float", init<>())
-			.def(init<std::string>())
-			.def(init<int>())
-			.def(init<long int>())
-			.def(init<T>())
+			class_<T>("Float", init<>("Default Construct a variable-precision float"))
+			.def(init<std::string>((arg("self"),arg("val")),"Construct a variable-precision float from a string.  The best way."))
+			.def(init<int>((arg("self"),arg("val")),"Construct a variable-precision float from a regular old integer."))
+			.def(init<long int>((arg("self"),arg("val")),"Construct a variable-precision float from a regular old integer."))
+			.def(init<T>((arg("self"),arg("val")),"Construct a variable-precision float from another."))
 
-			.def(init<mpz_int>())
+			.def(init<mpz_int>((arg("self"),arg("val")),"Construct an variable-precision float from an arbitrary-precision integer."))
 
 			.def(RealStrVisitor<T>())
 			.def(PrecisionVisitor<T>())
@@ -441,18 +441,19 @@ namespace bertini{
 			using T = bertini::mpfr_complex;
 
 			class_<T>("Complex", init<>())
-			.def(init<double>()) // this should probably be made an explicit constructor rather than implicit
-			.def(init<mpfr_float>())
-			.def(init<std::string>())
-			.def(init<mpfr_float,mpfr_float>())
-			.def(init<double, double>()) // this should probably be made an explicit constructor rather than implicit
-			.def(init<std::string, mpfr_float>())
-			.def(init<mpfr_float, std::string>())
-			.def(init<std::string, std::string>())
-			.def(init<T>())
+			.def(init<double>((arg("self"),arg("real")),"Construct variable-precision complex number from a double, with 0 imaginary part. do this with caution, as 0.1 is not what you think it is -- there's noise at the end.")) // this should probably be made an explicit constructor rather than implicit
+			.def(init<mpfr_float>((arg("self"),arg("real")),"Construct variable-precision complex number from a variable-precision float, with 0 imaginary part"))
+			.def(init<std::string>((arg("self"),arg("real")),"Construct variable-precision complex number from a string, with 0 imaginary part"))
+			.def(init<mpfr_float,mpfr_float>((arg("self"),arg("real"),arg("imag")),"Construct variable-precision complex number from a pair of variable-precision floats"))
+			.def(init<double, double>((arg("self"),arg("real"),arg("imag")),"Construct variable-precision complex number from a pair of doubles.  do this with caution, as 0.1 is not what you think it is -- there's noise at the end.")) // this should probably be made an explicit constructor rather than implicit
+			.def(init<std::string, mpfr_float>((arg("self"),arg("real"),arg("imag")),"Construct variable-precision complex number from a string and a variable-precision float"))
+			.def(init<mpfr_float, std::string>((arg("self"),arg("real"),arg("imag")),"Construct variable-precision complex number from a variable-precision float and a string"))
+			.def(init<std::string, std::string>((arg("self"),arg("real"),arg("imag")),"Construct variable-precision complex number from a pair of strings.  the best way to construct one and be sure you have padded with zeros to the end, in the current working precision"))
+			
+			.def(init<T>((arg("self"),arg("value")),"Construct variable-precision complex number from another one"))
 
-			.def(init<mpz_int>())
-			.def(init<mpz_int, mpz_int>())
+			.def(init<mpz_int>((arg("self"),arg("real")),"Construct variable-precision complex number from an arbitrary-precision integer, with 0 imaginary part"))
+			.def(init<mpz_int, mpz_int>((arg("self"),arg("real"),arg("imag")),"Construct variable-precision complex number from a pair of arbitrary-precision integers"))
 
 			.def(ComplexVisitor<T>())
 
