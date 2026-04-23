@@ -40,6 +40,7 @@ else ()
 
         # and things for release here
         $<$<CONFIG:Release>:-O3>
+        $<$<CONFIG:Release>:-g>
         # using O2 or O3 cuts runtime by over half.
 	)
 endif ()
