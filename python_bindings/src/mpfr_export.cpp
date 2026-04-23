@@ -23,7 +23,7 @@
 //
 //  silviana amethyst
 //  University of Wisconsin - Eau Claire
-//  Fall 2017, Spring 2018
+//  Fall 2017, Spring 2018, Spring 2026
 //
 //  James Collins
 //  West Texas A&M University
@@ -48,10 +48,6 @@ namespace bertini{
 		template<typename PyClass>
 		void PrecisionVisitor<T>::visit(PyClass& cl) const
 		{
-			// cl
-			// .def("precision", get_prec, (arg("self")), "get the precision of the number, in digits")
-			// .def("precision", set_prec, (arg("self"), arg("precision")),"set the precision of the number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.")
-			// ;
 			cl.add_property("precision", 
 				get_prec, set_prec, 
 				"get/set the precision of this variable-precision number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.");

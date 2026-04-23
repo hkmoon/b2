@@ -38,39 +38,39 @@ namespace bertini{
 		void TrackerVisitor<TrackerT>::visit(PyClass& cl) const
 		{
 			cl
-			.def("setup", &TrackerT::Setup, (boost::python::arg("predictor"), boost::python::arg("tolerance"), boost::python::arg("truncation"), boost::python::arg("stepping"),boost::python::arg("newton")), "Set values for the internal configuration of the tracker.  tolerance and truncation are both real doubles.  predictor is a valid value for predictor choice.  stepping and newton are the config structs from bertini.tracking.config.")
+			.def("setup", &TrackerT::Setup, (arg("predictor"), arg("tolerance"), arg("truncation"), arg("stepping"),arg("newton")), "Set values for the internal configuration of the tracker.  tolerance and truncation are both real doubles.  predictor is a valid value for predictor choice.  stepping and newton are the config structs from bertini.tracking.config.")
 
 			.def("track_path", &track_path_wrap, 
-				 (boost::python::arg("result"), "start_time", "end_time", "start_point"), 
+				 (arg("self"),arg("result"), "start_time", "end_time", "start_point"), 
 				 "The main function of the tracker, once its set up.  The first argument is the output.  Feed it, in (result, start_time, end_time, start_point")
 
 			.def("get_system",&TrackerT::GetSystem,return_internal_reference<>(), "Gets an internal reference to the tracked system.")
 
-			.def("predictor",get_predictor_,"Query the current predictor method used by the tracker.")
-			.def("predictor",set_predictor_,"Set the predictor method used by the tracker.")
+			.def("predictor",get_predictor_,(arg("self")), "Query the current predictor method used by the tracker.")
+			.def("predictor",set_predictor_,(arg("self"), arg("predictor")), "Set the predictor method used by the tracker.")
 
-			.def("set_stepsize", &TrackerT::SetStepSize)
+			.def("set_stepsize", &TrackerT::SetStepSize, (arg("self"), arg("stepsize")),"Set the stepsize for the tracker")
 
-			.def("reinitialize_initial_step_size", &TrackerT::ReinitializeInitialStepSize, "Set whether the tracker should re-set the stepsize to the configured-initial stepsize when it starts tracking.  Feed it a bool")
-			.def("num_total_steps_taken", &TrackerT::NumTotalStepsTaken,"Ask how many steps have been taken so far, including failures")
+			.def("reinitialize_initial_step_size", &TrackerT::ReinitializeInitialStepSize, (arg("self"), arg("val")), "Set whether the tracker should re-set the stepsize to the configured-initial stepsize when it starts tracking.  Feed it a bool")
+			.def("num_total_steps_taken", &TrackerT::NumTotalStepsTaken, (arg("self")),"Ask how many steps have been taken so far, including failures")
 
-			.def("tracking_tolerance", &TrackerT::TrackingTolerance,"A step is labeled as a failure if newton correcting doesn't yield a residual less than this tolerance.  A real number, the smaller the slower tracking, generally speaking")
-			.def("tracking_tolerance", &TrackerT::SetTrackingTolerance,"Set the tracking tolerance for the tracker")
+			.def("tracking_tolerance", &TrackerT::TrackingTolerance, (arg("self")), "Get.  A step is labeled as a failure if newton correcting doesn't yield a residual less than this tolerance.  A real number, the smaller the slower tracking, generally speaking")
+			.def("tracking_tolerance", &TrackerT::SetTrackingTolerance, (arg("self"), arg("tol")), "Set the tracking tolerance for the tracker")
 
-			.def("infinite_truncation_tolerance", &TrackerT::SetInfiniteTruncationTolerance,"Set the path truncation tolerance for infinite paths for the tracker")
-			.def("infinite_truncation_tolerance", &TrackerT::InfiniteTruncationTolerance,"Get the path truncation tolerance for infinite paths for the tracker")
+			.def("infinite_truncation_tolerance", &TrackerT::SetInfiniteTruncationTolerance, (arg("self"), arg("tol")) ,"Set the path truncation tolerance for infinite paths for the tracker")
+			.def("infinite_truncation_tolerance", &TrackerT::InfiniteTruncationTolerance, (arg("self")), "Get the path truncation tolerance for infinite paths for the tracker")
 
-			.def("infinite_truncation", &TrackerT::SetInfiniteTruncation, "Decide whether the tracker should truncate infinite paths.  See also infinite_truncation_tolerance")
-			.def("infinite_truncation", &TrackerT::InfiniteTruncation, "Get the bool for whether the tracker should truncate infinite paths.  See also infinite_truncation_tolerance")
+			.def("infinite_truncation", &TrackerT::SetInfiniteTruncation, (arg("self"), arg("val")), "Decide whether the tracker should truncate infinite paths.  See also infinite_truncation_tolerance")
+			.def("infinite_truncation", &TrackerT::InfiniteTruncation, (arg("self")), "Get the bool for whether the tracker should truncate infinite paths.  See also infinite_truncation_tolerance")
 
-			.def("get_stepping",&TrackerT::template Get<tracking::SteppingConfig>,return_internal_reference<>(),"Get the tracker's internal configuration for things that control stepping behaviour")
-			.def("get_newton",&TrackerT::template Get<tracking::NewtonConfig>,return_internal_reference<>(),"Get the tracker's internal configuration for Newton correction")
-			.def("set_stepping",&TrackerT::template Set<tracking::SteppingConfig>,"Set the tracker's internal configuration for things that control stepping behaviour")
-			.def("set_newton",&TrackerT::template Set<tracking::NewtonConfig>,"Set the tracker's internal configuration for Newton correction")
+			.def("get_stepping",&TrackerT::template Get<tracking::SteppingConfig>,return_internal_reference<>(), (arg("self")), "Get the tracker's internal configuration for things that control stepping behaviour")
+			.def("get_newton",&TrackerT::template Get<tracking::NewtonConfig>,return_internal_reference<>(), (arg("self")), "Get the tracker's internal configuration for Newton correction")
+			.def("set_stepping",&TrackerT::template Set<tracking::SteppingConfig>, (arg("self"), arg("config")), "Set the tracker's internal configuration for things that control stepping behaviour")
+			.def("set_newton",&TrackerT::template Set<tracking::NewtonConfig>, (arg("self"), arg("config")), "Set the tracker's internal configuration for Newton correction")
 
-			.def("current_point", &TrackerT::CurrentPoint)
-			.def("current_time", &TrackerT::CurrentTime)
-			.def("current_precision", &TrackerT::CurrentPrecision)
+			.def("current_point", &TrackerT::CurrentPoint, (arg("self")), "what is the current point?")
+			.def("current_time", &TrackerT::CurrentTime, (arg("self")), "what is the current time?")
+			.def("current_precision", &TrackerT::CurrentPrecision, (arg("self")), "what is the current working precision?")
 
 			.def(ObservableVisitor<TrackerT>());
 			;
@@ -85,10 +85,18 @@ namespace bertini{
 			.def("precision_setup", &TrackerT::PrecisionSetup)
 			.def("precision_preservation", &TrackerT::PrecisionPreservation, "Turn on or off the preservation of precision.  That is, if this is on (true), then the precision of the final point will be the precision of the start point.  Generally, you want to let precision drift, methinks.")
 
-			.def("refine", return_Refine3_ptr<dbl>)
-			.def("refine", return_Refine3_ptr<mpfr_complex>)
-			.def("refine", return_Refine4_ptr<dbl>)
-			.def("refine", return_Refine4_ptr<mpfr_complex>)
+			.def("refine", return_Refine3_ptr<dbl>(), 
+				(arg("self"), arg("result"), arg("start_point"), arg("time")), 
+				"refine a point using this tracker, from `start_point`, at fixed `time`.  returns a success code, computed refined point is in `result`.")
+			.def("refine", return_Refine3_ptr<mpfr_complex>(), 
+				(arg("self"), arg("result"), arg("start_point"), arg("time")), 
+				"refine a point using this tracker, from `start_point`, at fixed `time`.  returns a success code, computed refined point is in `result`.")
+			.def("refine", return_Refine4_ptr<dbl>(), 
+				(arg("self"), arg("result"), arg("start_point"), arg("time"), arg("tolerance"), arg("max_iterations")), 
+				"refine a point using this tracker, from `start_point`, at fixed `time`.  returns a success code, computed refined point is in `result`.")
+			.def("refine", return_Refine4_ptr<mpfr_complex>(), 
+				(arg("self"), arg("result"), arg("start_point"), arg("time"), arg("tolerance"), arg("max_iterations")), 
+				"refine a point using this tracker, from `start_point`, at fixed `time`.  returns a success code, computed refined point is in `result`.")
 			;
 		}
 
@@ -99,8 +107,13 @@ namespace bertini{
 		void FixedDoubleTrackerVisitor<TrackerT>::visit(PyClass& cl) const
 		{
 			cl
-			.def("refine", return_Refine3_ptr<dbl>)
-			.def("refine", return_Refine4_ptr<dbl>)
+			.def("refine", return_Refine3_ptr<dbl>(), 
+				(arg("self"), arg("result"), arg("start_point"), arg("time")), 
+				"refine a point using this tracker, from `start_point`, at fixed `time`.  returns a success code, computed refined point is in `result`.")
+
+			.def("refine", return_Refine4_ptr<dbl>(), 
+				(arg("self"), arg("result"), arg("start_point"), arg("time"), arg("tolerance"), arg("max_iterations")), 
+				"refine a point using this tracker, from `start_point`, at fixed `time`.  returns a success code, computed refined point is in `result`.")
 			;
 		}
 
@@ -110,8 +123,13 @@ namespace bertini{
 		void FixedMultipleTrackerVisitor<TrackerT>::visit(PyClass& cl) const
 		{
 			cl
-			.def("refine", return_Refine3_ptr<mpfr_complex>)
-			.def("refine", return_Refine4_ptr<mpfr_complex>)
+			.def("refine", return_Refine3_ptr<mpfr_complex>(), 
+				(arg("self"), arg("result"), arg("start_point"), arg("time")), 
+				"refine a point using this tracker, from `start_point`, at fixed `time`.  returns a success code, computed refined point is in `result`.")
+
+			.def("refine", return_Refine4_ptr<mpfr_complex>(), 
+				(arg("self"), arg("result"), arg("start_point"), arg("time"), arg("tolerance"), arg("max_iterations")), 
+				"refine a point using this tracker, from `start_point`, at fixed `time`.  returns a success code, computed refined point is in `result`.")
 			;
 		}
 
