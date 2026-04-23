@@ -60,8 +60,8 @@ jobs:
           # On macOS we rebuild Boost.Python and eigenpy against the current target
           # Python, because Homebrew only ships one boost-python3 / eigenpy bottle
           # linked to its default Python (currently 3.13). Installing those bottles
-          # produces wheels for cp39..cp312 that ImportError at load time (see
-          # `_PyObject_DelAttr not found` and similar symbol errors).
+          # produces wheels for cp39..cp312 that ImportError at load time
+          # (see `_PyObject_DelAttr not found` and similar symbol errors).
           CIBW_BEFORE_BUILD_MACOS: >
             pip install scikit-build-core numpy &&
             rm -rf /tmp/deps-py && mkdir -p /tmp/deps-py &&
