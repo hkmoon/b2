@@ -48,8 +48,8 @@ namespace bertini{
 		template<typename PyClass>
 		void PrecisionVisitor<T>::visit(PyClass& cl) const
 		{
-			cl.add_property("precision", 
-				get_prec, set_prec, 
+			cl.add_property("precision",
+				&PrecisionVisitor::get_prec, &PrecisionVisitor::set_prec,
 				"get/set the precision of this variable-precision number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.");
 		}
 
