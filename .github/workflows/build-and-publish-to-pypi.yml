@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-cibw-
       - uses: pypa/cibuildwheel@v2.23
         env:
-          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-*"
+          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
           CIBW_SKIP: "*-musllinux_* *-manylinux_i686"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_LINUX: >
@@ -52,8 +52,23 @@ jobs:
             cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPython3_EXECUTABLE=$(which python3) -DPython3_NumPy_INCLUDE_DIR=$(python3 -c "import numpy; print(numpy.get_include())") &&
             make -j$(nproc) install
           CIBW_BEFORE_ALL_MACOS: >
-            brew install gmp mpfr libmpc eigen@3 eigenpy boost boost-python3
-          CIBW_BEFORE_BUILD: "pip install scikit-build-core numpy"
+            brew install gmp mpfr libmpc eigen@3 boost &&
+            (brew uninstall --ignore-dependencies eigenpy boost-python3 2>/dev/null || true)
+          CIBW_BEFORE_BUILD_LINUX: "pip install scikit-build-core numpy"
+          CIBW_BEFORE_BUILD_MACOS: >
+            pip install scikit-build-core numpy &&
+            cd /tmp &&
+            rm -rf boost_1_87_0 boost_1_87_0.tar boost_1_87_0.tar.bz2 &&
+            curl -sLO https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 &&
+            tar xjf boost_1_87_0.tar.bz2 && cd boost_1_87_0 &&
+            ./bootstrap.sh --with-libraries=python --with-python=$(which python) --prefix=/opt/homebrew &&
+            ./b2 -d0 install &&
+            cd /tmp &&
+            rm -rf eigenpy-3.11.0 eigenpy-3.11.0.tar.gz &&
+            curl -sLO https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz &&
+            tar zxf eigenpy-3.11.0.tar.gz && cd eigenpy-3.11.0 && mkdir -p bld && cd bld &&
+            cmake .. -DCMAKE_PREFIX_PATH=/opt/homebrew -DCMAKE_INSTALL_PREFIX=/opt/homebrew -DPython3_EXECUTABLE=$(which python) -DPython3_NumPy_INCLUDE_DIR=$(python -c "import numpy; print(numpy.get_include())") &&
+            make -j$(sysctl -n hw.ncpu) install
           CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH"
           CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0"
 
@@ -70,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v4
         with:
@@ -129,7 +144,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-14]
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
       - uses: actions/checkout@v4
@@ -161,7 +176,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
       - uses: actions/checkout@v4
