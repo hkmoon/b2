@@ -48,10 +48,13 @@ namespace bertini{
 		template<typename PyClass>
 		void PrecisionVisitor<T>::visit(PyClass& cl) const
 		{
-			cl
-			.def("precision", get_prec, "get the precision of the number, in digits")
-			.def("precision", set_prec, "set the precision of the number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.")
-			;
+			// cl
+			// .def("precision", get_prec, (arg("self")), "get the precision of the number, in digits")
+			// .def("precision", set_prec, (arg("self"), arg("precision")),"set the precision of the number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.")
+			// ;
+			cl.add_property("precision", 
+				get_prec, set_prec, 
+				"get/set the precision of this variable-precision number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.");
 		}
 
 		template<typename T>
@@ -59,8 +62,8 @@ namespace bertini{
 		void RealStrVisitor<T>::visit(PyClass& cl) const
 		{
 			cl
-			.def("__str__", &RealStrVisitor::__str__)
-			.def("__repr__", &RealStrVisitor::__repr__)
+			.def("__str__", &RealStrVisitor::__str__, (arg("self")))
+			.def("__repr__", &RealStrVisitor::__repr__, (arg("self")))
 			;
 		}
 
@@ -134,7 +137,7 @@ namespace bertini{
 		template<typename PyClass>
 		void RealFreeVisitor<T>::visit(PyClass& cl) const
 		{
-			def("abs", &RealFreeVisitor::__abs__, "absolute value"); // free
+			def("abs", &RealFreeVisitor::__abs__, (arg("val")), "absolute value"); // free
 		}
 
 
@@ -214,25 +217,25 @@ namespace bertini{
 		template<typename PyClass>
 		void TranscendentalVisitor<T>::visit(PyClass& cl) const
 		{
-			def("exp", &TranscendentalVisitor::__exp__,"exponential, base e");
-			def("log", &TranscendentalVisitor::__log__,"natural log");
-			def("sqrt", &TranscendentalVisitor::__sqrt__,"square root");
+			def("exp", &TranscendentalVisitor::__exp__, (arg("val")), "exponential, base e");
+			def("log", &TranscendentalVisitor::__log__, (arg("val")), "natural log");
+			def("sqrt", &TranscendentalVisitor::__sqrt__, (arg("val")), "square root");
 
-			def("sin", &TranscendentalVisitor::__sin__,"sine");
-			def("cos", &TranscendentalVisitor::__cos__,"cosine");
-			def("tan", &TranscendentalVisitor::__tan__,"tangent");
+			def("sin", &TranscendentalVisitor::__sin__, (arg("val")), "sine");
+			def("cos", &TranscendentalVisitor::__cos__, (arg("val")), "cosine");
+			def("tan", &TranscendentalVisitor::__tan__, (arg("val")), "tangent");
 
-			def("asin", &TranscendentalVisitor::__asin__,"arcsine");
-			def("acos", &TranscendentalVisitor::__acos__,"arccosine");
-			def("atan", &TranscendentalVisitor::__atan__,"arctangent");
+			def("asin", &TranscendentalVisitor::__asin__, (arg("val")), "arcsine");
+			def("acos", &TranscendentalVisitor::__acos__, (arg("val")), "arccosine");
+			def("atan", &TranscendentalVisitor::__atan__, (arg("val")), "arctangent");
 
-			def("sinh", &TranscendentalVisitor::__sinh__,"hyperbolic sine");
-			def("cosh", &TranscendentalVisitor::__cosh__,"hyperbolic cosine");
-			def("tanh", &TranscendentalVisitor::__tanh__,"hyperbolic tangent");
+			def("sinh", &TranscendentalVisitor::__sinh__, (arg("val")), "hyperbolic sine");
+			def("cosh", &TranscendentalVisitor::__cosh__, (arg("val")), "hyperbolic cosine");
+			def("tanh", &TranscendentalVisitor::__tanh__, (arg("val")), "hyperbolic tangent");
 
-			def("asinh",&TranscendentalVisitor::__asinh__,"hyperbolic arcsine");
-			def("acosh",&TranscendentalVisitor::__acosh__,"hyperbolic arccosine");
-			def("atanh",&TranscendentalVisitor::__atanh__,"hyperbolic arctangent");
+			def("asinh",&TranscendentalVisitor::__asinh__, (arg("val")), "hyperbolic arcsine");
+			def("acosh",&TranscendentalVisitor::__acosh__, (arg("val")), "hyperbolic arccosine");
+			def("atanh",&TranscendentalVisitor::__atanh__, (arg("val")), "hyperbolic arctangent");
 		}
 
 
@@ -246,8 +249,8 @@ namespace bertini{
 			.add_property("real", &ComplexVisitor::get_real, &ComplexVisitor::set_real,"the real part of the complex number")
 			.add_property("imag", &ComplexVisitor::get_imag, &ComplexVisitor::set_imag,"the imaginary part of the complex number")
 
-			.def("__str__", &ComplexVisitor::__str__,"convert to string")
-			.def("__repr__", &ComplexVisitor::__repr__,"convert to string")
+			.def("__str__", &ComplexVisitor::__str__, (arg("self")), "convert to string")
+			.def("__repr__", &ComplexVisitor::__repr__, (arg("self")), "convert to string")
 			;
 
 
@@ -257,8 +260,8 @@ namespace bertini{
 
 			mpfr_float (*reeeal)(const T&) = &boost::multiprecision::real;
 			mpfr_float (*imaaag)(const T&) = &boost::multiprecision::real;
-			def("real",reeeal, "get the real part"); //,return_value_policy<copy_const_reference>()
-			def("imag",imaaag, "get the imaginary part"); //,return_value_policy<copy_const_reference>()
+			def("real",reeeal, (arg("val")), "get the real part"); //,return_value_policy<copy_const_reference>()
+			def("imag",imaaag, (arg("val")), "get the imaginary part"); //,return_value_policy<copy_const_reference>()
 
 			// and then a few more free functions
 			// def("abs2",&T::abs2);
