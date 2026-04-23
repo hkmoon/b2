@@ -57,17 +57,22 @@ jobs:
           CIBW_BEFORE_BUILD_LINUX: "pip install scikit-build-core numpy"
           CIBW_BEFORE_BUILD_MACOS: >
             pip install scikit-build-core numpy &&
+            PY_BIN=$(which python) &&
+            PY_VER=$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')") &&
+            PY_INC=$(python -c "import sysconfig; print(sysconfig.get_path('include'))") &&
+            PY_LIB=$(python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))") &&
             cd /tmp &&
             rm -rf boost_1_87_0 boost_1_87_0.tar boost_1_87_0.tar.bz2 &&
             curl -sLO https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 &&
             tar xjf boost_1_87_0.tar.bz2 && cd boost_1_87_0 &&
-            ./bootstrap.sh --with-libraries=python --with-python=$(which python) --prefix=/opt/homebrew &&
-            ./b2 -d0 install &&
+            printf 'using python : %s : %s : %s : %s ;\n' "$PY_VER" "$PY_BIN" "$PY_INC" "$PY_LIB" > user-config.jam &&
+            ./bootstrap.sh --with-libraries=python --prefix=/opt/homebrew &&
+            ./b2 --user-config=user-config.jam -d0 install &&
             cd /tmp &&
             rm -rf eigenpy-3.11.0 eigenpy-3.11.0.tar.gz &&
             curl -sLO https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz &&
             tar zxf eigenpy-3.11.0.tar.gz && cd eigenpy-3.11.0 && mkdir -p bld && cd bld &&
-            cmake .. -DCMAKE_PREFIX_PATH=/opt/homebrew -DCMAKE_INSTALL_PREFIX=/opt/homebrew -DPython3_EXECUTABLE=$(which python) -DPython3_NumPy_INCLUDE_DIR=$(python -c "import numpy; print(numpy.get_include())") &&
+            cmake .. -DCMAKE_PREFIX_PATH=/opt/homebrew -DCMAKE_INSTALL_PREFIX=/opt/homebrew -DPython3_EXECUTABLE=$PY_BIN -DPython3_INCLUDE_DIR=$PY_INC -DPython3_NumPy_INCLUDE_DIR=$(python -c "import numpy; print(numpy.get_include())") &&
             make -j$(sysctl -n hw.ncpu) install
           CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH"
           CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0"
@@ -144,7 +149,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-14]
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
       - uses: actions/checkout@v4
