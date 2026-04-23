@@ -220,6 +220,7 @@ if(${SKBUILD})
     # see https://stackoverflow.com/questions/1242904/finding-python-site-packages-directory-with-cmake
     install(TARGETS _pybertini LIBRARY DESTINATION .)
 else()
+    message(STATUS "Will install python bindings to: ${Python_SITELIB}/bertini")
     install(TARGETS _pybertini LIBRARY DESTINATION ${Python_SITELIB}/bertini)
 endif()
 
