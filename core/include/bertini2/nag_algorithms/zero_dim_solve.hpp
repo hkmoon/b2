@@ -727,10 +727,14 @@ std::ostream& operator<<(std::ostream & out, const EGBoundaryMetaData<NumT> & me
 				GetTracker().SetStepSize(solutions_at_endgame_boundary_[soln_ind].last_used_stepsize);
 				GetTracker().ReinitializeInitialStepSize(false);
 
-				DefaultPrecision(Precision(bdry_point));
-				// we make these fresh so they are in the correct precision to start.
+				auto start_prec = Precision(bdry_point);
+
+				DefaultPrecision(start_prec);
+
 				BaseComplexType t_end = this->template Get<ZeroDimConf>().target_time;
+
 				BaseComplexType t_endgame_boundary = this->template Get<ZeroDimConf>().endgame_boundary;
+				Precision(t_endgame_boundary,start_prec);
 
 				auto eg_success = GetEndgame().Run(t_endgame_boundary, bdry_point, t_end);
 
