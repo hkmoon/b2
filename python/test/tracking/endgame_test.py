@@ -53,6 +53,7 @@ from bertini.endgame.config import *
 import unittest
 import numpy as np
 import pdb
+import sys
 
 import bertini.system.start_system as ss
 import bertini.multiprec as mp
@@ -82,6 +83,7 @@ class EndgameTest(unittest.TestCase):
     def setUp(self):
         self.ambient_precision = 50;
 
+    @unittest.skipIf(sys.platform == "win32", "AMPCauchyEG currently crashes the Windows Python extension")
     def test_using_total_degree_ss(self):
         default_precision(self.ambient_precision);
 
