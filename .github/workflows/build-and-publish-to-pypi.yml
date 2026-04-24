@@ -72,7 +72,7 @@ jobs:
             { [ -f boost_1_87_0.tar.bz2 ] || curl -fsSL -o boost_1_87_0.tar.bz2 https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 ; } &&
             rm -rf boost_1_87_0 && tar xjf boost_1_87_0.tar.bz2 &&
             cd boost_1_87_0 &&
-            ./bootstrap.sh --with-libraries=python --prefix=/tmp/deps-py &&
+            ./bootstrap.sh --with-python=$(which python3) --prefix=/tmp/deps-py &&
             printf 'using python : %s : %s : %s : %s ;\n' "$PY_VER" "$(which python)" "$PY_INC" "$PY_LIB" > user-config.jam &&
             ./b2 install -j $(sysctl -n hw.ncpu) --user-config=user-config.jam python=$PY_VER &&
             cd /tmp &&
