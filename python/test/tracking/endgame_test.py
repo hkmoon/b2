@@ -139,8 +139,8 @@ class EndgameTest(unittest.TestCase):
         final_homogenized_solutions = [np.empty(dtype=mpfr_complex, shape=(3,)) for i in range(n)]
 
         for i in range(n):
-            default_precision(bdry_points[i][0].precision);
-            final_system.precision(bdry_points[i][0].precision);
+            default_precision(bdry_points[i][0].precision());
+            final_system.precision(bdry_points[i][0].precision());
 
             bdry_time = mpfr_complex(t_endgame_boundary)
 

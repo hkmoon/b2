@@ -48,9 +48,14 @@ namespace bertini{
 		template<typename PyClass>
 		void PrecisionVisitor<T>::visit(PyClass& cl) const
 		{
-			cl.add_property("precision", 
-				get_prec, set_prec, 
-				"get/set the precision of this variable-precision number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.");
+			// Expose precision as a method on all platforms: x.precision() to
+			// get, x.precision(N) to set. add_property would be ergonomic but
+			// Boost.Python under clang-cl on Windows falls back to exposing it
+			// as a method anyway, so use the method form uniformly.
+			cl.def("precision", &PrecisionVisitor::get_prec,
+				"get the precision of this variable-precision number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.");
+			cl.def("precision", &PrecisionVisitor::set_prec,
+				"set the precision of this variable-precision number, in digits.");
 		}
 
 		template<typename T>

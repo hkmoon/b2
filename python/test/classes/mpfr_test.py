@@ -222,7 +222,7 @@ class MPFRComplex(unittest.TestCase):
         a = mp.Complex(4)
         b = mp.Complex(5)
 
-        self.assertEqual(y.precision,30)
+        self.assertEqual(y.precision(),30)
 
 
         mp.default_precision(50);
@@ -234,12 +234,12 @@ class MPFRComplex(unittest.TestCase):
         c = mp.Complex(6)
         d = mp.Complex(7)
         w = x+y
-        self.assertEqual(w.precision,60)
+        self.assertEqual(w.precision(),60)
 
         c = a
-        self.assertEqual(c.precision,40) # even though the source is 40, target is 60, and APPoT.
+        self.assertEqual(c.precision(),40) # even though the source is 40, target is 60, and APPoT.
         d = a+b
-        self.assertEqual(d.precision,60) # even though the source is 30, target is 60, and APPoT.
+        self.assertEqual(d.precision(),60) # even though the source is 30, target is 60, and APPoT.
 
 
     def test_arith_mp_complex(self):

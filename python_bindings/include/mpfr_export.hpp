@@ -58,9 +58,12 @@ namespace bertini{
 			template<class PyClass>
 			void visit(PyClass& cl) const;
 		private:
-
-			unsigned (T::*get_prec)() const= &T::precision; // return type needs to be PrecT
-			void (T::*set_prec)(unsigned) = &T::precision;
+			// Static wrappers instead of member function pointers.
+			// clang-cl on Windows does not always link member function pointers
+			// through boost::python::add_property reliably, so use free functions
+			// that forward to the member.
+			static unsigned get_prec(T const& self) { return self.precision(); }
+			static void set_prec(T& self, unsigned p) { self.precision(p); }
 		};
 
 
