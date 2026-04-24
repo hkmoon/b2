@@ -48,17 +48,9 @@ namespace bertini{
 		template<typename PyClass>
 		void PrecisionVisitor<T>::visit(PyClass& cl) const
 		{
-			// Bind member function pointers directly so the setter mutates the
-			// actual instance via `this`. Static wrappers taking `T&` behaved
-			// inconsistently across platforms (mutation was lost on Linux /
-			// clang-cl Windows). Expose as a method on all platforms:
-			// x.precision() to get, x.precision(N) to set.
-			cl.def("precision",
-				static_cast<unsigned (T::*)() const>(&T::precision),
-				"get the precision of this variable-precision number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.");
-			cl.def("precision",
-				static_cast<void (T::*)(unsigned)>(&T::precision),
-				"set the precision of this variable-precision number, in digits.");
+			cl.add_property("precision", 
+				get_prec, set_prec, 
+				"get/set the precision of this variable-precision number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.");
 		}
 
 		template<typename T>
