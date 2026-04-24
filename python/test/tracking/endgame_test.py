@@ -71,14 +71,6 @@ def _prec(x):
     return p() if callable(p) else p
 
 
-def _set_prec(x, p):
-    """Set the precision of an mpfr value across platforms."""
-    if callable(x.precision):
-        x.precision(p)
-    else:
-        x.precision = p
-
-
 class EndgameTest(unittest.TestCase):
     def setUp(self):
         self.ambient_precision = 50;
@@ -163,8 +155,12 @@ class EndgameTest(unittest.TestCase):
             default_precision(pt_prec)
             final_system.precision(pt_prec)
 
-            bdry_time = mpfr_complex(t_endgame_boundary)
-            _set_prec(bdry_time, pt_prec)
+            # Construct bdry_time at the current default precision. Copying from
+            # t_endgame_boundary and then setting precision does not work reliably
+            # across platforms: the copy constructor preserves the source's
+            # precision, and the property-based setter silently fails to mutate
+            # on some Linux Boost.Python builds.
+            bdry_time = mpfr_complex("0.1")
 
             track_success_code = my_endgame.run(bdry_time,bdry_points[i]) # should be bdry_pts[i], not XXX
 
