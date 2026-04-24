@@ -139,17 +139,16 @@ class EndgameTest(unittest.TestCase):
         final_homogenized_solutions = [np.empty(dtype=mpfr_complex, shape=(3,)) for i in range(n)]
 
         for i in range(n):
-            target_prec = bdry_points[i][0].precision()
-            default_precision(target_prec);
-            final_system.precision(target_prec);
+            pt_prec = bdry_points[i][0].precision()
+            default_precision(pt_prec)
+            final_system.precision(pt_prec)
 
             bdry_time = mpfr_complex(t_endgame_boundary)
-            bdry_time.precision(target_prec)
+            bdry_time.precision(pt_prec)
 
-            track_success_code = my_endgame.run(bdry_time,bdry_points[i]); # should be bdry_pts[i], not XXX
+            track_success_code = my_endgame.run(bdry_time,bdry_points[i]) # should be bdry_pts[i], not XXX
 
-
-            final_homogenized_solutions[i] = my_endgame.final_approximation();
+            final_homogenized_solutions[i] = my_endgame.final_approximation()
 
             self.assertEqual(track_success_code, SuccessCode.Success)
 
