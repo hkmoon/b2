@@ -209,7 +209,7 @@ jobs:
       - name: Install wheel and run tests
         shell: pwsh
         run: |
-          pip install --find-links dist/ bertini
+          pip install --no-index --find-links dist/ bertini
           pip install pytest
           pytest python/test/ -v
 
