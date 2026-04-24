@@ -23,21 +23,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Cache cibuildwheel + pip + Homebrew + dep sources
+      - name: Cache cibuildwheel + pip + Homebrew
         uses: actions/cache@v4
         with:
           path: |
             ~/.cache/pip
             ~/.cache/cibuildwheel
             ~/Library/Caches/Homebrew
-            /tmp/boost_1_87_0.tar.bz2
-            /tmp/eigenpy-3.11.0.tar.gz
           key: ${{ runner.os }}-cibw-${{ hashFiles('pyproject.toml', 'python/pyproject.toml', 'CMakeLists.txt', 'core/CMakeLists.txt', '.github/workflows/build-and-publish-to-pypi.yml') }}
           restore-keys: |
             ${{ runner.os }}-cibw-
       - uses: pypa/cibuildwheel@v2.23
         env:
-          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
+          # Linux builds all 5 CPython versions; macOS only builds cp313.
+          # Homebrew's boost-python3 / eigenpy bottles are linked to the current
+          # Homebrew default Python (3.13), and per-Python source builds on
+          # macOS have been unreliable (see commit history / PR notes).
+          # Users on macOS + older Python can still build from sdist / source.
+          CIBW_BUILD: "cp39-manylinux* cp310-manylinux* cp311-manylinux* cp312-manylinux* cp313-manylinux* cp313-macosx*"
           CIBW_SKIP: "*-musllinux_* *-manylinux_i686"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_LINUX: >
@@ -54,35 +57,10 @@ jobs:
             cmake .. -DCMAKE_PREFIX_PATH=/usr/local -DCMAKE_INSTALL_PREFIX=/usr/local -DPython3_EXECUTABLE=$(which python3) -DPython3_NumPy_INCLUDE_DIR=$(python3 -c "import numpy; print(numpy.get_include())") &&
             make -j$(nproc) install
           CIBW_BEFORE_ALL_MACOS: >
-            brew install gmp mpfr libmpc eigen@3
-          CIBW_BEFORE_BUILD_LINUX: "pip install scikit-build-core numpy"
-          CIBW_BEFORE_BUILD_WINDOWS: "pip install scikit-build-core numpy"
-          # On macOS we rebuild Boost.Python and eigenpy against the current target
-          # Python, because Homebrew only ships one boost-python3 / eigenpy bottle
-          # linked to its default Python (currently 3.13). Installing those bottles
-          # produces wheels for cp39..cp312 that ImportError at load time
-          # (see `_PyObject_DelAttr not found` and similar symbol errors).
-          CIBW_BEFORE_BUILD_MACOS: >
-            pip install scikit-build-core numpy scipy &&
-            rm -rf /tmp/deps-py && mkdir -p /tmp/deps-py &&
-            PY_VER=$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')") &&
-            PY_INC=$(python -c "import sysconfig; print(sysconfig.get_path('include'))") &&
-            PY_LIB=$(python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))") &&
-            cd /tmp &&
-            { [ -f boost_1_87_0.tar.bz2 ] || curl -fsSL -o boost_1_87_0.tar.bz2 https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 ; } &&
-            rm -rf boost_1_87_0 && tar xjf boost_1_87_0.tar.bz2 &&
-            cd boost_1_87_0 &&
-            ./bootstrap.sh --with-python=$(which python3) --prefix=/tmp/deps-py &&
-            printf 'using python : %s : %s : %s : %s ;\n' "$PY_VER" "$(which python)" "$PY_INC" "$PY_LIB" > user-config.jam &&
-            ./b2 install -j $(sysctl -n hw.ncpu) --user-config=user-config.jam python=$PY_VER hardcode-dll-paths=true dll-path=/tmp/deps-py/lib &&
-            cd /tmp &&
-            { [ -f eigenpy-3.11.0.tar.gz ] || curl -fsSL -o eigenpy-3.11.0.tar.gz https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz ; } &&
-            rm -rf eigenpy-3.11.0 && tar zxf eigenpy-3.11.0.tar.gz &&
-            cd eigenpy-3.11.0 && mkdir -p bld && cd bld &&
-            cmake .. -DCMAKE_PREFIX_PATH="/tmp/deps-py;/opt/homebrew" -DCMAKE_INSTALL_PREFIX=/tmp/deps-py -DPython3_EXECUTABLE=$(which python) -DPython3_NumPy_INCLUDE_DIR=$(python -c "import numpy; print(numpy.get_include())") -DBUILD_TESTING=OFF &&
-            make -j $(sysctl -n hw.ncpu) install
+            brew install gmp mpfr libmpc eigen@3 boost boost-python3 eigenpy
+          CIBW_BEFORE_BUILD: "pip install scikit-build-core numpy"
           CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH"
-          CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0 CMAKE_PREFIX_PATH=/tmp/deps-py:/opt/homebrew"
+          CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -149,14 +127,26 @@ jobs:
           path: ./dist/*.whl
 
   test_wheels_linux_macos:
-    name: Test wheels on ${{ matrix.os }}
+    name: Test wheels on ${{ matrix.os }} / py${{ matrix.python-version }}
     needs: build_wheels
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-14]
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        include:
+          - os: ubuntu-latest
+            python-version: '3.9'
+          - os: ubuntu-latest
+            python-version: '3.10'
+          - os: ubuntu-latest
+            python-version: '3.11'
+          - os: ubuntu-latest
+            python-version: '3.12'
+          - os: ubuntu-latest
+            python-version: '3.13'
+          # macOS wheels are only built for cp313 — see build_wheels job.
+          - os: macos-14
+            python-version: '3.13'
 
     steps:
       - uses: actions/checkout@v4
