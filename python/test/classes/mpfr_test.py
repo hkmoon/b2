@@ -38,6 +38,17 @@ import unittest
 import pdb
 
 
+def _prec(x):
+    """Return the precision of an mpfr value.
+
+    Boost.Python exposes ``precision`` as a read-write property on macOS/Linux,
+    but as a method on Windows (clang-cl). This helper returns the integer
+    precision regardless of which binding form is active.
+    """
+    p = x.precision
+    return p() if callable(p) else p
+
+
 dbltol = 1e-15;
 class MPFRFloat(unittest.TestCase):
     def setUp(self):
@@ -222,7 +233,7 @@ class MPFRComplex(unittest.TestCase):
         a = mp.Complex(4)
         b = mp.Complex(5)
 
-        self.assertEqual(y.precision(),30)
+        self.assertEqual(_prec(y),30)
 
 
         mp.default_precision(50);
@@ -234,12 +245,12 @@ class MPFRComplex(unittest.TestCase):
         c = mp.Complex(6)
         d = mp.Complex(7)
         w = x+y
-        self.assertEqual(w.precision(),60)
+        self.assertEqual(_prec(w),60)
 
         c = a
-        self.assertEqual(c.precision(),40) # even though the source is 40, target is 60, and APPoT.
+        self.assertEqual(_prec(c),40) # even though the source is 40, target is 60, and APPoT.
         d = a+b
-        self.assertEqual(d.precision(),60) # even though the source is 30, target is 60, and APPoT.
+        self.assertEqual(_prec(d),60) # even though the source is 30, target is 60, and APPoT.
 
 
     def test_arith_mp_complex(self):

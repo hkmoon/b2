@@ -60,6 +60,24 @@ from bertini.multiprec import Float as mpfr_float
 from bertini.multiprec import Complex as mpfr_complex
 
 
+def _prec(x):
+    """Read the precision of an mpfr value across platforms.
+
+    ``precision`` is exposed as a property on macOS/Linux but as a method on
+    Windows (clang-cl). Accept either form and return the integer.
+    """
+    p = x.precision
+    return p() if callable(p) else p
+
+
+def _set_prec(x, p):
+    """Set the precision of an mpfr value across platforms."""
+    if callable(x.precision):
+        x.precision(p)
+    else:
+        x.precision = p
+
+
 class EndgameTest(unittest.TestCase):
     def setUp(self):
         self.ambient_precision = 50;
@@ -139,12 +157,12 @@ class EndgameTest(unittest.TestCase):
         final_homogenized_solutions = [np.empty(dtype=mpfr_complex, shape=(3,)) for i in range(n)]
 
         for i in range(n):
-            pt_prec = bdry_points[i][0].precision()
+            pt_prec = _prec(bdry_points[i][0])
             default_precision(pt_prec)
             final_system.precision(pt_prec)
 
             bdry_time = mpfr_complex(t_endgame_boundary)
-            bdry_time.precision(pt_prec)
+            _set_prec(bdry_time, pt_prec)
 
             track_success_code = my_endgame.run(bdry_time,bdry_points[i]) # should be bdry_pts[i], not XXX
 
