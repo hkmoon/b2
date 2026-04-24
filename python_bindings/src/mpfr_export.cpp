@@ -48,13 +48,16 @@ namespace bertini{
 		template<typename PyClass>
 		void PrecisionVisitor<T>::visit(PyClass& cl) const
 		{
-			// Expose precision as a method on all platforms: x.precision() to
-			// get, x.precision(N) to set. add_property would be ergonomic but
-			// Boost.Python under clang-cl on Windows falls back to exposing it
-			// as a method anyway, so use the method form uniformly.
-			cl.def("precision", &PrecisionVisitor::get_prec,
+			// Bind member function pointers directly so the setter mutates the
+			// actual instance via `this`. Static wrappers taking `T&` behaved
+			// inconsistently across platforms (mutation was lost on Linux /
+			// clang-cl Windows). Expose as a method on all platforms:
+			// x.precision() to get, x.precision(N) to set.
+			cl.def("precision",
+				static_cast<unsigned (T::*)() const>(&T::precision),
 				"get the precision of this variable-precision number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.");
-			cl.def("precision", &PrecisionVisitor::set_prec,
+			cl.def("precision",
+				static_cast<void (T::*)(unsigned)>(&T::precision),
 				"set the precision of this variable-precision number, in digits.");
 		}
 
