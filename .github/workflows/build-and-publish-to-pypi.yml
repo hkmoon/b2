@@ -74,7 +74,7 @@ jobs:
             cd boost_1_87_0 &&
             ./bootstrap.sh --with-python=$(which python3) --prefix=/tmp/deps-py &&
             printf 'using python : %s : %s : %s : %s ;\n' "$PY_VER" "$(which python)" "$PY_INC" "$PY_LIB" > user-config.jam &&
-            ./b2 install -j $(sysctl -n hw.ncpu) --user-config=user-config.jam python=$PY_VER &&
+            ./b2 install -j $(sysctl -n hw.ncpu) --user-config=user-config.jam python=$PY_VER hardcode-dll-paths=true dll-path=/tmp/deps-py/lib &&
             cd /tmp &&
             { [ -f eigenpy-3.11.0.tar.gz ] || curl -fsSL -o eigenpy-3.11.0.tar.gz https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz ; } &&
             rm -rf eigenpy-3.11.0 && tar zxf eigenpy-3.11.0.tar.gz &&
