@@ -35,12 +35,10 @@ jobs:
             ${{ runner.os }}-cibw-
       - uses: pypa/cibuildwheel@v2.23
         env:
-          # Linux builds all 5 CPython versions; macOS only builds cp313.
-          # Homebrew's boost-python3 / eigenpy bottles are linked to the current
-          # Homebrew default Python (3.13), and per-Python source builds on
-          # macOS have been unreliable (see commit history / PR notes).
-          # Users on macOS + older Python can still build from sdist / source.
-          CIBW_BUILD: "cp39-manylinux* cp310-manylinux* cp311-manylinux* cp312-manylinux* cp313-manylinux* cp313-macosx*"
+          # Build cp39 through cp313 for both Linux (manylinux) and macOS.
+          # Boost.Python and eigenpy are rebuilt per target Python in BEFORE_BUILD
+          # so each wheel bundles a matching libboost_python3X.
+          CIBW_BUILD: "cp39-manylinux* cp310-manylinux* cp311-manylinux* cp312-manylinux* cp313-manylinux* cp39-macosx* cp310-macosx* cp311-macosx* cp312-macosx* cp313-macosx*"
           CIBW_SKIP: "*-musllinux_* *-manylinux_i686"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           # Install system deps + download (but DO NOT build) Boost & eigenpy sources
@@ -174,20 +172,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            python-version: '3.9'
-          - os: ubuntu-latest
-            python-version: '3.10'
-          - os: ubuntu-latest
-            python-version: '3.11'
-          - os: ubuntu-latest
-            python-version: '3.12'
-          - os: ubuntu-latest
-            python-version: '3.13'
-          # macOS wheels are only built for cp313 — see build_wheels job.
-          - os: macos-14
-            python-version: '3.13'
+        os: [ubuntu-latest, macos-14]
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
       - uses: actions/checkout@v4
