@@ -137,6 +137,15 @@ using bmp::backends::mpc_complex_backend;
 	{
 		mpfr_float::default_precision(prec);
 		mpfr_complex::default_precision(prec);
+		// Boost.Multiprecision constructors read thread_default_precision; on
+        // Boost 1.87 (manylinux) setting only the static default leaves
+        // thread_default_precision at 0, so default-constructed temporaries
+        // (e.g., from boost::python const& extractors) land at precision 0
+        // and the endgame's "Run time and point must be of matching precision"
+        // check trips with (0!=N). macOS happens to escape this on Linux's
+        // failure path. Set both to be portable.
+        mpfr_float::thread_default_precision(prec);
+        mpfr_complex::thread_default_precision(prec);
 	}
 
 
