@@ -155,7 +155,12 @@ class EndgameTest(unittest.TestCase):
             default_precision(pt_prec)
             final_system.precision(pt_prec)
 
-            bdry_time = mpfr_complex("0.1")
+            # Construct bdry_time at exactly pt_prec via the (string, digits10)
+            # Float constructor. mpfr_complex("0.1") relying on default_precision
+            # propagation came out at precision 0 on Linux Boost 1.87, even after
+            # default_precision(pt_prec). The mpfr_float (str, prec) constructor
+            # sets precision directly, then mpfr_complex(Float) preserves it.
+            bdry_time = mpfr_complex(mpfr_float("0.1", pt_prec))
 
             track_success_code = my_endgame.run(bdry_time, bdry_points[i])
 

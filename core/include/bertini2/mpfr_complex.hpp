@@ -137,12 +137,6 @@ using bmp::backends::mpc_complex_backend;
 	{
 		mpfr_float::default_precision(prec);
 		mpfr_complex::default_precision(prec);
-		// Boost.Multiprecision constructors read thread_default_precision, not the
-		// static default. On Boost 1.90 setting the static propagates to thread-local;
-		// on Boost 1.87 (manylinux) it does not, so mpfr_complex("0.1") came out at
-		// precision 0 in the test suite. Set both to be portable.
-		mpfr_float::thread_default_precision(prec);
-		mpfr_complex::thread_default_precision(prec);
 	}
 
 

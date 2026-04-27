@@ -367,6 +367,7 @@ namespace bertini{
 
 			class_<T>("Float", init<>("Default Construct a variable-precision float"))
 			.def(init<std::string>((arg("self"),arg("val")),"Construct a variable-precision float from a string.  The best way."))
+			.def(init<std::string, unsigned>((arg("self"),arg("val"),arg("digits10")),"Construct a variable-precision float from a string at the specified precision (in digits).  Use this when you need a value at a specific precision regardless of the current default_precision (e.g., when default-precision propagation is unreliable across Boost.Multiprecision versions)."))
 			.def(init<int>((arg("self"),arg("val")),"Construct a variable-precision float from a regular old integer."))
 			.def(init<long int>((arg("self"),arg("val")),"Construct a variable-precision float from a regular old integer."))
 			.def(init<T>((arg("self"),arg("val")),"Construct a variable-precision float from another."))
