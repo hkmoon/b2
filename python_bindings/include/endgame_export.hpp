@@ -58,12 +58,12 @@ namespace bertini{
 			using BaseEGT = typename EndgameT::BaseEGT;
 
 			static
-			SuccessCode WrapRunDefaultTime(EndgameT & self, BCT const& t, Vec<BCT> const& s){
+			SuccessCode WrapRunDefaultTime(EndgameT & self, BCT t, Vec<BCT> const& s){
 				return self.Run(t, s);
 			}
 
 			static
-			 SuccessCode WrapRunCustomTime(EndgameT & self, BCT const& t, Vec<BCT> const& s, BCT const& u){
+			 SuccessCode WrapRunCustomTime(EndgameT & self, BCT t, Vec<BCT> const& s, BCT const& u){
 				return self.Run(t, s, u);
 			}
 
