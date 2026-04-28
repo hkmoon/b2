@@ -61,16 +61,6 @@ from bertini.multiprec import Float as mpfr_float
 from bertini.multiprec import Complex as mpfr_complex
 
 
-def _prec(x):
-    """Read the precision of an mpfr value across platforms.
-
-    ``precision`` is exposed as a property on macOS/Linux but as a method on
-    Windows (clang-cl). Accept either form and return the integer.
-    """
-    p = x.precision
-    return p() if callable(p) else p
-
-
 class EndgameTest(unittest.TestCase):
     def setUp(self):
         self.ambient_precision = 50;
@@ -151,18 +141,12 @@ class EndgameTest(unittest.TestCase):
         final_homogenized_solutions = [np.empty(dtype=mpfr_complex, shape=(3,)) for i in range(n)]
 
         for i in range(n):
-            pt_prec = _prec(bdry_points[i][0])
-            default_precision(pt_prec)
-            final_system.precision(pt_prec)
+            default_precision(bdry_points[i][0].precision);
+            final_system.precision(bdry_points[i][0].precision);
 
-            # Construct bdry_time at exactly pt_prec via the (string, digits10)
-            # Float constructor. mpfr_complex("0.1") relying on default_precision
-            # propagation came out at precision 0 on Linux Boost 1.87, even after
-            # default_precision(pt_prec). The mpfr_float (str, prec) constructor
-            # sets precision directly, then mpfr_complex(Float) preserves it.
-            bdry_time = mpfr_complex(mpfr_float("0.1", pt_prec))
+            bdry_time = mpfr_complex(t_endgame_boundary)
 
-            track_success_code = my_endgame.run(bdry_time, bdry_points[i])
+            track_success_code = my_endgame.run(bdry_time,bdry_points[i]) # should be bdry_pts[i], not XXX
 
             final_homogenized_solutions[i] = my_endgame.final_approximation()
 
