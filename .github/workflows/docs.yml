@@ -1,0 +1,89 @@
+name: Build and deploy docs to GitHub Pages
+
+on:
+  push:
+    branches: [develop]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+# Single concurrent deployment; cancel in-progress on new push.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies (Doxygen + bertini build deps)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            doxygen graphviz \
+            libgmp-dev libmpfr-dev libmpc-dev libeigen3-dev libboost-all-dev
+
+      - name: Fetch doxygen-awesome-css
+        run: |
+          curl -sSL https://github.com/jothepro/doxygen-awesome-css/archive/refs/tags/v2.3.4.tar.gz | tar -xz
+          mv doxygen-awesome-css-2.3.4 doxygen-awesome-css
+
+      - name: Build C++ docs (Doxygen)
+        run: |
+          doxygen Doxyfile
+          mkdir -p site
+          mv build/docs/cpp site/cpp
+
+      - name: Install Python deps for Sphinx
+        run: |
+          python -m pip install --upgrade pip
+          pip install \
+            sphinx sphinx-rtd-theme sphinxcontrib-bibtex \
+            scikit-build-core build numpy eigenpy
+
+      - name: Install bertini from PyPI
+        # Sphinx autodoc imports the package. Building from source here would
+        # take ~10 min; pulling from PyPI keeps the docs build fast. The doc
+        # site will lag the source by one release cycle. Replace with a
+        # source build (`pip install .`) if you need bleeding-edge.
+        run: pip install bertini || pip install --pre bertini
+
+      - name: Build Python docs (Sphinx)
+        working-directory: python/docs
+        run: |
+          sphinx-build -b html -W --keep-going source ../../site/python || \
+            sphinx-build -b html source ../../site/python
+
+      - name: Add landing page
+        run: |
+          cp doc_resources/landing/index.html site/index.html
+          cp doc_resources/landing/style.css site/style.css
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
