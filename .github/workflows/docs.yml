@@ -83,7 +83,7 @@ jobs:
     # dispatches from non-develop refs) build the docs but don't publish, so
     # PR previews validate without hitting the github-pages environment's
     # branch-protection rule.
-    if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/docs' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
