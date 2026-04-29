@@ -24,8 +24,34 @@
 # stuff to get autodoc to work. silviana amethyst
 import sys
 import os
-sys.path.insert(0,os.path.abspath('../../../bld/python_bindings'))
-sys.path.insert(0, os.path.abspath('../'))
+
+# autodoc needs to import the `bertini` package so it can introspect classes
+# and functions. Prefer the installed package (pip install / virtualenv) so
+# the C++ binary extension `_pybertini` resolves correctly.
+#
+# Only add the source tree at python/ to sys.path if it has the compiled
+# `_pybertini` next to it. Otherwise it shadows the installed package and
+# autodoc silently produces empty stubs (the source `__init__.py` re-exports
+# from `bertini._pybertini`, which lives in the .so file).
+#
+# For local development, set PYTHONPATH (or BERTINI_BUILD_DIR) to your CMake
+# build's python_bindings/ directory if it isn't an installed package.
+import glob
+def _has_pybertini(path):
+    return bool(glob.glob(os.path.join(path, 'bertini', '_pybertini*.so'))) or \
+           bool(glob.glob(os.path.join(path, 'bertini', '_pybertini*.pyd')))
+
+_local_src = os.path.abspath('../')           # repo's python/ (source tree)
+_local_bld = os.path.abspath('../../../bld/python_bindings')
+
+for _p in (_local_bld, _local_src):
+    if _has_pybertini(_p):
+        sys.path.insert(0, _p)
+
+# Allow an explicit override (used by maintainers with non-standard layouts).
+_override = os.environ.get('BERTINI_BUILD_DIR')
+if _override and _has_pybertini(_override):
+    sys.path.insert(0, _override)
 
 # -- General configuration ------------------------------------------------
 
