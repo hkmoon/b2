@@ -141,6 +141,14 @@ if build_date:
     # build date there makes it visible without template overrides.
     release = '{} ({})'.format(version, build_date)
 
+# Expose build metadata to Jinja templates (used by _templates/footer.html
+# to render the "Built from <sha> on <date>" line in the page footer).
+html_context = {
+    'commit_sha': last_commit if last_commit and last_commit != 'unknown' else '',
+    'commit_short': version if last_commit and last_commit != 'unknown' else '',
+    'build_date': build_date,
+}
+
 
 
 
