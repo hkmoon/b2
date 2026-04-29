@@ -91,17 +91,29 @@ author = 'Bertini Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
-# built documents.
-try:
-    import git  #package gitpython
-    repo = git.Repo(search_parent_directories=True) 
-    last_commit = str(repo.head.commit) 
+# built documents. Prefer CI-supplied env vars (set by .github/workflows/docs.yml)
+# since they work on shallow clones; fall back to gitpython for local builds.
+last_commit = os.environ.get('BERTINI_GIT_SHA')
+if last_commit:
     version = last_commit[:7]
-    release = last_commit # full version
-except:
-    last_commit = 'gitpython not installed'
-    version = last_commit # The short X.Y version.
-    release = version # The full version, including alpha/beta/rc tags.
+    release = last_commit
+else:
+    try:
+        import git  # package gitpython
+        repo = git.Repo(search_parent_directories=True)
+        last_commit = str(repo.head.commit)
+        version = last_commit[:7]
+        release = last_commit
+    except Exception:
+        last_commit = 'unknown'
+        version = last_commit
+        release = version
+
+build_date = os.environ.get('BERTINI_BUILD_DATE', '')
+if build_date:
+    # sphinx_rtd_theme shows `release` in the sidebar header; appending the
+    # build date there makes it visible without template overrides.
+    release = '{} ({})'.format(version, build_date)
 
 
 
