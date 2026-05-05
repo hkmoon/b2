@@ -24,8 +24,34 @@
 # stuff to get autodoc to work. silviana amethyst
 import sys
 import os
-sys.path.insert(0,os.path.abspath('../../../bld/python_bindings'))
-sys.path.insert(0, os.path.abspath('../'))
+
+# autodoc needs to import the `bertini` package so it can introspect classes
+# and functions. Prefer the installed package (pip install / virtualenv) so
+# the C++ binary extension `_pybertini` resolves correctly.
+#
+# Only add the source tree at python/ to sys.path if it has the compiled
+# `_pybertini` next to it. Otherwise it shadows the installed package and
+# autodoc silently produces empty stubs (the source `__init__.py` re-exports
+# from `bertini._pybertini`, which lives in the .so file).
+#
+# For local development, set PYTHONPATH (or BERTINI_BUILD_DIR) to your CMake
+# build's python_bindings/ directory if it isn't an installed package.
+import glob
+def _has_pybertini(path):
+    return bool(glob.glob(os.path.join(path, 'bertini', '_pybertini*.so'))) or \
+           bool(glob.glob(os.path.join(path, 'bertini', '_pybertini*.pyd')))
+
+_local_src = os.path.abspath('../')           # repo's python/ (source tree)
+_local_bld = os.path.abspath('../../../bld/python_bindings')
+
+for _p in (_local_bld, _local_src):
+    if _has_pybertini(_p):
+        sys.path.insert(0, _p)
+
+# Allow an explicit override (used by maintainers with non-standard layouts).
+_override = os.environ.get('BERTINI_BUILD_DIR')
+if _override and _has_pybertini(_override):
+    sys.path.insert(0, _override)
 
 # -- General configuration ------------------------------------------------
 
@@ -91,17 +117,37 @@ author = 'Bertini Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
-# built documents.
-try:
-    import git  #package gitpython
-    repo = git.Repo(search_parent_directories=True) 
-    last_commit = str(repo.head.commit) 
+# built documents. Prefer CI-supplied env vars (set by .github/workflows/docs.yml)
+# since they work on shallow clones; fall back to gitpython for local builds.
+last_commit = os.environ.get('BERTINI_GIT_SHA')
+if last_commit:
     version = last_commit[:7]
-    release = last_commit # full version
-except:
-    last_commit = 'gitpython not installed'
-    version = last_commit # The short X.Y version.
-    release = version # The full version, including alpha/beta/rc tags.
+    release = last_commit
+else:
+    try:
+        import git  # package gitpython
+        repo = git.Repo(search_parent_directories=True)
+        last_commit = str(repo.head.commit)
+        version = last_commit[:7]
+        release = last_commit
+    except Exception:
+        last_commit = 'unknown'
+        version = last_commit
+        release = version
+
+build_date = os.environ.get('BERTINI_BUILD_DATE', '')
+if build_date:
+    # sphinx_rtd_theme shows `release` in the sidebar header; appending the
+    # build date there makes it visible without template overrides.
+    release = '{} ({})'.format(version, build_date)
+
+# Expose build metadata to Jinja templates (used by _templates/footer.html
+# to render the "Built from <sha> on <date>" line in the page footer).
+html_context = {
+    'commit_sha': last_commit if last_commit and last_commit != 'unknown' else '',
+    'commit_short': version if last_commit and last_commit != 'unknown' else '',
+    'build_date': build_date,
+}
 
 
 

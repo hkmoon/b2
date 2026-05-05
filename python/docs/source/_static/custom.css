@@ -21,3 +21,17 @@ table.docutils th, table.docutils td {
 .rst-versions {
     font-size: 0.9em;
 }
+
+/* Build metadata in the footer (rendered by _templates/footer.html) */
+footer .build-info {
+    margin-top: 0.5rem;
+    font-size: 0.85em;
+    color: #888;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+}
+footer .build-info code {
+    font-family: inherit;
+    background: rgba(0, 0, 0, 0.04);
+    padding: 0.05em 0.4em;
+    border-radius: 4px;
+}

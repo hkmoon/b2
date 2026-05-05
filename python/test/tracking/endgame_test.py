@@ -61,21 +61,10 @@ from bertini.multiprec import Float as mpfr_float
 from bertini.multiprec import Complex as mpfr_complex
 
 
-def _prec(x):
-    """Read the precision of an mpfr value across platforms.
-
-    ``precision`` is exposed as a property on macOS/Linux but as a method on
-    Windows (clang-cl). Accept either form and return the integer.
-    """
-    p = x.precision
-    return p() if callable(p) else p
-
-
 class EndgameTest(unittest.TestCase):
     def setUp(self):
         self.ambient_precision = 50;
 
-    @unittest.skipIf(sys.platform == "win32", "AMPCauchyEG currently crashes the Windows Python extension")
     def test_using_total_degree_ss(self):
         default_precision(self.ambient_precision);
 
@@ -151,16 +140,10 @@ class EndgameTest(unittest.TestCase):
         final_homogenized_solutions = [np.empty(dtype=mpfr_complex, shape=(3,)) for i in range(n)]
 
         for i in range(n):
-            pt_prec = _prec(bdry_points[i][0])
-            default_precision(pt_prec)
-            final_system.precision(pt_prec)
+            default_precision(bdry_points[i][0].precision);
+            final_system.precision(bdry_points[i][0].precision);
 
-            # Construct bdry_time at the current default precision. Copying from
-            # t_endgame_boundary and then setting precision does not work reliably
-            # across platforms: the copy constructor preserves the source's
-            # precision, and the property-based setter silently fails to mutate
-            # on some Linux Boost.Python builds.
-            bdry_time = mpfr_complex("0.1")
+            bdry_time = mpfr_complex(t_endgame_boundary)
 
             track_success_code = my_endgame.run(bdry_time,bdry_points[i]) # should be bdry_pts[i], not XXX
 

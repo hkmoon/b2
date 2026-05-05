@@ -48,8 +48,8 @@ namespace bertini{
 		template<typename PyClass>
 		void PrecisionVisitor<T>::visit(PyClass& cl) const
 		{
-			cl.add_property("precision", 
-				get_prec, set_prec, 
+			cl.add_property("precision",
+				get_prec, set_prec,
 				"get/set the precision of this variable-precision number, in digits.  remember, the system knows not where your number came from, so upsampling will NOT add more correct digits.");
 		}
 
@@ -367,7 +367,6 @@ namespace bertini{
 
 			class_<T>("Float", init<>("Default Construct a variable-precision float"))
 			.def(init<std::string>((arg("self"),arg("val")),"Construct a variable-precision float from a string.  The best way."))
-			.def(init<int>((arg("self"),arg("val")),"Construct a variable-precision float from a regular old integer."))
 			.def(init<long int>((arg("self"),arg("val")),"Construct a variable-precision float from a regular old integer."))
 			.def(init<T>((arg("self"),arg("val")),"Construct a variable-precision float from another."))
 
@@ -407,8 +406,8 @@ namespace bertini{
 			// eigenpy::registerCast<T,int>(true);
 			// eigenpy::registerCast<T,int64_t>(true);
 
-			// unsafe.  so the argument is false.  
-			// you can ask for the conversions, but you probably shouldn't.  
+			// unsafe.  so the argument is false.
+			// you can ask for the conversions, but you probably shouldn't.
 			// both directions are scary.
 			eigenpy::registerCast<T,double>(false);
 			eigenpy::registerCast<double,T>(false);
@@ -422,7 +421,7 @@ namespace bertini{
 			// because 0.1 as a float64 does NOT convert to 0.1 as a variable precision number.
 			// the user should use strings to guarantee matching.
 			// that is, leave commented-out.  silviana, 2026.04.14
-			// IMPLICITLY_CONVERTIBLE(double,T); 
+			// IMPLICITLY_CONVERTIBLE(double,T);
 
 
 			eigenpy::EigenToPyConverter<Vec<T>>::registration();
@@ -448,7 +447,7 @@ namespace bertini{
 			.def(init<std::string, mpfr_float>((arg("self"),arg("real"),arg("imag")),"Construct variable-precision complex number from a string and a variable-precision float"))
 			.def(init<mpfr_float, std::string>((arg("self"),arg("real"),arg("imag")),"Construct variable-precision complex number from a variable-precision float and a string"))
 			.def(init<std::string, std::string>((arg("self"),arg("real"),arg("imag")),"Construct variable-precision complex number from a pair of strings.  the best way to construct one and be sure you have padded with zeros to the end, in the current working precision"))
-			
+
 			.def(init<T>((arg("self"),arg("value")),"Construct variable-precision complex number from another one"))
 
 			.def(init<mpz_int>((arg("self"),arg("real")),"Construct variable-precision complex number from an arbitrary-precision integer, with 0 imaginary part"))
