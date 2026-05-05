@@ -23,7 +23,6 @@ PyBertini -- the Python bindings for Bertini
    :maxdepth: 2
 
    detailed/detailed
-   building
    zbib
 
 🔀 Indices and tables
