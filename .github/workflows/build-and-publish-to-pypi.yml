@@ -234,6 +234,7 @@ jobs:
 
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
+    if: github.event_name == 'push' && github.ref == 'refs/heads/deveop'  # only publish to TestPyPI on pushes to develop branch
     needs:
       - test_wheels_linux_macos
       - test_wheels_windows
@@ -262,7 +263,7 @@ jobs:
   publish-to-pypi:
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
-    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # only publish to PyPI on pushes to main branch
     needs:
       - test_wheels_linux_macos
       - test_wheels_windows
