@@ -76,13 +76,13 @@ namespace bertini{
 
 
 			/**
-			\brief Compute the expression \f$D\f$ from the AMP papers \cite AMP1, \cite AMP2.
+			\brief Compute the expression \f$D\f$ from the AMP papers \cite AMP1, \cite AMP2, \cite AMP3.
 
 			\param norm_J The matrix norm of the Jacobian matrix
 			\param norm_J_inverse An estimate on the norm of the inverse of the Jacobian matrix.
 			\param AMP_config The settings for adaptive multiple precision.
 
-			\return a double scalar, the quantity \f$D\f$ from the AMP papers \cite AMP1, \cite AMP2.
+			\return a double scalar, the quantity \f$D\f$ from the AMP papers \cite AMP1, \cite AMP2, \cite AMP3.
 			*/
 			inline
 			double D(double const& norm_J, double const& norm_J_inverse, AdaptiveMultiplePrecisionConfig const& AMP_config)
