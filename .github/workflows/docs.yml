@@ -11,9 +11,9 @@ on:
     branches:
       - "**"
 
-# Single concurrent deployment; cancel in-progress on new push.
+# Single concurrent deployment; cancel in-progress if a new one is triggered. The concurrency group is per-ref, so PRs and pushes to different branches don't cancel each other.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
