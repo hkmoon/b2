@@ -96,3 +96,4 @@ build/
 bld/
 build_*/
 python/examples/profile_stats
+/dist
