@@ -193,7 +193,7 @@ jobs:
       - name: Install wheel
         run: |
           pip install numpy
-          pip install --no-index --find-links dist/ bertini
+          pip install --no-index --find-links dist/ bertini2
 
       - name: Run Python tests
         run: |
@@ -228,7 +228,7 @@ jobs:
       - name: Install wheel and run tests
         shell: pwsh
         run: |
-          pip install --no-index --find-links dist/ bertini
+          pip install --no-index --find-links dist/ bertini2
           pip install pytest
           pytest python/test/ -v
 
@@ -242,7 +242,7 @@ jobs:
 
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/bertini
+      url: https://test.pypi.org/p/bertini2
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -276,7 +276,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/bertini
+      url: https://pypi.org/p/bertini2
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
