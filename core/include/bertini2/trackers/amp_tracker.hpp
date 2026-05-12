@@ -126,9 +126,8 @@ namespace bertini{
 
 		 \todo Remove the default value of the predictor order, as that seems weird to have
 		*/
-		inline
 		template<typename RealT>
-		RealT StepsizeSatisfyingCriterionB(unsigned precision,
+		inline RealT StepsizeSatisfyingCriterionB(unsigned precision,
 										unsigned digits_B,
 										unsigned num_newton_iterations,
 										unsigned predictor_order = 0)
