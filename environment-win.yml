@@ -1,7 +1,7 @@
 name: b2-windows
 channels:
   - conda-forge
-  - defaults
+  - nodefaults
 dependencies:
   - cmake
   - ccache
@@ -19,9 +19,8 @@ dependencies:
   - vs2022_win-64
   - scipy
   - python
-  - scipy
   - wheel
-  - build
+  - python-build
   - scikit-build-core
   - pkg-config
   - git

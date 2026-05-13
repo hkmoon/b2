@@ -1,4 +1,4 @@
-name: Build, publish, and document Python 🐍 distribution 📦
+name: Build, test, publish wheels 🐍; build and deploy documentation 📝
 
 on:
   push:
@@ -8,6 +8,11 @@ on:
       - 'v*.*.*'
   pull_request:
   workflow_dispatch:
+    inputs:
+      reuse_run_id:
+        description: 'Run ID to reuse wheels from (leave empty to build fresh)'
+        required: false
+        type: string
 
 concurrency:
   group: publish-${{ github.ref }}
@@ -15,13 +20,13 @@ concurrency:
 
 jobs:
   get_version:
-    name: Get version
+    name: Get version from pyproject.toml
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get.outputs.version }}
       is_prerelease: ${{ steps.get.outputs.is_prerelease }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get version
         id: get
         run: |
@@ -29,9 +34,10 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "$VERSION" | grep -Eq '(dev|rc|a|b)[0-9]+' && echo "is_prerelease=true" >> $GITHUB_OUTPUT || echo "is_prerelease=false" >> $GITHUB_OUTPUT
 
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+  build_macos_ubuntu_wheels:
+    name: ${{ matrix.os }} Python-${{ matrix.python-version }} wheels 
     needs: get_version
+    if: inputs.reuse_run_id == ''
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -40,9 +46,9 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Cache cibuildwheel + pip + Homebrew
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cache/pip
@@ -128,15 +134,16 @@ jobs:
           CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/tmp/deps-py/lib:/tmp/deps-py/lib64:$LD_LIBRARY_PATH CMAKE_PREFIX_PATH=/tmp/deps-py"
           CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0 CMAKE_PREFIX_PATH=/tmp/deps-py:/opt/homebrew DYLD_FALLBACK_LIBRARY_PATH=/tmp/deps-py/lib:/opt/homebrew/lib"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
           if-no-files-found: error
 
-  build_windows:
-    name: Build wheel on windows-${{ matrix.python-version }}
+  build_windows_wheels:
+    name: Windows Python-${{ matrix.python-version }} wheels 
     needs: get_version
+    if: inputs.reuse_run_id == ''
     runs-on: windows-latest
     env:
       CONDA_PKGS_DIRS: ${{ github.workspace }}\conda_pkgs
@@ -145,11 +152,11 @@ jobs:
       matrix:
         python-version: ['3.9', '3.10', '3.11']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - name: Cache conda packages + pip
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ${{ github.workspace }}\conda_pkgs
@@ -164,39 +171,43 @@ jobs:
           environment-file: environment-win.yml
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
+          channel-priority: strict
+
       - name: Build Windows
         shell: pwsh
-        # https://stackoverflow.com/questions/79073953/clang-undefined-symbol-boostarchivearchive-exception
         run: |
+          conda install -y python=${{ matrix.python-version }} --update-deps
           conda info
           conda list
+          $env:CC = 'clang-cl'
+          $env:CXX = 'clang-cl'
+          $env:CMAKE_GENERATOR = 'Ninja'
+          $env:CMAKE_GENERATOR_PLATFORM = ''
+          $env:CMAKE_GENERATOR_TOOLSET = ''
+          $env:CMAKE_PREFIX_PATH = "$env:CONDA_PREFIX\Library"
 
-          $env:CC='clang-cl'
-          $env:CXX='clang-cl'
-          $env:CMAKE_GENERATOR='Ninja'
-          $env:CMAKE_PREFIX_PATH="$env:CONDA_PREFIX\Library"
-
-          # Patch boost header to fix clang-cl linker error
           $boostHeader = "$env:CONDA_PREFIX\Library\include\boost\archive\archive_exception.hpp"
           (Get-Content $boostHeader).Replace('public virtual std::exception', 'public std::exception') | Set-Content $boostHeader
 
-          cd ${{github.workspace}}
+          cd ${{ github.workspace }}
           pip install build delvewheel
           python -m build --wheel --no-isolation
 
-          # Bundle all dependent DLLs (boost, gmp, eigenpy, etc.) into the wheel
-          $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
-          delvewheel repair $wheel.FullName -w repaired/ --add-path "$env:CONDA_PREFIX\Library\bin"
+          $wheelPath = (Get-ChildItem dist/*.whl | Select-Object -First 1).FullName
+          if (-not $wheelPath) { Write-Error "No wheel found in dist/"; exit 1 }
+          delvewheel repair $wheelPath -w repaired/ --add-path "$env:CONDA_PREFIX\Library\bin"
           Remove-Item dist/*.whl
           Move-Item repaired/*.whl dist/
-      - uses: actions/upload-artifact@v4
+
+      - uses: actions/upload-artifact@v5
         with:
           name: wheels-windows-${{ matrix.python-version }}
           path: ./dist/*.whl
 
   test_wheels_linux_macos:
     name: Test wheels on ${{ matrix.os }} / py${{ matrix.python-version }}
-    needs: build_wheels
+    needs: [get_version, build_macos_ubuntu_wheels]
+    if: always() && !failure() && !cancelled()
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -205,17 +216,19 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download wheels artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
           path: dist/
+          run-id: ${{ inputs.reuse_run_id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install wheel
         run: |
@@ -225,11 +238,12 @@ jobs:
       - name: Run Python tests
         run: |
           pip install pytest
-          pytest python/test/ -v
+          python -m pytest python/test/ -v
 
   test_wheels_windows:
     name: Test wheel on windows-${{ matrix.python-version }}
-    needs: build_windows
+    needs: [get_version, build_windows_wheels]
+    if: always() && !failure() && !cancelled()
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -237,7 +251,7 @@ jobs:
         python-version: ['3.9', '3.10', '3.11']
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -245,22 +259,31 @@ jobs:
           environment-file: environment-win.yml
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
+          channel-priority: strict
+
 
       - name: Download wheels artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: wheels-windows-${{ matrix.python-version }}
           path: dist/
+          run-id: ${{ inputs.reuse_run_id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Install wheel and run tests
         shell: pwsh
         run: |
-          pip install --no-index --find-links dist/ bertini2
-          pip install pytest
-          pytest python/test/ -v
+          conda info
+          conda install -y python=${{ matrix.python-version }} --update-deps
+          $py = "C:\Miniconda\envs\b2-windows\python.exe"
+          & $py -m pip install --no-index --find-links dist/ bertini2
+          & $py -m pip install pytest
+          & $py -m pytest python/test/ -v
+
 
   publish-to-testpypi:
-    name: Publish Python 🐍 distribution 📦 to TestPyPI
+    name: Publish to TestPyPI
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.get_version.outputs.is_prerelease == 'true'
     needs:
       - get_version
@@ -277,7 +300,7 @@ jobs:
 
     steps:
       - name: Download all the dists
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           merge-multiple: true
           path: dist/
@@ -290,7 +313,7 @@ jobs:
 
   publish-to-pypi:
     name: >-
-      Publish Python 🐍 distribution 📦 to PyPI
+      Publish to PyPI
     if: | # only publish to PyPI on version tags, release versions only
       github.event_name == 'push' &&
       startsWith(github.ref, 'refs/tags/v') &&
@@ -309,7 +332,7 @@ jobs:
 
     steps:
       - name: Download all the dists
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           merge-multiple: true
           path: dist/
@@ -335,10 +358,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           merge-multiple: true
           path: dist/
@@ -371,10 +394,10 @@ jobs:
     name: Build docs
     needs:
       - get_version
-      - build_wheels
+      - build_macos_ubuntu_wheels
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # gitpython (used by python/docs/source/conf.py to derive version)
           # needs the full history; the default depth=1 leaves it unable to
@@ -425,7 +448,7 @@ jobs:
             scikit-build-core build numpy eigenpy
 
       - name: Download built wheel
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: wheels-ubuntu-latest-3.11
           path: dist/

@@ -1,7 +1,7 @@
 name: b2-ubuntu
 channels:
   - conda-forge
-  - defaults
+  - nodefaults
 dependencies:
   - gxx==13.3.0
   - numpy
@@ -18,5 +18,5 @@ dependencies:
   - libboost-python
   - scipy
   - wheel
-  - build
+  - python-build
   - patchelf
