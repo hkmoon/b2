@@ -62,6 +62,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # --- OPTIONS  ---------------------------------------
 # Need to be set before including base.cmake
 # ----------------------------------------------------
+option(BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 option(INSTALL_DOCUMENTATION "Generate and install the documentation" OFF)
 option(SUFFIX_SO_VERSION "Suffix library name with its version" OFF)
 option(BUILD_TESTING_SCIPY
@@ -93,12 +94,15 @@ compute_project_args(PROJECT_ARGS LANGUAGES CXX)
 project(${PROJECT_NAME} ${PROJECT_ARGS})
 
 include("${JRL_CMAKE_MODULES}/boost.cmake")
-include("${JRL_CMAKE_MODULES}/python.cmake")
+
+if(BUILD_PYTHON_BINDINGS)
+  include("${JRL_CMAKE_MODULES}/python.cmake")
+endif(BUILD_PYTHON_BINDINGS)
+
 include("${JRL_CMAKE_MODULES}/ide.cmake")
 include("${JRL_CMAKE_MODULES}/apple.cmake")
 
-option(GENERATE_PYTHON_STUBS
-       "Generate the Python stubs associated to the Python library" OFF)
+
 
 
 
@@ -122,20 +126,27 @@ else(WIN32)
   set(LINK create_symlink)
 endif(WIN32)
 
-if(CMAKE_CROSSCOMPILING)
-  set(PYTHON_COMPONENTS Interpreter NumPy)
-else()
-  set(PYTHON_COMPONENTS Interpreter Development.Module NumPy)
-endif()
-set(PYTHON_EXPORT_DEPENDENCY ON)
-findpython(REQUIRED)
+if(BUILD_PYTHON_BINDINGS)
+  if(CMAKE_CROSSCOMPILING)
+    set(PYTHON_COMPONENTS Interpreter NumPy)
+  else()
+    set(PYTHON_COMPONENTS Interpreter Development.Module NumPy)
+  endif()
+  set(PYTHON_EXPORT_DEPENDENCY ON)
+  findpython(REQUIRED)
 
-if(${NUMPY_VERSION} VERSION_LESS "1.16.0")
-  set(NUMPY_WITH_BROKEN_UFUNC_SUPPORT TRUE)
-endif()
+  if(${NUMPY_VERSION} VERSION_LESS "1.16.0")
+    set(NUMPY_WITH_BROKEN_UFUNC_SUPPORT TRUE)
+  endif()
+endif(BUILD_PYTHON_BINDINGS)
+
+
 
 if(WIN32)
-  link_directories(${PYTHON_LIBRARY_DIRS})
+  if(BUILD_PYTHON_BINDINGS)
+    link_directories(${PYTHON_LIBRARY_DIRS})
+  endif(BUILD_PYTHON_BINDINGS)
+
   # # Set default Windows build paths SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY
   # ${PROJECT_BINARY_DIR}/Bin CACHE PATH "Single directory for all libraries")
   # SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Bin CACHE PATH
@@ -186,9 +197,12 @@ add_subdirectory(core)
 # next, in `python_bindings`, build a shared python library, and a pure-python library that wraps around that.
 #
 
-#python_add_library(_pybertini MODULE WITH_SOABI)
 
-add_subdirectory(python_bindings)
+if(BUILD_PYTHON_BINDINGS)
+    add_subdirectory(python_bindings)
+else()
+    message(STATUS "skipping the python bindings")
+endif()
 
 
 

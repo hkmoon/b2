@@ -24,3 +24,5 @@ dependencies:
   - scikit-build-core
   - pkg-config
   - git
+  - pip
+  
