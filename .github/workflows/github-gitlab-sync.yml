@@ -1,10 +1,9 @@
 name: Sync to MPI GitLab
-
 on: 
   push
-
 jobs:
   sync:
+    if: github.repository == 'bertiniteam/b2'
     runs-on: ubuntu-latest
     steps:
     - name: Sync to GitLab
@@ -21,4 +20,3 @@ jobs:
         # Whether to force push to GitLab. Defaults to false.
         
         #force_push: # optional, default is false
-          
