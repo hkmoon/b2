@@ -222,6 +222,12 @@ jobs:
           PY="${{ matrix.python-version }}"
           PY_TAG="cp${PY//./}"
           echo "CIBW_BUILD=${PY_TAG}-manylinux* ${PY_TAG}-macosx*" >> $GITHUB_ENV
+      - name: Set macOS deployment target
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          SW_VERS=$(sw_vers -productVersion | cut -d. -f1)
+          echo "MACOSX_DEPLOYMENT_TARGET=${SW_VERS}.0" >> $GITHUB_ENV
       - uses: pypa/cibuildwheel@v2.23
         env:
           # Build cp39 through cp313 for both Linux (manylinux) and macOS.
@@ -290,7 +296,7 @@ jobs:
             make -j2 install
           CIBW_BEFORE_BUILD: "pip install scikit-build-core numpy"
           CIBW_ENVIRONMENT_LINUX: "LD_LIBRARY_PATH=/tmp/deps-py/lib:/tmp/deps-py/lib64:$LD_LIBRARY_PATH CMAKE_PREFIX_PATH=/tmp/deps-py"
-          CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0 CMAKE_PREFIX_PATH=/tmp/deps-py:/opt/homebrew DYLD_FALLBACK_LIBRARY_PATH=/tmp/deps-py/lib:/opt/homebrew/lib"
+          CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET CMAKE_PREFIX_PATH=/tmp/deps-py:/opt/homebrew DYLD_FALLBACK_LIBRARY_PATH=/tmp/deps-py/lib:/opt/homebrew/lib"
 
       - uses: actions/upload-artifact@v5
         with:
