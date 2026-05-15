@@ -99,6 +99,8 @@ namespace bertini
 			ExportLogging();
 			
 			ExportZeroDim();
+
+			ExportInfo();
 		}
 	
 	}

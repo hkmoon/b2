@@ -137,6 +137,7 @@ set(PYBERTINI_HEADERS
     include/endgame_observers.hpp
     include/detail.hpp
     include/logging.hpp
+    include/info.hpp
 )
 
 set(PYBERTINI_SOURCES
@@ -160,6 +161,7 @@ set(PYBERTINI_SOURCES
     src/endgame_observers.cpp
     src/zero_dim_export.cpp
     src/bertini_python.cpp
+    src/info.cpp
 )
 
 

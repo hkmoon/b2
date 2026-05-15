@@ -73,6 +73,7 @@ import bertini.logging as logging
 import bertini.nag_algorithm as nag_algorithm
 import bertini.random as random
 
+from bertini._pybertini import info
 
 import bertini.multiprec as multiprec
 
