@@ -32,6 +32,10 @@
 
 #include "bertini2/config.hpp"
 
+#include <Eigen/Core>
+#include <gmp.h>
+#include <mpfr.h>
+
 #include "boost/version.hpp"
 
 #include <sstream>
@@ -139,6 +143,28 @@ std::string GenericHelp()
 }
 
 
+inline
+std::string EigenHeaderVersion()
+{
+    std::stringstream ss;
+    ss << EIGEN_WORLD_VERSION << "."
+       << EIGEN_MAJOR_VERSION << "."
+       << EIGEN_MINOR_VERSION;
+    return ss.str();
+}
+
+inline
+std::string GMPVersion()
+{
+    return gmp_version;
+}
+
+inline
+std::string MPFRVersion()
+{
+    return mpfr_get_version();
+}
+
 inline 
 std::string BoostHeaderVersion()
 {
@@ -154,9 +180,12 @@ std::string BoostHeaderVersion()
 inline 
 std::string DependencyVersions()
 {
-	std::stringstream ss;
-	ss << "Compiled against Boost headers " << BoostHeaderVersion() << "\n\n";
-	return ss.str();
+    std::stringstream ss;
+    ss << "Compiled against Boost headers " << BoostHeaderVersion() << "\n";
+    ss << "Compiled against Eigen " << EigenHeaderVersion() << "\n";
+    ss << "Linked against GMP " << GMPVersion() << "\n";
+    ss << "Linked against MPFR " << MPFRVersion() << "\n\n";
+    return ss.str();
 }
 
 
