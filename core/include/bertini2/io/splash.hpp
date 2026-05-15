@@ -30,12 +30,13 @@
 
 #pragma once
 
-#include "bertini2/version.hpp"
+#include "bertini2/config.hpp"
 
 #include "boost/version.hpp"
 
 #include <sstream>
 
+#define BERTINI2_PACKAGE_URL "https://github.com/bertiniteam/b2"
 namespace bertini{
 
 inline
@@ -84,7 +85,7 @@ std::string LicenseInfo()
 inline 
 std::string SourceURL()
 {
-	return PACKAGE_URL;
+	return BERTINI2_PACKAGE_URL;
 }
 
 inline
@@ -96,7 +97,7 @@ std::string WikiURL()
 inline
 std::string Version()
 {
-	return PACKAGE_VERSION;
+	return BERTINI2_VERSION;
 }
 
 inline 

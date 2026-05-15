@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
 
 set(PROJECT_NAME bertini2)
+set(PROJECT_VERSION 2.0.1) # this has to be manually kept the same as the one in pyproject.toml at top level.
+
 set(PROJECT_DESCRIPTION "Implementation of the foundations of Numerical Algebraic Geometry")
 set(PROJECT_URL "https://github.com/bertiniteam/b2")
 set(PROJECT_USE_CMAKE_EXPORT TRUE)

@@ -109,7 +109,6 @@ set(basics_rootinclude_headers
     include/bertini2/logging.hpp
     include/bertini2/endgames.hpp
     include/bertini2/bertini.hpp
-    include/bertini2/version.hpp
 )
 
 set(common_headers
@@ -402,6 +401,7 @@ target_include_directories(bertini2
 
 target_include_directories(bertini2 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>  # <prefix>/include
     )
 
@@ -465,6 +465,11 @@ install(
 
 install(
     FILES ${function_tree_headers_rootinclude_HEADERS} ${parallel_rootinclude_HEADERS} ${system_rootinclude_HEADERS} ${tracking_rootinclude_HEADERS} ${parallel_rootinclude_HEADERS} ${system_rootinclude_HEADERS} ${tracking_rootinclude_HEADERS}
+    DESTINATION "include/bertini2"
+)
+
+install(
+    FILES ${CMAKE_BINARY_DIR}/include/bertini2/config.hpp
     DESTINATION "include/bertini2"
 )
 

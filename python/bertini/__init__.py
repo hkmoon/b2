@@ -47,8 +47,8 @@ See the source at https://github.com/bertiniteam/b2
 ### this __init__.py is strongly inspired by that for GalSim 
 ### https://github.com/GalSim-developers/GalSim
 
-from ._version import __version__, __version_info__
-version = __version__
+from importlib.metadata import version
+__version__ = version("bertini2")
 
 import os
 import sys
