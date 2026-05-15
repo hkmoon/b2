@@ -1,7 +1,17 @@
 cmake_minimum_required(VERSION 3.22)
 
 set(PROJECT_NAME bertini2)
-set(PROJECT_VERSION 2.0.1) # this has to be manually kept the same as the one in pyproject.toml at top level.
+
+file(READ "${CMAKE_SOURCE_DIR}/pyproject.toml" PYPROJECT_TOML)
+string(REGEX MATCH "\nversion = \"([^\"]+)\"" _ ${PYPROJECT_TOML})
+set(PROJECT_VERSION_FULL ${CMAKE_MATCH_1})
+
+# Strip PEP 440 prerelease suffix for cmake VERSION field
+string(REGEX REPLACE "[._]?(dev|a|b|rc)[0-9]+.*$" "" PROJECT_VERSION ${PROJECT_VERSION_FULL})
+
+message(STATUS "Full version: ${PROJECT_VERSION_FULL}")
+message(STATUS "CMake version: ${PROJECT_VERSION}")
+
 
 set(PROJECT_DESCRIPTION "Implementation of the foundations of Numerical Algebraic Geometry")
 set(PROJECT_URL "https://github.com/bertiniteam/b2")
