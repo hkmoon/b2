@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with python/zero_dim_export.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2023 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
