@@ -1,6 +1,6 @@
 [project]
 name = "bertini2"
-version = "2.0.1.dev1" # this has to be manually kept the same as the one in the top-level cmakelists.txt file, minus the stuff after subminor.
+version = "2.0.1.dev1" 
 requires-python = ">= 3.9"
 readme = "README.md"
 dependencies = ["numpy"]
