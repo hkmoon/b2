@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with straight_line_program.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license,
 // as well as COPYING.  Bertini2 is provided with permitted
@@ -853,6 +853,13 @@ namespace bertini{
 				n->Accept(*this);
 		}
 
+
+		// Re-seed the thread-local default precision from the SLP's own precision before
+		// growing the mpfr_complex memory block. resize() default-constructs each new
+		// element via mpfr_init2(x, thread_default_precision()); on Boost 1.87 that value
+		// can be 0 on fresh threads, which aborts. DefaultPrecision() sets both the static
+		// and thread-local defaults so the default-constructed slots are valid.
+		DefaultPrecision(slp_under_construction_.precision_);
 
 		// adjust the sizes of the memory blocks to match the number expected via compilation
 		slp_under_construction_.GetMemory<dbl_complex>().resize(next_available_complex_);

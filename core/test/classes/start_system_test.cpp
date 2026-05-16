@@ -13,10 +13,10 @@
 //You should have received a copy of the GNU General Public License
 //along with start_system_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
@@ -57,29 +57,32 @@ template<typename NumType> using Mat = bertini::Mat<NumType>;
 
 
 
-	
+
 BOOST_AUTO_TEST_CASE(index_and_subscript_generation1)
 {
-
+	// some system use size_t as unsigned long long
 	std::vector<size_t> dimensions{2,2};
 	std::vector<size_t> v;
+	size_t index = 0;
 
 	std::vector<size_t> solution{0,0};
-	v = bertini::IndexToSubscript(0ul,dimensions);
+	v = bertini::IndexToSubscript(index,dimensions);
 	BOOST_CHECK(v==solution);
 
+	index = 1;
 	solution[0] = 1; solution[1] = 0;
-	v = bertini::IndexToSubscript(1ul,dimensions);
+	v = bertini::IndexToSubscript(index,dimensions);
 	BOOST_CHECK(v==solution);
 
+	index = 2;
 	solution[0] = 0; solution[1] = 1;
-	v = bertini::IndexToSubscript(2ul,dimensions);
+	v = bertini::IndexToSubscript(index,dimensions);
 	BOOST_CHECK(v==solution);
 
+	index = 3;
 	solution[0] = 1; solution[1] = 1;
-	v = bertini::IndexToSubscript(3ul,dimensions);
+	v = bertini::IndexToSubscript(index,dimensions);
 	BOOST_CHECK(v==solution);
-
 }
 
 
@@ -114,10 +117,10 @@ BOOST_AUTO_TEST_CASE(index_and_subscript_generation3)
 
 BOOST_AUTO_TEST_CASE(index_and_subscript_generation_out_of_range)
 {
-
+	size_t index = 120;
 
 	std::vector<size_t> dimensions{2,3,4,5};
-	BOOST_CHECK_THROW(bertini::IndexToSubscript(120ul,dimensions),std::out_of_range);
+	BOOST_CHECK_THROW(bertini::IndexToSubscript(index,dimensions),std::out_of_range);
 }
 
 
@@ -147,8 +150,8 @@ BOOST_AUTO_TEST_CASE(make_total_degree_system_linear)
 		BOOST_CHECK_EQUAL(d[0],1);
 		BOOST_CHECK_EQUAL(d[1],1);
 	}
-	
-	
+
+
 	BOOST_CHECK_EQUAL(TD.NumVariables(),2);
 
 	BOOST_CHECK_EQUAL(TD.NumStartPoints(), 1);
@@ -180,8 +183,8 @@ BOOST_AUTO_TEST_CASE(make_total_degree_system_quadratic)
 		BOOST_CHECK_EQUAL(d[0],2);
 		BOOST_CHECK_EQUAL(d[1],2);
 	}
-	
-	
+
+
 	BOOST_CHECK_EQUAL(TD.NumVariables(),2);
 	BOOST_CHECK_EQUAL(TD.NumStartPoints(), 4);
 }
@@ -195,7 +198,7 @@ BOOST_AUTO_TEST_CASE(linear_total_degree_start_system)
 
 	VariableGroup vars{x,y};
 
-	sys.AddVariableGroup(vars);  
+	sys.AddVariableGroup(vars);
 	sys.AddFunction(y+1);
 	sys.AddFunction(x+y+bertini::node::Pi());
 
@@ -207,10 +210,10 @@ BOOST_AUTO_TEST_CASE(linear_total_degree_start_system)
 	BOOST_CHECK(!TD.IsPatched());
 
 	BOOST_CHECK_EQUAL(deg.size(),2);
-	
+
 	BOOST_CHECK_EQUAL(deg[0],1);
 	BOOST_CHECK_EQUAL(deg[1],1);
-	
+
 	VariableGroup variable_ordering = TD.Variables();
 
 	BOOST_CHECK_EQUAL(variable_ordering.size(), 2);
@@ -240,7 +243,7 @@ BOOST_AUTO_TEST_CASE(linear_total_degree_start_system)
 
 	for (unsigned ii = 0; ii < 2; ++ii)
 		BOOST_CHECK(abs(sysvals(ii)+TD.RandomValue<dbl>(ii)) < threshold_clearance_d);
-	
+
 
 	J = TD.Jacobian(vals);
 
@@ -267,7 +270,7 @@ BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_total_degree_start_system)
 	VariableGroup vars;
 	vars.push_back(x); vars.push_back(y); vars.push_back(z);
 
-	sys.AddVariableGroup(vars);  
+	sys.AddVariableGroup(vars);
 	sys.AddFunction(y+x*y + mpfr_float("0.5"));
 	sys.AddFunction(pow(x,3)+x*y+bertini::node::E());
 	sys.AddFunction(pow(x,2)*pow(y,2)+x*y*z*z - 1);
@@ -339,13 +342,13 @@ BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_total_degree_start_system)
 BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_start_points)
 {
 	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
-	
+
 	bertini::System sys;
 	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
 
 	VariableGroup vars{x,y,z};
 
-	sys.AddVariableGroup(vars);  
+	sys.AddVariableGroup(vars);
 	sys.AddFunction(y+x*y + mpfr_float("0.5"));
 	sys.AddFunction(pow(x,3)+x*y+bertini::node::E());
 	sys.AddFunction(pow(x,2)*pow(y,2)+x*y*z*z - 1);
@@ -360,7 +363,7 @@ BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_start_points)
 		const auto& vs = TD.RandomValues();
 
 		for (decltype(function_values.size()) jj = 0; jj < function_values.size(); ++jj)
-			BOOST_CHECK(abs(function_values(jj)) < 
+			BOOST_CHECK(abs(function_values(jj)) <
 				abs(vs[jj]->Eval<dbl>())*relaxed_threshold_clearance_d);
 	}
 
@@ -382,13 +385,13 @@ BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_start_points)
 BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_start_points_homogenized_patched)
 {
 	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
-	
+
 	bertini::System sys;
 	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
 
 	VariableGroup vars{x,y,z};
 
-	sys.AddVariableGroup(vars);  
+	sys.AddVariableGroup(vars);
 	sys.AddFunction(y+x*y + mpfr_float("0.5"));
 	sys.AddFunction(pow(x,3)+x*y+bertini::node::E());
 	sys.AddFunction(pow(x,2)*pow(y,2)+x*y*z*z - 1);
@@ -403,7 +406,7 @@ BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_start_points_homogenized_patched)
 	BOOST_CHECK(TD.IsPatched());
 
 
-	// generate each start point, and 
+	// generate each start point, and
 	// evaluate the start system at that point.
 	//
 	// the function values must be near 0
@@ -413,7 +416,7 @@ BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_start_points_homogenized_patched)
 		auto function_values = TD.Eval(start);
 
 		for (decltype(function_values.size()) jj = 0; jj < function_values.size(); ++jj)
-			BOOST_CHECK(abs(function_values(jj)) < 
+			BOOST_CHECK(abs(function_values(jj)) <
 				1000*relaxed_threshold_clearance_d);
 	}
 
@@ -453,13 +456,13 @@ BOOST_AUTO_TEST_CASE(total_degree_start_system_precision_16)
 	sys.AddFunction(pow(y-1,2));
 
 	auto TD = bertini::start_system::TotalDegree(sys);
-	
-	BOOST_CHECK(!sys.IsHomogeneous()); 
-	BOOST_CHECK(!sys.IsPatched());	
-	BOOST_CHECK(!TD.IsHomogeneous());  
+
+	BOOST_CHECK(!sys.IsHomogeneous());
+	BOOST_CHECK(!sys.IsPatched());
+	BOOST_CHECK(!TD.IsHomogeneous());
 	BOOST_CHECK(!TD.IsPatched());
 
-	
+
 	auto final_system = (1-t)*sys + t*TD;
 	final_system.AddPathVariable(t);
 
@@ -501,14 +504,14 @@ BOOST_AUTO_TEST_CASE(total_degree_start_system_homogenized_patched_precision_16)
 	sys.AutoPatch();
 
 	BOOST_CHECK(sys.IsHomogeneous());
-	BOOST_CHECK(sys.IsPatched());	
+	BOOST_CHECK(sys.IsPatched());
 
 	auto TD = bertini::start_system::TotalDegree(sys);
 	TD.Homogenize();
 	BOOST_CHECK(TD.IsHomogeneous());
 	BOOST_CHECK(TD.IsPatched());
 
-	
+
 	auto final_system = (1-t)*sys + t*TD;
 	final_system.AddPathVariable(t);
 
@@ -541,7 +544,7 @@ BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_all_the_way_to_final_system)
 
 	VariableGroup vars{x,y,z};
 
-	sys.AddVariableGroup(vars);  
+	sys.AddVariableGroup(vars);
 	sys.AddFunction(y+x*y + mpfr_float("0.5"));
 	sys.AddFunction(pow(x,3)+x*y+bertini::node::E());
 	sys.AddFunction(pow(x,2)*pow(y,2)+x*y*z*z - 1);
@@ -576,7 +579,7 @@ BOOST_AUTO_TEST_CASE(quadratic_cubic_quartic_all_the_way_to_final_system)
 
 	auto J = final_mixed_sum.Jacobian(v,bertini::multiprecision::rand());
 	BOOST_CHECK_EQUAL(J.rows(), 4);
-	BOOST_CHECK_EQUAL(J.cols(), 4);	
+	BOOST_CHECK_EQUAL(J.cols(), 4);
 }
 
 
@@ -591,7 +594,7 @@ BOOST_AUTO_TEST_CASE(start_system_total_degree_nonpolynomial_should_throw)
 	VariableGroup vars;
 	vars.push_back(x); vars.push_back(y); vars.push_back(z);
 
-	sys.AddVariableGroup(vars);  
+	sys.AddVariableGroup(vars);
 	sys.AddFunction(exp(y)+x*y + mpq_rational(1,2));
 	sys.AddFunction(pow(x,3)+x*y+bertini::node::E());
 	sys.AddFunction(pow(x,2)*pow(y,2)+x*y*z*z - 1);
@@ -623,9 +626,9 @@ BOOST_AUTO_TEST_CASE(total_degree_start_system_coefficient_bound_degree_bound)
 	sys.AutoPatch();
 
 	BOOST_CHECK(sys.IsHomogeneous());
-	BOOST_CHECK(sys.IsPatched());	
+	BOOST_CHECK(sys.IsPatched());
 
-	
+
 
 	auto TD = bertini::start_system::TotalDegree(sys);
 	TD.Homogenize();

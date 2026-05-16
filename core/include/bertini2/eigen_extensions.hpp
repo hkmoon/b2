@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with eigen_extensions.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license,
 // as well as COPYING.  Bertini2 is provided with permitted
@@ -499,7 +499,7 @@ namespace bertini {
 	*/
 	template <typename NumberType>
 	inline
-	Mat<NumberType> RandomOfUnits(uint rows, uint cols)
+	Mat<NumberType> RandomOfUnits(unsigned int rows, unsigned int cols)
 	{
 		return Mat<NumberType>(rows,cols).unaryExpr([](NumberType const& x) { return RandomUnit<NumberType>(); });
 	}
@@ -514,7 +514,7 @@ namespace bertini {
 	*/
 	template <typename NumberType>
 	inline
-	Vec<NumberType> RandomOfUnits(uint size)
+	Vec<NumberType> RandomOfUnits(unsigned int size)
 	{
 		return Vec<NumberType>(size).unaryExpr([](NumberType const& x) { return RandomUnit<NumberType>(); });
 	}

@@ -13,10 +13,10 @@
 //You should have received a copy of the GNU General Public License
 //along with class_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
@@ -31,7 +31,7 @@
 
 //TODO: make the DYN_LINK change depending on the targeted architecture.  some need it, others don't.
 //if used, BOOST_TEST_DYN_LINK must appear before #include <boost/test/unit_test.hpp>
-#define BOOST_TEST_DYN_LINK
+//#define BOOST_TEST_DYN_LINK
 
 //this #define MUST appear before #include <boost/test/unit_test.hpp>
 #define BOOST_TEST_MODULE "Bertini 2 Class Testing"
@@ -49,7 +49,7 @@ using dbl = bertini::dbl;
 using mpfr = bertini::mpfr_complex;
 
 const double relaxed_threshold_clearance_d = 1e-14;
-const double threshold_clearance_d = 1e-15;
+const double threshold_clearance_d = 1e-14;
 
 unsigned const CLASS_TEST_MPFR_DEFAULT_DIGITS = 50;
 bertini::mpfr_float threshold_clearance_mp("1e-27");

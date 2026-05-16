@@ -13,17 +13,16 @@ PyBertini -- the Python bindings for Bertini
 .. toctree::
    :maxdepth: 2
 
-   intro
+   welcome
    tutorials/tutorials
 
 🏛 Reference materials
 ============================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    detailed/detailed
-   building
    zbib
 
 🔀 Indices and tables

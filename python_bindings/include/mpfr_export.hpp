@@ -13,10 +13,10 @@
 //You should have received a copy of the GNU General Public License
 //along with python/mpfr_export.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2016-2018 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 //
 // individual authors of this file include:
@@ -41,19 +41,19 @@
 
 namespace bertini{
 	namespace python{
-		
+
 		using namespace boost::python;
-		
-		
+
+
 		void ExportMpfr();
-		
+
 		/**
 		 \brief Exposes  precision
 		*/
 		template<typename T>
 		class PrecisionVisitor: public def_visitor<PrecisionVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -71,7 +71,7 @@ namespace bertini{
 		template<typename T>
 		class RealStrVisitor: public def_visitor<RealStrVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -104,7 +104,7 @@ namespace bertini{
 		template<typename T>
 		class EqualitySelfVisitor: public def_visitor<EqualitySelfVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -117,7 +117,7 @@ namespace bertini{
 		template<typename T, typename S>
 		class EqualityVisitor: public def_visitor<EqualityVisitor<T,S>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -131,12 +131,12 @@ namespace bertini{
 		class RingVisitor: public def_visitor<RingVisitor<T, S> >
 		{
 			static_assert(!std::is_same<T,S>::value, "RingVisitor is to define T-S operations.  for T-T operations, use RingSelfVisitor");
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T __add__(const T& a, const S& b){ return a+b; };
 			static T __radd__(const T& b, const S& a){ return a+b; };
@@ -150,19 +150,19 @@ namespace bertini{
 			static T __rmul__(const T& b, const S& a){ return a*b; };
 			static T __imul__(T& a, const S& b){ a*=b; return a; };
 		}; // RingVisitor
-		
+
 		/**
 		 \brief Exposes +, - and *
 		*/
 		template<typename T>
 		class RingSelfVisitor: public def_visitor<RingSelfVisitor<T> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T __add__(const T& a, const T& b){ return a+b; };
 			static T __iadd__(T& a, const T& b){ a+=b; return a; };
@@ -175,23 +175,23 @@ namespace bertini{
 
 			static T __neg__(const T& a){ return -a; };
 		}; // RingSelfVisitor
-		
+
 		/**
 		 \brief Exposes +, - and *
 		*/
 		template<typename T>
 		class RealFreeVisitor: public def_visitor<RealFreeVisitor<T> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T __abs__(T const& x){ return abs(x);}
 		}; // RingSelfVisitor
-		
+
 
 
 		/**
@@ -200,12 +200,12 @@ namespace bertini{
 		template<typename T, typename S>
 		class FieldVisitor: public def_visitor<FieldVisitor<T, S> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T __div__(const T& a, const S& b){ return a/b; };
 			static T __rdiv__(const T& b, const S& a){ return a/b; };
@@ -215,12 +215,12 @@ namespace bertini{
 		template<typename T>
 		class FieldSelfVisitor: public def_visitor<FieldSelfVisitor<T> >
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
-			
+
+
 		private:
 			static T div(const T& a, const T& b){ return a/b; };
 			static T idiv(T& a, const T& b){ a/=b; return a; };
@@ -231,7 +231,7 @@ namespace bertini{
 		template<typename T, typename S>
 		class PowVisitor: public def_visitor<PowVisitor<T,S>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -244,7 +244,7 @@ namespace bertini{
 		template<typename T, typename S>
 		class GreatLessVisitor: public def_visitor<GreatLessVisitor<T,S>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -253,11 +253,11 @@ namespace bertini{
 
 		};
 
-			
+
 		template<typename T>
 		class GreatLessSelfVisitor: public def_visitor<GreatLessSelfVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
@@ -271,25 +271,25 @@ namespace bertini{
 		template<typename T>
 		class TranscendentalVisitor: public def_visitor<TranscendentalVisitor<T>>
 		{
-			friend class def_visitor_access;
+			friend class ::boost::python::def_visitor_access;
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
 
 		private:
-		
+
 			static T __log__(T const& x){ return log(x);}
 			static T __exp__(T const& x){ return exp(x);}
 			static T __sqrt__(T const& x){ return sqrt(x);}
-			
+
 			static T __sin__(T const& x){ return sin(x);}
 			static T __cos__(T const& x){ return cos(x);}
 			static T __tan__(T const& x){ return tan(x);}
-			
+
 			static T __asin__(T const& x){ return asin(x);}
 			static T __acos__(T const& x){ return acos(x);}
 			static T __atan__(T const& x){ return atan(x);}
-			
+
 			static T __sinh__(T const& x){ return sinh(x);}
 			static T __cosh__(T const& x){ return cosh(x);}
 			static T __tanh__(T const& x){ return tanh(x);}
@@ -305,23 +305,23 @@ namespace bertini{
 		template<typename T>
 		class ComplexVisitor: public def_visitor<ComplexVisitor<T>>
 		{
-			friend class def_visitor_access;
-			
+			friend class ::boost::python::def_visitor_access;
+
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
+
 			using RealT = typename NumTraits<T>::Real;
-			
+
 		private:
 			static void set_real(T &c, mpfr_float const& r) { c.real(r);}
 			static RealT get_real(T const&c) { return c.real();}
-			
+
 			static void set_imag(T &c, RealT const& r) { c.imag(r);}
 			static RealT get_imag(T const&c) { return c.imag();}
 
 			static RealT __abs__(T const& x){ return abs(x);}
-			
+
 
 			static std::string __str__(const object& obj)
 			{
@@ -331,7 +331,7 @@ namespace bertini{
 				ss << self;
 				return ss.str();
 			}
-			
+
 			static std::string __repr__(const object& obj)
 			{
 				std::ostringstream oss;

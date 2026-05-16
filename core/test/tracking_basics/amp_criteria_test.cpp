@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with amp_criteria_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(AMP_criteriaA_double)
 
 	//For Criterion A to be checked we need Norm_J and inverse of Norm_J these were taken from Euler.hpp
 	Mat<dbl> dh_dx = sys.Jacobian(current_space, current_time); 
-	auto LU = dh_dx.lu();
+	Eigen::PartialPivLU<Mat<dbl>> LU = dh_dx.lu();
 
 	Vec<dbl> randy = Vec<dbl>::Random(sys.NumVariables());
 	Vec<dbl> temp_soln = LU.solve(randy);
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(AMP_criteriaA_mp)
 
 	//For Criterion A to be checked we need Norm_J and inverse of Norm_J these were taken from Euler.hpp
 	Mat<mpfr> dh_dx = sys.Jacobian(current_space, current_time); 
-	auto LU = dh_dx.lu();
+	Eigen::PartialPivLU<Mat<mpfr>> LU = dh_dx.lu();
 
 	Vec<mpfr> randy = Vec<mpfr>::Random(sys.NumVariables());
 	Vec<mpfr> temp_soln = LU.solve(randy);
@@ -189,8 +189,8 @@ BOOST_AUTO_TEST_CASE(AMP_criteriaB_double)
 	//For Criterion A to be checked we need Norm_J and inverse of Norm_J these were taken from Euler.hpp
 	auto f = sys.Eval(current_space, current_time);
 	Mat<dbl> dh_dx = sys.Jacobian(current_space, current_time); 
-	auto LU = dh_dx.lu();
-	auto delta_z = LU.solve(-f);
+	Eigen::PartialPivLU<Mat<dbl>> LU = dh_dx.lu();
+	Vec<dbl> delta_z = LU.solve(-f);
 
 	Vec<dbl> randy = Vec<dbl>::Random(sys.NumVariables());
 	Vec<dbl> temp_soln = LU.solve(randy);
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(AMP_criteriaB_mp)
 	//For Criterion A to be checked we need Norm_J and inverse of Norm_J these were taken from Euler.hpp
 	auto f = sys.Eval(current_space, current_time);
 	Mat<mpfr> dh_dx = sys.Jacobian(current_space, current_time); 
-	auto LU = dh_dx.lu();
+	Eigen::PartialPivLU<Mat<mpfr>> LU = dh_dx.lu();
 	Vec<mpfr> delta_z = LU.solve(-f);
 
 	Vec<mpfr> randy = Vec<mpfr>::Random(sys.NumVariables());
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE(AMP_criteriaC_double)
 
 	//For Criterion A to be checked we need Norm_J and inverse of Norm_J these were taken from Euler.hpp
 	Mat<dbl> dh_dx = sys.Jacobian(current_space, current_time); 
-	auto LU = dh_dx.lu();
+	Eigen::PartialPivLU<Mat<dbl>> LU = dh_dx.lu();
 
 	Vec<dbl> randy = Vec<dbl>::Random(sys.NumVariables());
 	Vec<dbl> temp_soln = LU.solve(randy);
@@ -340,7 +340,7 @@ BOOST_AUTO_TEST_CASE(AMP_criteriaC_mp)
 
 	//For Criterion A to be checked we need Norm_J and inverse of Norm_J these were taken from Euler.hpp
 	Mat<mpfr> dh_dx = sys.Jacobian(current_space, current_time); 
-	auto LU = dh_dx.lu();
+	Eigen::PartialPivLU<Mat<mpfr>> LU = dh_dx.lu();
 
 	Vec<mpfr> randy = Vec<mpfr>::Random(sys.NumVariables());
 	Vec<mpfr> temp_soln = LU.solve(randy);

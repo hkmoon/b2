@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with python/test/endgame_test.py.  If not, see <http://www.gnu.org/licenses/>.
 #
-#  Copyright(C) 2016-2018 by Bertini2 Development Team
+#  Copyright(C) Bertini2 Development Team
 #
 #  See <http://www.gnu.org/licenses/> for a copy of the license,
 #  as well as COPYING.  Bertini2 is provided with permitted
@@ -53,6 +53,7 @@ from bertini.endgame.config import *
 import unittest
 import numpy as np
 import pdb
+import sys
 
 import bertini.system.start_system as ss
 import bertini.multiprec as mp
@@ -70,9 +71,9 @@ class EndgameTest(unittest.TestCase):
         x = Variable("x");
         y = Variable("y");
         t = Variable("t");
-        
+
         sys = System();
-        
+
         var_grp = VariableGroup();
         var_grp.append(x);
         var_grp.append(y);
@@ -123,7 +124,7 @@ class EndgameTest(unittest.TestCase):
             final_system.precision(self.ambient_precision);
             start_point = td.start_point_mp(i);
 
-            bdry_pt = np.array( np.zeros( (3)).astype(np.int64),dtype=mpfr_complex)   
+            bdry_pt = np.array( np.zeros( (3)).astype(np.int64),dtype=mpfr_complex)
 
             track_success_code = tracker.track_path(bdry_pt,t_start, t_endgame_boundary, start_point);
             bdry_points.append(bdry_pt);
@@ -139,24 +140,23 @@ class EndgameTest(unittest.TestCase):
         final_homogenized_solutions = [np.empty(dtype=mpfr_complex, shape=(3,)) for i in range(n)]
 
         for i in range(n):
-            default_precision(bdry_points[i][0].precision());
-            final_system.precision(bdry_points[i][0].precision());
+            default_precision(bdry_points[i][0].precision);
+            final_system.precision(bdry_points[i][0].precision);
 
             bdry_time = mpfr_complex(t_endgame_boundary)
 
-            track_success_code = my_endgame.run(bdry_time,bdry_points[i]); # should be bdry_pts[i], not XXX
-        
+            track_success_code = my_endgame.run(bdry_time,bdry_points[i]) # should be bdry_pts[i], not XXX
 
-            final_homogenized_solutions[i] = my_endgame.final_approximation();
+            final_homogenized_solutions[i] = my_endgame.final_approximation()
 
             self.assertEqual(track_success_code, SuccessCode.Success)
 
         dehomogenized_solns = [sys.dehomogenize_point(soln) for soln in final_homogenized_solutions]
 
-        exact_soln = np.array([1,1])
+        exact_soln = np.array([mpfr_complex(1), mpfr_complex(1)])
 
         for soln in dehomogenized_solns:
-            assert np.sqrt(np.sum((exact_soln - soln)**2)) < 1e-10
+            assert mp.abs(np.sqrt(np.sum((exact_soln - soln)**2))) < 1e-10
 
 
 

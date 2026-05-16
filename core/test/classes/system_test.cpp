@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with system_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -40,6 +40,8 @@
 #include "bertini2/io/parsing/system_parsers.hpp"
 
 #include "externs.hpp"
+
+namespace utf = boost::unit_test;
 
 using Variable = bertini::node::Variable;
 
@@ -494,11 +496,11 @@ BOOST_AUTO_TEST_CASE(add_two_systems)
 	VariableGroup vars;
 	vars.push_back(x); vars.push_back(y);
 
-	sys1.AddVariableGroup(vars);  
+	sys1.AddVariableGroup(vars);
 	sys1.AddFunction(y+1);
 	sys1.AddFunction(x*y);
 
-	sys2.AddVariableGroup(vars);  
+	sys2.AddVariableGroup(vars);
 	sys2.AddFunction(-y-1);
 	sys2.AddFunction(-x*y);
 
@@ -526,6 +528,306 @@ BOOST_AUTO_TEST_CASE(add_two_systems)
 
 }
 
+
+/**
+\class bertini::System
+\test \b add_two_systems_evaluated_in_mpfr Sibling of add_two_systems, but
+exercises the Vec<mpfr> evaluation path. This is the C++ analog of the
+Python test_add_systems that surfaced the macos-15-intel SIGABRT — the C++
+suite previously only covered the Vec<dbl> path.
+*/
+BOOST_AUTO_TEST_CASE(add_two_systems_evaluated_in_mpfr)
+{
+	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
+
+	bertini::System sys1, sys2;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys1.AddVariableGroup(vars);
+	sys1.AddFunction(y+1);
+	sys1.AddFunction(x*y);
+
+	sys2.AddVariableGroup(vars);
+	sys2.AddFunction(-y-1);
+	sys2.AddFunction(-x*y);
+
+	sys1+=sys2;
+
+	Vec<mpfr> values(2);
+	values << mpfr(2), mpfr(3);
+
+	auto v = sys1.Eval(values);
+
+	BOOST_CHECK_EQUAL(v(0), mpfr(0));
+	BOOST_CHECK_EQUAL(v(1), mpfr(0));
+}
+
+
+/**
+\class bertini::System
+\test \b add_system_to_self_doubles_under_function_tree_eval Self-add of a
+System should double every function. Forces FunctionTree eval to bypass any
+SLP caching, isolating the question "does the symbolic mutation in
+operator+= work for an aliased rhs?" to just the function-tree level.
+*/
+BOOST_AUTO_TEST_CASE(add_system_to_self_doubles_under_function_tree_eval)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys.AddVariableGroup(vars);
+	sys.AddFunction(y+1);
+	sys.AddFunction(x*y);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
+
+	Vec<dbl> values(2);
+	values << dbl(2.0), dbl(3.0);
+	auto before = sys.Eval(values);   // [4, 6]
+
+	sys += sys;                       // self-add
+
+	auto after = sys.Eval(values);    // expected [8, 12]
+	BOOST_CHECK_EQUAL(after(0), 2.0 * before(0));
+	BOOST_CHECK_EQUAL(after(1), 2.0 * before(1));
+}
+
+
+/**
+\class bertini::System
+\test \b operator_plus_equals_invalidates_slp_cache System::operator+=
+mutates each Function's entry_node_ via SetRoot. The cached
+StraightLineProgram (the default eval method) is built lazily on first
+Differentiate(); if we don't invalidate is_differentiated_ here, a
+subsequent Eval reads stale values. Pin this so it doesn't regress.
+*/
+BOOST_AUTO_TEST_CASE(operator_plus_equals_invalidates_slp_cache)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys.AddVariableGroup(vars);
+	sys.AddFunction(y+1);
+	sys.AddFunction(x*y);
+
+	Vec<dbl> values(2);
+	values << dbl(2.0), dbl(3.0);
+	(void) sys.Eval(values);          // primes the SLP cache: [y+1, x*y]
+
+	sys += sys;                       // mutates tree to [2(y+1), 2xy] but cache stale
+
+	auto after = sys.Eval(values);    // expected [8, 12], currently [4, 6]
+	BOOST_CHECK_EQUAL(after(0), dbl(8.0));
+	BOOST_CHECK_EQUAL(after(1), dbl(12.0));
+}
+
+
+/**
+\class bertini::System
+\test \b operator_mult_equals_invalidates_slp_cache Sibling of the
+operator+= cache-invalidation test. operator*= multiplies each function
+by a Node and must also invalidate is_differentiated_.
+*/
+BOOST_AUTO_TEST_CASE(operator_mult_equals_invalidates_slp_cache)
+{
+	using bertini::node::Float;
+
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys.AddVariableGroup(vars);
+	sys.AddFunction(x+y);
+
+	Vec<dbl> values(2);
+	values << dbl(1.0), dbl(2.0);
+	(void) sys.Eval(values);          // primes SLP for f = x+y
+
+	sys *= Float::Make("3.0");        // f should now be 3*(x+y)
+
+	auto after = sys.Eval(values);    // expected [9], currently [3]
+	BOOST_CHECK_EQUAL(after(0), dbl(9.0));
+}
+
+
+/**
+\class bertini::System
+\test \b reorder_functions_decreasing_invalidates_slp_cache The function
+ordering inside the SLP corresponds to the order of functions_ at SLP
+build time. ReorderFunctionsByDegreeDecreasing swaps entries in functions_
+and must invalidate is_differentiated_ so the SLP is rebuilt to match.
+*/
+BOOST_AUTO_TEST_CASE(reorder_functions_decreasing_invalidates_slp_cache)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+	sys.AddVariableGroup(vars);
+
+	sys.AddFunction(x+y);             // degree 1, initially at position 0
+	sys.AddFunction(x*y);             // degree 2, initially at position 1
+
+	Vec<dbl> values(2);
+	values << dbl(2.0), dbl(3.0);
+	(void) sys.Eval(values);          // primes SLP with the [degree1, degree2] order
+
+	sys.ReorderFunctionsByDegreeDecreasing();   // now [degree2, degree1] = [x*y, x+y]
+
+	auto after = sys.Eval(values);
+	BOOST_CHECK_EQUAL(after(0), dbl(6.0));      // x*y at position 0
+	BOOST_CHECK_EQUAL(after(1), dbl(5.0));      // x+y at position 1
+}
+
+
+/**
+\class bertini::System
+\test \b reorder_functions_increasing_invalidates_slp_cache Sibling of the
+decreasing test. Reorders an already-cached system into ascending degree
+order and verifies the SLP follows.
+*/
+BOOST_AUTO_TEST_CASE(reorder_functions_increasing_invalidates_slp_cache)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+	sys.AddVariableGroup(vars);
+
+	sys.AddFunction(x*y);             // degree 2, initially at position 0
+	sys.AddFunction(x+y);             // degree 1, initially at position 1
+
+	Vec<dbl> values(2);
+	values << dbl(2.0), dbl(3.0);
+	(void) sys.Eval(values);          // primes SLP with the [degree2, degree1] order
+
+	sys.ReorderFunctionsByDegreeIncreasing();   // now [degree1, degree2] = [x+y, x*y]
+
+	auto after = sys.Eval(values);
+	BOOST_CHECK_EQUAL(after(0), dbl(5.0));      // x+y at position 0
+	BOOST_CHECK_EQUAL(after(1), dbl(6.0));      // x*y at position 1
+}
+
+
+/**
+\class bertini::System
+\test \b eval_wrong_size_input_throws Verifies that passing a variable
+vector of the wrong size to System::Eval throws std::runtime_error rather
+than reading past the end or producing garbage.
+*/
+BOOST_AUTO_TEST_CASE(eval_wrong_size_input_throws)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys.AddVariableGroup(vars);
+	sys.AddFunction(x+y);
+
+	Vec<dbl> too_small(1);
+	too_small << dbl(1.0);
+	BOOST_CHECK_THROW(sys.Eval(too_small), std::runtime_error);
+
+	Vec<dbl> too_big(3);
+	too_big << dbl(1.0), dbl(2.0), dbl(3.0);
+	BOOST_CHECK_THROW(sys.Eval(too_big), std::runtime_error);
+}
+
+
+/**
+\class bertini::System
+\test \b add_systems_chain Verifies operator+= return-by-reference and that
+chained += accumulates correctly. C++ groups `a += b += c` as `a += (b += c)`,
+so b is mutated to b+c, then a becomes a+b+c.
+*/
+BOOST_AUTO_TEST_CASE(add_systems_chain)
+{
+	bertini::System sys1, sys2, sys3;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	for (auto* s : {&sys1, &sys2, &sys3})
+		s->AddVariableGroup(vars);
+
+	sys1.AddFunction(x);       sys1.AddFunction(y);
+	sys2.AddFunction(y);       sys2.AddFunction(x);
+	sys3.AddFunction(x*y);     sys3.AddFunction(x+y);
+
+	sys1 += sys2 += sys3;      // sys2 becomes sys2+sys3; sys1 becomes sys1+sys2+sys3
+
+	Vec<dbl> v(2);
+	v << dbl(2.0), dbl(3.0);
+
+	// sys1 originally: [x, y] = [2, 3]
+	// sys2 originally: [y, x] = [3, 2]
+	// sys3 originally: [xy, x+y] = [6, 5]
+	// sys1 final:      [2+3+6, 3+2+5] = [11, 10]
+	auto v1 = sys1.Eval(v);
+	BOOST_CHECK_EQUAL(v1(0), dbl(11.0));
+	BOOST_CHECK_EQUAL(v1(1), dbl(10.0));
+
+	// sys2 final:      [3+6, 2+5] = [9, 7]
+	auto v2 = sys2.Eval(v);
+	BOOST_CHECK_EQUAL(v2(0), dbl(9.0));
+	BOOST_CHECK_EQUAL(v2(1), dbl(7.0));
+}
+
+
+/**
+\class bertini::System
+\test \b add_incompatible_systems_throws Exercises the four guard clauses in
+System::operator+= for mismatched function count, variable count, and
+variable group count. Each branch should throw std::runtime_error.
+*/
+BOOST_AUTO_TEST_CASE(add_incompatible_systems_throws)
+{
+	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
+
+	VariableGroup vars2; vars2.push_back(x); vars2.push_back(y);
+	VariableGroup vars3; vars3.push_back(x); vars3.push_back(y); vars3.push_back(z);
+
+	// Mismatched function count: 2 fns vs 1 fn, same vars.
+	{
+		bertini::System a, b;
+		a.AddVariableGroup(vars2);  a.AddFunction(x);  a.AddFunction(y);
+		b.AddVariableGroup(vars2);  b.AddFunction(x+y);
+		BOOST_CHECK_THROW(a += b, std::runtime_error);
+	}
+
+	// Mismatched variable count: 2 vars vs 3 vars, same fn count.
+	{
+		bertini::System a, b;
+		a.AddVariableGroup(vars2);  a.AddFunction(x+y);
+		b.AddVariableGroup(vars3);  b.AddFunction(x+y+z);
+		BOOST_CHECK_THROW(a += b, std::runtime_error);
+	}
+
+	// Mismatched variable group count: one VG of 2 vs two VGs of 1 each.
+	{
+		VariableGroup vg_x; vg_x.push_back(x);
+		VariableGroup vg_y; vg_y.push_back(y);
+		bertini::System a, b;
+		a.AddVariableGroup(vars2);              a.AddFunction(x+y);
+		b.AddVariableGroup(vg_x);  b.AddVariableGroup(vg_y);  b.AddFunction(x+y);
+		BOOST_CHECK_THROW(a += b, std::runtime_error);
+	}
+}
 
 
 /**

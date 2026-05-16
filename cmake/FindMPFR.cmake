@@ -49,20 +49,20 @@ endif(NOT MPFR_FIND_VERSION)
 if(MPFR_INCLUDES)
 
   # Set MPFR_VERSION
-  
+
   file(READ "${MPFR_INCLUDES}/mpfr.h" _mpfr_version_header)
-  
+
   string(REGEX MATCH "define[ \t]+MPFR_VERSION_MAJOR[ \t]+([0-9]+)" _mpfr_major_version_match "${_mpfr_version_header}")
   set(MPFR_MAJOR_VERSION "${CMAKE_MATCH_1}")
   string(REGEX MATCH "define[ \t]+MPFR_VERSION_MINOR[ \t]+([0-9]+)" _mpfr_minor_version_match "${_mpfr_version_header}")
   set(MPFR_MINOR_VERSION "${CMAKE_MATCH_1}")
   string(REGEX MATCH "define[ \t]+MPFR_VERSION_PATCHLEVEL[ \t]+([0-9]+)" _mpfr_patchlevel_version_match "${_mpfr_version_header}")
   set(MPFR_PATCHLEVEL_VERSION "${CMAKE_MATCH_1}")
-  
+
   set(MPFR_VERSION ${MPFR_MAJOR_VERSION}.${MPFR_MINOR_VERSION}.${MPFR_PATCHLEVEL_VERSION})
-  
+
   # Check whether found version exceeds minimum version
-  
+
   if(${MPFR_VERSION} VERSION_LESS ${MPFR_FIND_VERSION})
     set(MPFR_VERSION_OK FALSE)
     message(STATUS "MPFR version ${MPFR_VERSION} found in ${MPFR_INCLUDES}, "
@@ -75,7 +75,11 @@ endif(MPFR_INCLUDES)
 
 # Set MPFR_LIBRARIES
 
-find_library(MPFR_LIBRARIES mpfr PATHS $ENV{GMPDIR} ${LIB_INSTALL_DIR})
+if(WIN32)
+	find_library(MPFR_LIBRARIES libmpfr.dll.a PATHS $ENV{GMPDIR} ${LIB_INSTALL_DIR})
+else()
+	find_library(MPFR_LIBRARIES mpfr PATHS $ENV{GMPDIR} ${LIB_INSTALL_DIR})
+endif()
 
 # Epilogue
 

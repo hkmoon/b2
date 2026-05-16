@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with python/bertini_python.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2016-2018 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -49,7 +49,7 @@ namespace bertini
 			// docstring_options d(true, true, false); // local_
 			docstring_options docopt;
 			docopt.enable_all();
-			// docopt.disable_cpp_signatures();
+			docopt.disable_cpp_signatures();
 
 			object package = scope();
 		    package.attr("__path__") = "_pybertini";
@@ -99,6 +99,8 @@ namespace bertini
 			ExportLogging();
 			
 			ExportZeroDim();
+
+			ExportInfo();
 		}
 	
 	}

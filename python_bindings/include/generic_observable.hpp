@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with python/generic_observable.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2017-2018 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -38,7 +38,7 @@ namespace bertini{
 template <typename ObsT>
 class ObservableVisitor : public def_visitor<ObservableVisitor<ObsT>>
 {
-	friend class def_visitor_access;
+	friend class ::boost::python::def_visitor_access;
 
 	static void AddObserver(object& obj, object& obs)
 	{
@@ -59,8 +59,8 @@ public:
 	template<class PyClass>
 	void visit(PyClass& cl) const{
 		cl
-		.def("add_observer", 	&ObservableVisitor::AddObserver)
-		.def("remove_observer", &ObservableVisitor::RemoveObserver)
+		.def("add_observer", 	&ObservableVisitor::AddObserver, (arg("self"),arg("observer")) , "Attach an observer to this observable object")
+		.def("remove_observer", &ObservableVisitor::RemoveObserver, (arg("self"),arg("observer")) , "Remove an observer to this observable object")
 		;
 	}
 };

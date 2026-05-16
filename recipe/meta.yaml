@@ -1,0 +1,68 @@
+{% set name = "bertini" %}
+{% set version = "1.0.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://github.com/bertiniteam/b2/archive/v{{ version }}.tar.gz
+  sha256: REPLACE_WITH_ACTUAL_SHA256
+
+build:
+  number: 0
+  skip: true  # [py<39 or py>312]
+  script: {{ PYTHON }} -m pip install . --no-deps -vv
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - cmake >=3.22
+    - ninja
+    - pkg-config
+  host:
+    - python
+    - pip
+    - scikit-build-core >=0.2.0
+    - numpy
+    - gmp
+    - mpfr
+    - mpc
+    - libboost-devel
+    - libboost-python-devel
+    - eigen
+    - eigenpy
+  run:
+    - python
+    - numpy
+    - eigenpy
+    - gmp
+    - mpfr
+    - mpc
+    - libboost
+    - libboost-python
+
+test:
+  imports:
+    - bertini
+    - bertini.function_tree
+    - bertini.system
+    - bertini.tracking
+
+about:
+  home: https://github.com/bertiniteam/b2
+  license: GPL-3.0-or-later
+  license_family: GPL
+  license_file: core/COPYING
+  summary: Software for numerical algebraic geometry
+  description: |
+    Bertini 2 is a C++ numerical algebraic geometry library with Python
+    bindings. It implements homotopy continuation for solving polynomial
+    systems, including path tracking, endgames (power series, Cauchy),
+    and start systems (total degree, multihomogeneous).
+  doc_url: https://github.com/bertiniteam/b2/wiki
+  dev_url: https://github.com/bertiniteam/b2
+
+extra:
+  recipe-maintainers:
+    - ofloveandhate

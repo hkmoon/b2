@@ -13,10 +13,10 @@
 //You should have received a copy of the GNU General Public License
 //along with python/endgame_export.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2016-2024 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
@@ -45,12 +45,12 @@ namespace bertini{
 		template<typename EndgameT>
 		class EndgameBaseVisitor: public def_visitor<EndgameBaseVisitor<EndgameT> >
 		{
-			friend class def_visitor_access;
-			
+			friend class ::boost::python::def_visitor_access;
+
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
+
 		private:
 
 			using BCT = typename TrackerTraits<typename EndgameT::TrackerType>::BaseComplexType;
@@ -58,16 +58,16 @@ namespace bertini{
 			using BaseEGT = typename EndgameT::BaseEGT;
 
 			static
-			SuccessCode WrapRunDefaultTime(EndgameT & self, BCT const& t, const Eigen::Ref<const Vec<BCT>> s){
+			SuccessCode WrapRunDefaultTime(EndgameT & self, BCT t, Vec<BCT> const& s){
 				return self.Run(t, s);
 			}
 
 			static
-			SuccessCode WrapRunCustomTime(EndgameT & self, BCT const& t, const Eigen::Ref<const Vec<BCT>> s, BCT const& u){
+			 SuccessCode WrapRunCustomTime(EndgameT & self, BCT t, Vec<BCT> const& s, BCT const& u){
 				return self.Run(t, s, u);
 			}
 
-			
+
 			using unsigned_of_void = unsigned (BaseEGT::*)() const;
 			static unsigned_of_void GetCycleNumberFn()
 			{
@@ -75,7 +75,7 @@ namespace bertini{
 			};
 
 			template <typename T>
-			static 
+			static
 			Vec<T> return_final_approximation(EndgameT const& self)
 			{
 				return self.template FinalApproximation<T>();
@@ -91,12 +91,12 @@ namespace bertini{
 		template<typename PowerSeriesT>
 		class PowerSeriesVisitor: public def_visitor<PowerSeriesVisitor<PowerSeriesT> >
 		{
-			friend class def_visitor_access;
-			
+			friend class ::boost::python::def_visitor_access;
+
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
+
 		private:
 
 			using BCT = typename TrackerTraits<typename PowerSeriesT::TrackerType>::BaseComplexType;
@@ -114,12 +114,12 @@ namespace bertini{
 		template<typename CauchyT>
 		class CauchyVisitor: public def_visitor<CauchyVisitor<CauchyT> >
 		{
-			friend class def_visitor_access;
-			
+			friend class ::boost::python::def_visitor_access;
+
 		public:
 			template<class PyClass>
 			void visit(PyClass& cl) const;
-			
+
 		private:
 
 			using BCT = typename TrackerTraits<typename CauchyT::TrackerType>::BaseComplexType;
@@ -156,7 +156,7 @@ namespace bertini{
 		void ExportFDCauchyEG();
 		void ExportFMCauchyEG();
 
-		
+
 
 }}// re: namespaces
 

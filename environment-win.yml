@@ -1,0 +1,28 @@
+name: b2-windows
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - cmake
+  - ccache
+  - cxx-compiler
+  - compilers
+  - ninja
+  - numpy
+  - gmp
+  - mpfr
+  - mpc
+  - libboost-devel
+  - eigen
+  - eigenpy
+  - libboost-python-devel
+  - vs2022_win-64
+  - scipy
+  - python
+  - wheel
+  - python-build
+  - scikit-build-core
+  - pkg-config
+  - git
+  - pip
+  

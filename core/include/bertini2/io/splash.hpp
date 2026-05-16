@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with bertini2/io/splash.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -30,12 +30,17 @@
 
 #pragma once
 
-#include "bertini2/version.hpp"
+#include "bertini2/config.hpp"
+
+#include <Eigen/Core>
+#include <gmp.h>
+#include <mpfr.h>
 
 #include "boost/version.hpp"
 
 #include <sstream>
 
+#define BERTINI2_PACKAGE_URL "https://github.com/bertiniteam/b2"
 namespace bertini{
 
 inline
@@ -84,7 +89,7 @@ std::string LicenseInfo()
 inline 
 std::string SourceURL()
 {
-	return PACKAGE_URL;
+	return BERTINI2_PACKAGE_URL;
 }
 
 inline
@@ -96,7 +101,7 @@ std::string WikiURL()
 inline
 std::string Version()
 {
-	return PACKAGE_VERSION;
+	return BERTINI2_VERSION;
 }
 
 inline 
@@ -138,11 +143,35 @@ std::string GenericHelp()
 }
 
 
+inline
+std::string EigenHeaderVersion()
+{
+    std::stringstream ss;
+    ss << EIGEN_WORLD_VERSION << "."
+       << EIGEN_MAJOR_VERSION << "."
+       << EIGEN_MINOR_VERSION;
+    return ss.str();
+}
+
+inline
+std::string GMPVersion()
+{
+    return gmp_version;
+}
+
+inline
+std::string MPFRVersion()
+{
+    return mpfr_get_version();
+}
+
 inline 
 std::string BoostHeaderVersion()
 {
 	std::stringstream ss;
-	ss << BOOST_VERSION; 
+	ss << BOOST_VERSION / 100000 << "."
+	   << BOOST_VERSION / 100 % 1000 << "."
+	   << BOOST_VERSION % 100;
 	return ss.str();
 }
 
@@ -151,9 +180,12 @@ std::string BoostHeaderVersion()
 inline 
 std::string DependencyVersions()
 {
-	std::stringstream ss;
-	ss << "Compiled against Boost headers " << BoostHeaderVersion() << "\n\n";
-	return ss.str();
+    std::stringstream ss;
+    ss << "Compiled against Boost headers " << BoostHeaderVersion() << "\n";
+    ss << "Compiled against Eigen " << EigenHeaderVersion() << "\n";
+    ss << "Linked against GMP " << GMPVersion() << "\n";
+    ss << "Linked against MPFR " << MPFRVersion() << "\n\n";
+    return ss.str();
 }
 
 

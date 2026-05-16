@@ -1,7 +1,6 @@
 🛤 bertini.tracking
 ===========================
 
-.. include:: common_doc_nav.incl
 
 Notes
 --------

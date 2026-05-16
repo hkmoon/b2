@@ -49,18 +49,47 @@ Users wanting a more developed implementation are recommended to use [Bertini 1]
 
 ---
 
-# Building and Installing
+# Installation
 
-Please see [the Wiki compiling section](https://github.com/bertiniteam/b2/wiki/Compilation-Guide) for instructions on compiling Bertini2's core library, and companion Python bindings.
+The Python package `bertini` provides pre-built wheels for Linux, macOS, and Windows. Requires Python 3.9--3.12.
+The total number of wheels is 4 for Linux, 4 for macOS, and 3 for Windows excluding Python 3.12.
+
+## Linux
+
+```bash
+pip install bertini
+```
+
+## macOS (Apple Silicon)
+
+```bash
+pip install bertini
+```
+
+Wheels are built for macOS 14.0+ on arm64.
+
+## Windows
+
+```bash
+pip install bertini
+```
+Python 3.12 is excluded for Windows.
+Wheels are built for Windows as Boost, GMP, MPFR, MPC, eigenpy are bundled.
+
+## Building from source
+
+Please see [the Wiki compiling section](https://github.com/bertiniteam/b2/wiki/Compilation-Guide) for instructions on compiling Bertini2's core library and companion Python bindings.
 
 ---
 
 # Other information
 
-The offical project repository is hosted on GitHub at [github.com/bertiniteam/b2](https://github.com/bertiniteam/b2).
+The official project repository is hosted on GitHub at [github.com/bertiniteam/b2](https://github.com/bertiniteam/b2).
 
 Please note that this is a long-term project, and is under active development.  If you want to help, please see [the wiki](https://github.com/bertiniteam/b2/wiki) for contact information.  We have opportinuties for all skill levels and interests.
 
 # License
 
 Bertini 2 is Free and Open Source Software.  Source is available under GPL Version 3, with additional terms as permitted under Section 7.
+
+

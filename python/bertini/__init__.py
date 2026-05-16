@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with python/bertini/__init__.py.  If not, see <http://www.gnu.org/licenses/>.
 # 
-#  Copyright(C) 2018-2025 by Bertini2 Development Team
+#  Copyright(C) Bertini2 Development Team
 # 
 #  See <http://www.gnu.org/licenses/> for a copy of the license, 
 #  as well as COPYING.  Bertini2 is provided with permitted 
@@ -47,9 +47,18 @@ See the source at https://github.com/bertiniteam/b2
 ### this __init__.py is strongly inspired by that for GalSim 
 ### https://github.com/GalSim-developers/GalSim
 
-from ._version import __version__, __version_info__
-version = __version__
+from importlib.metadata import version
+__version__ = version("bertini2")
 
+import os
+import sys
+
+if sys.platform == "win32":
+    from .windows_dll_manager import get_dll_paths, build_directory_manager
+    _dll_manager = build_directory_manager()
+    _dll_manager.__enter__()
+    for p in get_dll_paths():
+        _dll_manager.add_dll_directory(p)
 
 # put stuff in the bertini namespace
 
@@ -64,6 +73,7 @@ import bertini.logging as logging
 import bertini.nag_algorithm as nag_algorithm
 import bertini.random as random
 
+from bertini._pybertini import info
 
 import bertini.multiprec as multiprec
 

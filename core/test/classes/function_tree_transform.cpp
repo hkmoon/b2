@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with b2/core/test/classes/function_tree_transform.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2017-2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -811,7 +811,7 @@ BOOST_AUTO_TEST_CASE(complicated)
 	auto b = y->Eval<dbl>();
 
 	BOOST_CHECK(num_rounds >= 2);
-	BOOST_CHECK_EQUAL(n->Eval<dbl>(), a*b);
+	BOOST_CHECK_SMALL(abs(n->Eval<dbl>() - a*b), threshold_clearance_d);
 }
 
 

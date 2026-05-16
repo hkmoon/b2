@@ -13,10 +13,10 @@
 //You should have received a copy of the GNU General Public License
 //along with mpfr_complex.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
@@ -67,7 +67,7 @@ using bmp::backends::mpc_complex_backend;
 		return bmp::variable_precision_options::preserve_source_precision;
 	}
 
-	
+
 
 	// shamelessly adapted from the documentation for variable precision in Boost.Multiprecision.
 	// see https://www.boost.org/doc/libs/1_82_0/libs/multiprecision/doc/html/boost_multiprecision/tut/variable.html
@@ -99,8 +99,8 @@ using bmp::backends::mpc_complex_backend;
 	   boost::multiprecision::variable_precision_options saved_options_all_threads;
 	   boost::multiprecision::variable_precision_options saved_options_this_thread;
 
-	   scoped_mpfr_precision_options_all_threads(boost::multiprecision::variable_precision_options opts) : 
-	   		saved_options_all_threads(mpfr_float::default_variable_precision_options()), 
+	   scoped_mpfr_precision_options_all_threads(boost::multiprecision::variable_precision_options opts) :
+	   		saved_options_all_threads(mpfr_float::default_variable_precision_options()),
 	   		saved_options_this_thread(mpfr_float::default_variable_precision_options())
 	   {
 	      mpfr_float::default_variable_precision_options(opts);
@@ -137,6 +137,13 @@ using bmp::backends::mpc_complex_backend;
 	{
 		mpfr_float::default_precision(prec);
 		mpfr_complex::default_precision(prec);
+		// Boost.Multiprecision >= 1.87 reads thread_default_precision when
+		// default-constructing mpfr temporaries (including those created by
+		// boost::python const& extractors). If left at 0, mpfr_init2 aborts.
+		// Set both so that calls to default_precision() align thread-local
+		// with the static default. See commit 3111255b for original context.
+		mpfr_float::thread_default_precision(prec);
+		mpfr_complex::thread_default_precision(prec);
 	}
 
 
@@ -182,7 +189,7 @@ BOOST_SERIALIZATION_SPLIT_FREE(::boost::multiprecision::backends::mpc_complex_ba
 
 namespace bertini{
 
-	/** 
+	/**
 	\brief Get the precision of a number.
 
 	For mpfr_floats, this calls the precision member method for mpfr_float.
@@ -194,7 +201,7 @@ namespace bertini{
 	}
 
 
-	/** 
+	/**
 	\brief Change the precision of a number.
 
 	For mpfr_floats, this calls the precision member method for mpfr_float.

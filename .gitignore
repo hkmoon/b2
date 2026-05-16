@@ -26,7 +26,9 @@ m4/ltsugar.m4
 m4/ltversion.m4
 m4/lt~obsolete.m4
 
-
+core/doc/html/
+core/doc/latex/
+bertini_*.log
 /config
 
 # Python folders
@@ -91,3 +93,5 @@ python/src/UNKNOWN.egg-info/top_level.txt
 _skbuild/
 */build/
 build/
+bld/
+build_mine/

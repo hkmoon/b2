@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with amp_criteria.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -76,13 +76,13 @@ namespace bertini{
 
 
 			/**
-			\brief Compute the expression \f$D\f$ from the AMP papers \cite AMP1, \cite AMP2.
+			\brief Compute the expression \f$D\f$ from the AMP papers \cite AMP1, \cite AMP2, \cite AMP3.
 
 			\param norm_J The matrix norm of the Jacobian matrix
 			\param norm_J_inverse An estimate on the norm of the inverse of the Jacobian matrix.
 			\param AMP_config The settings for adaptive multiple precision.
 
-			\return a double scalar, the quantity \f$D\f$ from the AMP papers \cite AMP1, \cite AMP2.
+			\return a double scalar, the quantity \f$D\f$ from the AMP papers \cite AMP1, \cite AMP2, \cite AMP3.
 			*/
 			inline
 			double D(double const& norm_J, double const& norm_J_inverse, AdaptiveMultiplePrecisionConfig const& AMP_config)

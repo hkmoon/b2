@@ -13,27 +13,27 @@
 //You should have received a copy of the GNU General Public License
 //along with logging.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
 // silviana amethyst, university of wisconsin eau claire
 
 /**
-\file logging.hpp 
+\file logging.hpp
 
 \brief Logging in Bertini using Boost.Log
 */
 
 
 #ifndef BERTINI_LOGGING_HPP
-#define BERTINI_LOGGING_HPP 
+#define BERTINI_LOGGING_HPP
 
- 
-#define BOOST_LOG_DYN_LINK 1
+
+//#define BOOST_LOG_DYN_LINK
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
@@ -47,7 +47,7 @@
 namespace bertini{
 namespace logging{
 
-	
+
 
 	namespace blog = boost::log;
 
@@ -55,7 +55,7 @@ namespace logging{
 	namespace src = blog::sources;
 	namespace sinks = blog::sinks;
 	namespace keywords = blog::keywords;
-	
+
 
 	// the following is adapted from https://stackoverflow.com/questions/11421432/
 	// question answered by user James Adkison, asked by Adi, edited by James McNellis.
@@ -75,7 +75,7 @@ namespace logging{
 	Provided as an interface to the underlying logging library.
 
 	Highlight functions:
-	
+
 	* Init -- a "call-it-once" kinda function
 	* SetFilter
 	* AddFile
@@ -84,14 +84,14 @@ namespace logging{
 
 	There is Init, with all defaults, so you should totally call it to initialize all logging facilities for Bertini2.  Failure to do so produces pure screen output.
 
-	//[%TimeStamp%]: 
+	//[%TimeStamp%]:
 	*/
 	struct Logging
 	{
 
-		static 
-		void Init(std::string const& name_pattern = "bertini_%N.log", 
-				std::string const& format = "%Message%", 
+		static
+		void Init(std::string const& name_pattern = "bertini_%N.log",
+				std::string const& format = "%Message%",
 				unsigned rotation_size = 10*1024*1024,
 				severity_level const& new_level = severity_level::error)
 		{
@@ -110,13 +110,13 @@ namespace logging{
 			    keywords::file_name = name_pattern,
 			    keywords::rotation_size = rotation_size,
 			    keywords::format = format,
-			    keywords::auto_flush = auto_flush 
+			    keywords::auto_flush = auto_flush
 			);
 		}
 
 
 		/**
-		 trivial logger-provided severity levels are  
+		 trivial logger-provided severity levels are
 
 		 trace, debug, info, warning, error, fatal
 		*/
@@ -128,11 +128,11 @@ namespace logging{
 			    blog::trivial::severity >= new_level
 			);
 		}
-		
-	    
+
+
 	};
 
-	
+
 
 } // namespace logging
 } // re: namespace bertini

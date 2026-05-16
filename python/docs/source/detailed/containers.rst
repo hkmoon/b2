@@ -1,7 +1,6 @@
 🕳 bertini.container
 =====================
 
-.. include:: common_doc_nav.incl
 
 Notes
 --------

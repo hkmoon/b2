@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with amp_tracker.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2021 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -126,13 +126,13 @@ namespace bertini{
 
 		 \todo Remove the default value of the predictor order, as that seems weird to have
 		*/
-		inline
-		mpfr_float StepsizeSatisfyingCriterionB(unsigned precision,
+		template<typename RealT>
+		inline RealT StepsizeSatisfyingCriterionB(unsigned precision,
 										unsigned digits_B,
 										unsigned num_newton_iterations,
 										unsigned predictor_order = 0)
 		{
-			return pow(mpfr_float(10), -( digits_B - precision )*num_newton_iterations/(predictor_order+1));
+			return pow(RealT(10), -( digits_B - precision )*num_newton_iterations/(predictor_order+1.0));
 		}
 		
 
@@ -198,22 +198,25 @@ namespace bertini{
 						  unsigned predictor_order = 0)
 		{
 			double min_cost = Eigen::NumTraits<double>::highest();
-			new_precision = MaxPrecisionAllowed()+1; // initialize to an impossible value.
-			new_stepsize = min_stepsize; // initialize to minimum permitted step size.
+
+			unsigned minimizing_precision = 0; // initialize to an impossible value.
+
+			// a few casts so that we can work in double precision, because doing this in multiprec sucks
+			double min_stepsize_lowprec = static_cast<double>(min_stepsize);
+			double max_stepsize_lowprec = static_cast<double>(max_stepsize);
 
 			auto minimizer_routine = 
-				[&min_cost, &new_stepsize, &new_precision, &digits_B, num_newton_iterations, predictor_order, max_stepsize](unsigned p)
+				[&min_cost, &minimizing_precision, digits_B, num_newton_iterations, predictor_order, max_stepsize_lowprec](unsigned p)
 				{
-					RealT candidate_stepsize = min(StepsizeSatisfyingCriterionB(p, digits_B, num_newton_iterations, predictor_order),
-					                              max_stepsize);
+					double candidate_stepsize = min(StepsizeSatisfyingCriterionB<double>(p, digits_B, num_newton_iterations, predictor_order),
+					                              max_stepsize_lowprec);
 					using std::abs;
-					double current_cost = ArithmeticCost(p) / abs(double(candidate_stepsize));
+					double current_cost = ArithmeticCost(p) / abs(candidate_stepsize);
 
 					if (current_cost < min_cost)
 					{
 						min_cost = current_cost;
-						new_stepsize = candidate_stepsize;
-						new_precision = p;
+						minimizing_precision = p;
 					}
 				};
 
@@ -236,6 +239,17 @@ namespace bertini{
 
 			for (unsigned p = lowest_mp_precision_to_test; p <= max_precision; p+=PrecisionIncrement())
 				minimizer_routine(p);
+
+			if (minimizing_precision==0){
+				throw std::runtime_error("MinimizeTrackingCost failed to find a suitable stepsize and precision");
+			}
+
+			new_precision = minimizing_precision; // copy the computed value
+			// next, because the above computed the new stepsize in double precision, which may be lowprec, we compute in full precision
+			new_stepsize = min(
+				               StepsizeSatisfyingCriterionB<RealT>(new_precision, digits_B, num_newton_iterations, predictor_order),
+					           max_stepsize
+					           );
 		}
 
 
