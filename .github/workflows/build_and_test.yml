@@ -29,8 +29,13 @@ jobs:
       - name: Set OS matrix
         id: matrix
         run: |
+          # macos-15-intel is intentionally omitted: an MPFR/Boost interaction
+          # causes SIGABRT in pytest that we cannot reproduce locally (no Intel
+          # Mac available to the maintainer). Intel macOS support is paused
+          # pending a reproducer or an upstream fix. Re-add "macos-15-intel"
+          # below when ready to revisit.
           if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/develop" || "${{ github.ref }}" == refs/tags/* || "${{ inputs.full_matrix }}" == "true" || "${{ github.event.pull_request.base.ref }}" == "develop" ]]; then
-            echo 'os=["ubuntu-latest","macos-15-intel","macos-14"]' >> $GITHUB_OUTPUT
+            echo 'os=["ubuntu-latest","macos-14"]' >> $GITHUB_OUTPUT
             echo 'python_versions=["3.9","3.10","3.11","3.12","3.13"]' >> $GITHUB_OUTPUT
           else
             echo 'os=["ubuntu-latest","macos-14"]' >> $GITHUB_OUTPUT
