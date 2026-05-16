@@ -854,6 +854,13 @@ namespace bertini{
 		}
 
 
+		// Re-seed the thread-local default precision from the SLP's own precision before
+		// growing the mpfr_complex memory block. resize() default-constructs each new
+		// element via mpfr_init2(x, thread_default_precision()); on Boost 1.87 that value
+		// can be 0 on fresh threads, which aborts. DefaultPrecision() sets both the static
+		// and thread-local defaults so the default-constructed slots are valid.
+		DefaultPrecision(slp_under_construction_.precision_);
+
 		// adjust the sizes of the memory blocks to match the number expected via compilation
 		slp_under_construction_.GetMemory<dbl_complex>().resize(next_available_complex_);
 		slp_under_construction_.GetMemory<mpfr_complex>().resize(next_available_complex_);
