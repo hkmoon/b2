@@ -237,9 +237,9 @@ jobs:
             cd /tmp &&
             rm -rf eigenpy-3.11.0 && tar zxf eigenpy-3.11.0.tar.gz &&
             cd eigenpy-3.11.0 && mkdir -p bld && cd bld &&
-            cmake .. -DCMAKE_PREFIX_PATH=/tmp/deps-py -DCMAKE_INSTALL_PREFIX=/tmp/deps-py -DPython3_EXECUTABLE=$(which python) -DPython3_NumPy_INCLUDE_DIR=$(python -c "import numpy; print(numpy.get_include())") -DBUILD_TESTING=OFF &&
+            cmake .. -DCMAKE_PREFIX_PATH=/tmp/deps-py -DCMAKE_INSTALL_PREFIX=/tmp/deps-py -DPython3_EXECUTABLE=$(which python) -DPython3_NumPy_INCLUDE_DIR=$(python -c "import numpy; print(numpy.get_include())") -DBUILD_TESTING=OFF -DCMAKE_INSTALL_DO_STRIP=ON &&
             make -j2 install &&
-            find /tmp/deps-py/lib -name '*.so*' -exec strip --strip-debug {} + 2>/dev/null || true
+            find /tmp/deps-py/lib -name '*.so*' -not -type l -exec strip --strip-unneeded {} + || true
           # On macOS, build all Boost components (including Boost.Python) into /tmp/deps-py
           # so delocate sees only one set of dylibs. boost-base is used only for C++ tests.
           CIBW_BEFORE_BUILD_MACOS: >
