@@ -197,7 +197,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install \
             sphinx sphinx-rtd-theme sphinxcontrib-bibtex gitpython \
-            scikit-build-core build numpy eigenpy
+            scikit-build-core build numpy eigenpy==3.11.0
 
       - name: Download built wheel
         uses: actions/download-artifact@v5
@@ -214,8 +214,7 @@ jobs:
           BERTINI_GIT_SHA: ${{ steps.meta.outputs.sha }}
           BERTINI_BUILD_DATE: ${{ steps.meta.outputs.date }}
         run: |
-          sphinx-build -b html -W --keep-going source ../../site/python || \
-            sphinx-build -b html source ../../site/python
+          sphinx-build -b html -W --keep-going source ../../site/python
 
       - name: Add landing page
         env:
