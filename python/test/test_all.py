@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with python/test/run_all_test_suites.py.  If not, see <http://www.gnu.org/licenses/>.
 # 
-#  Copyright(C) 2016 by Bertini2 Development Team
+#  Copyright(C) Bertini2 Development Team
 # 
 #  See <http://www.gnu.org/licenses/> for a copy of the license, 
 #  as well as COPYING.  Bertini2 is provided with permitted 
@@ -21,12 +21,17 @@
 
 #  individual authors of this file include:
 # 
-#   Dani Brake
+#   silviana amethyst
 #   University of Notre Dame
 #   Summer 2016
 # 
+#  silviana amethyst
+#  UWEC
+#  Spring 2018
+#
 
 import classes.test_classes
 import tracking.test_tracking
+import zero_dim.test_zero_dim
 
 import unittest

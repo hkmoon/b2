@@ -1,0 +1,22 @@
+name: b2-ubuntu
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - gxx==13.3.0
+  - numpy
+  - gmp
+  - mpfr
+  - mpc
+  - auditwheel
+  - automake
+  - autoconf
+  - libtool
+  - libboost
+  - eigen
+  - eigenpy
+  - libboost-python
+  - scipy
+  - wheel
+  - python-build
+  - patchelf

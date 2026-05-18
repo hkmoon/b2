@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with special_number.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -24,8 +24,9 @@
 //  West Texas A&M University
 //  Spring, Summer 2015
 //
-// Dani Brake
-// University of Notre Dame
+//
+// silviana amethyst
+// University of Wisconsin - Eau Claire
 //
 //  Created by Collins, James B. on 4/30/15.
 //
@@ -62,30 +63,41 @@ namespace node{
 
 		The number \f$\pi\f$.  Gets its own class because it is such an important number.
 		*/
-		class Pi : public virtual Number, public virtual NamedSymbol
+		class Pi : public virtual Number, public virtual NamedSymbol, public virtual EnableSharedFromThisVirtual<Pi>
 		{
 		public:
-			Pi() : NamedSymbol("pi")
-			{}
+			BERTINI_DEFAULT_VISITABLE()
 
 			virtual ~Pi() = default;
 
+			template<typename... Ts> 
+			static 
+			std::shared_ptr<Pi> Make(Ts&& ...ts){ 
+				return std::shared_ptr<Pi>( new Pi(ts...) );
+			}
+
+
 		private:
+
+			Pi() : NamedSymbol("pi")
+			{}
+
 			// Return value of constant
 			dbl FreshEval_d(std::shared_ptr<Variable> const& diff_variable) const override;
 			
 			void FreshEval_d(dbl& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const override;
 
 
-			mpfr FreshEval_mp(std::shared_ptr<Variable> const& diff_variable) const override;
+			mpfr_complex FreshEval_mp(std::shared_ptr<Variable> const& diff_variable) const override;
 			
-			void FreshEval_mp(mpfr& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const override;
+			void FreshEval_mp(mpfr_complex& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const override;
 
 
 			friend class boost::serialization::access;
 
 			template <typename Archive>
 			void serialize(Archive& ar, const unsigned version) {
+				ar & boost::serialization::base_object<Number>(*this);
 				ar & boost::serialization::base_object<NamedSymbol>(*this);
 			}
 		};
@@ -97,32 +109,45 @@ namespace node{
 
 		The number \f$e\f$.  Gets its own class because it is such an important number.
 		*/
-		class E : public virtual Number, public virtual NamedSymbol
+		class E : public virtual Number, public virtual NamedSymbol, public virtual EnableSharedFromThisVirtual<E>
 		{
 		public:
-			E() : NamedSymbol("e")
-			{}
+			BERTINI_DEFAULT_VISITABLE()
+			
+
 
 			virtual ~E() = default;
 
 
+			template<typename... Ts> 
+			static 
+			std::shared_ptr<E> Make(Ts&& ...ts){ 
+				return std::shared_ptr<E>( new E(ts...) );
+			}
+
 
 		private:
+
+			E() : NamedSymbol("e")
+			{}
+
+			
 			// Return value of constant
 			dbl FreshEval_d(std::shared_ptr<Variable> const& diff_variable) const override;
 			
 			void FreshEval_d(dbl& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const override;
 
 
-			mpfr FreshEval_mp(std::shared_ptr<Variable> const& diff_variable) const override;
+			mpfr_complex FreshEval_mp(std::shared_ptr<Variable> const& diff_variable) const override;
 			
-			void FreshEval_mp(mpfr& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const override;
+			void FreshEval_mp(mpfr_complex& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const override;
 
 
 			friend class boost::serialization::access;
 
 			template <typename Archive>
 			void serialize(Archive& ar, const unsigned version) {
+				ar & boost::serialization::base_object<Number>(*this);
 				ar & boost::serialization::base_object<NamedSymbol>(*this);
 			}
 

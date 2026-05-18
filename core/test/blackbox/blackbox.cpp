@@ -13,37 +13,29 @@
 //You should have received a copy of the GNU General Public License
 //along with test/blackbox/blackbox.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 
 
 //test/blackbox/blackbox.cpp
 //
 
 
- 
-#define BOOST_TEST_DYN_LINK 1
+
+//#define BOOST_TEST_DYN_LINK 1
 
 //this #define MUST appear before #include <boost/test/unit_test.hpp>
 #define BOOST_TEST_MODULE "Bertini 2 Blackbox Testing"
 #include <boost/test/unit_test.hpp>
 
-
-#include "logging.hpp"
-
-
-using sec_level = boost::log::trivial::severity_level;
-
-using LoggingInit = bertini::LoggingInit;
-
-
-BOOST_GLOBAL_FIXTURE( LoggingInit );
+#define BERTINI_TEST_MODULE "blackbox"
+#include "test/utility/enable_logging.hpp"
 
 
 

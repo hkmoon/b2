@@ -13,25 +13,19 @@
 //You should have received a copy of the GNU General Public License
 //along with node_serialization.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 
 //  node_serialization.cpp
 //
 //  Created by Collins, James B. on 4/30/15.
 //  Copyright (c) 2015 West Texas A&M University. All rights reserved.
-//
-// also modified by
-//  Daniel Brake
-//  University of Notre Dame
-//  ACMS
-//  Spring, Summer 2015
 
 
 #include <iostream>
@@ -64,18 +58,17 @@ template<typename NumType> using Mat = bertini::Mat<NumType>;
 using Variable = bertini::node::Variable;
 using Node = bertini::node::Node;
 using Float = bertini::node::Float;
-using bertini::MakeVariable;
-using bertini::MakeFloat;
+
 
 using dbl = bertini::dbl;
-using mpfr = bertini::mpfr;
+using mpfr = bertini::mpfr_complex;
 
 using System = bertini::System;
 
 
 BOOST_AUTO_TEST_CASE(serialize_variable)
 {
-	std::shared_ptr<Variable> x = MakeVariable("x");
+	std::shared_ptr<Variable> x = Variable::Make("x");
 
 
 	{
@@ -102,7 +95,7 @@ BOOST_AUTO_TEST_CASE(serialize_variable)
 
 BOOST_AUTO_TEST_CASE(serialize_float)
 {
-	std::shared_ptr<Float> two_point_oh_four = MakeFloat("2.04");
+	std::shared_ptr<Float> two_point_oh_four = Float::Make("2.04");
 
 	{
 		std::ofstream fout("serialization_test_node");
@@ -127,7 +120,7 @@ BOOST_AUTO_TEST_CASE(serialize_float)
 
 BOOST_AUTO_TEST_CASE(serialize_complicated_expression)
 {
-	std::shared_ptr<Variable> x = MakeVariable("x");
+	std::shared_ptr<Variable> x = Variable::Make("x");
 
 	auto f = exp(sqrt(pow(pow(x*x+ (-x) -sin(x)+cos(x)+tan(x),x),3)))/x;
 
@@ -164,17 +157,32 @@ BOOST_AUTO_TEST_CASE(serialize_complicated_expression)
 
 
 
-BOOST_AUTO_TEST_CASE(system_serialize)
+BOOST_AUTO_TEST_CASE(system_serialize_scopes)
 {
-	std::string str = "function f1, f2; variable_group x1, x2; y = x1*x2; f1 = y*y; f2 = x1*y; ";
 
-	bertini::System sys;
-	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
 
 	
+	Vec<dbl> values(2);
+
+	values(0) = dbl(2.0);
+	values(1) = dbl(3.0);
 
 	
-	{
+	
+	{ // to create a scope
+
+		bertini::System sys;
+		auto x = Variable::Make("x");
+		auto y = Variable::Make("y");
+
+		bertini::VariableGroup vg{x,y};
+
+		sys.AddVariableGroup(vg);
+
+		sys.AddFunction(x+y);
+		sys.AddFunction(x-y);
+
+
 		std::ofstream fout("serialization_test_node");
 		
 		boost::archive::text_oarchive oa(fout);
@@ -183,41 +191,149 @@ BOOST_AUTO_TEST_CASE(system_serialize)
 		oa << sys;
 	}
 	
-	bertini::System sys2;
+	
 	{
 		std::ifstream fin("serialization_test_node");
 		
 		boost::archive::text_iarchive ia(fin);
 		// read class state from archive
+		bertini::System sys2;
 		ia >> sys2;
+
+		Vec<dbl> v = sys2.Eval(values);
+
+
+		BOOST_CHECK_EQUAL(v.size(),2);
+
+
+		BOOST_CHECK_EQUAL(v(0).real(), 5);
+		BOOST_CHECK_EQUAL(v(0).imag(), 0);
+		BOOST_CHECK_EQUAL(v(1).real(), -1);
+		BOOST_CHECK_EQUAL(v(1).imag(), 0);
+
+
 	}
+	
+}
+
+
+
+BOOST_AUTO_TEST_CASE(system_serialize_scopes_via_parsing)
+{
+
 
 	
+	Vec<dbl> x(2);
 
+	x(0) = dbl(2.0);
+	x(1) = dbl(3.0);
+
+	Vec<dbl> y_before(2);
+	
+	{ // to create a scope
+
+		std::string str = "function f1, f2; variable_group x1, x2;  f1 = x1^2 * x2^2; f2 = x1^2*x2; ";
+
+		bertini::System sys;
+		bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+
+
+		y_before = sys.Eval(x);
+
+		std::ofstream fout("serialization_test_node");
+		boost::archive::text_oarchive oa(fout);
+		
+		// write class instance to archive
+		oa << sys;
+	}
+	
+	
+	{
+		std::ifstream fin("serialization_test_node");
+		
+		boost::archive::text_iarchive ia(fin);
+		// read class state from archive
+		bertini::System sys2;
+		ia >> sys2;
+
+		Vec<dbl> y_after = sys2.Eval(x);
+
+
+		BOOST_CHECK_EQUAL(y_after.size(),2);
+
+		BOOST_CHECK_EQUAL(y_before(0), y_after(0));
+		BOOST_CHECK_EQUAL(y_before(1), y_after(1));
+
+	}
+	
+}
+
+
+
+
+
+BOOST_AUTO_TEST_CASE(system_serialize_scopes_using_subfunctions_via_parsing)
+{
+
+
+	
 	Vec<dbl> values(2);
 
 	values(0) = dbl(2.0);
 	values(1) = dbl(3.0);
 
-	Vec<dbl> v = sys2.Eval(values);
-
-	BOOST_CHECK_EQUAL(v.size(),2);
-
-	BOOST_CHECK_EQUAL(v(0), 36.0);
-	BOOST_CHECK_EQUAL(v(1), 12.0);
 	
+	
+	{ // to create a scope
 
+		std::string str = "function f1, f2; variable_group x1, x2; y = x1*x2; f1 = y*y; f2 = x1*y; ";
+
+		bertini::System sys;
+		bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+
+
+		std::ofstream fout("serialization_test_node");
+		
+		boost::archive::text_oarchive oa(fout);
+		
+		// write class instance to archive
+		oa << sys;
+	}
+	
+	
+	{
+		std::ifstream fin("serialization_test_node");
+		
+		boost::archive::text_iarchive ia(fin);
+		// read class state from archive
+		bertini::System sys2;
+		ia >> sys2;
+
+		Vec<dbl> v = sys2.Eval(values);
+
+
+		BOOST_CHECK_EQUAL(v.size(),2);
+
+		BOOST_CHECK_EQUAL(v(0), 36.0);
+		BOOST_CHECK_EQUAL(v(1), 12.0);
+
+	}
+	
 }
+
+
+
+
 
 BOOST_AUTO_TEST_CASE(system_clone)
 {
 	std::string str = "function f1, f2; variable_group x1, x2; y = x1*x2; f1 = y*y; f2 = x1*y; ";
 
-	bertini::System sys;
-	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	bertini::System sys1;
+	bertini::parsing::classic::parse(str.begin(), str.end(), sys1);
 
 	
-	auto sys2 = Clone(sys);
+	auto sys2 = Clone(sys1);
 	
 
 	Vec<dbl> values(2);
@@ -231,7 +347,17 @@ BOOST_AUTO_TEST_CASE(system_clone)
 
 	BOOST_CHECK_EQUAL(v(0), 36.0);
 	BOOST_CHECK_EQUAL(v(1), 12.0);
-	
+
+	auto variables1 = sys1.Variables();
+	auto variables2 = sys2.Variables();
+
+	BOOST_CHECK_EQUAL(variables1.size(), variables2.size());
+
+
+	for (int ii=0; ii<variables2.size(); ++ii)
+	{
+		BOOST_CHECK(variables1[ii].get() != variables2[ii].get());
+	}
 
 }
 

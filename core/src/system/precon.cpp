@@ -13,14 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with src/system/precon.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of notre dame
+// silviana amethyst, university of notre dame
 
 
 #include "bertini2/system/precon.hpp"
@@ -29,13 +29,14 @@
 namespace bertini{
 	namespace system {
 
+using namespace bertini::node;
 // has multiplicity 3 root at origin, and 3 infinite roots
 System Precon::GriewankOsborn()
 {
 	using Var = std::shared_ptr<node::Variable>;
 
 	bertini::System griewank_osborn_sys;
-	Var x = MakeVariable("x"), t = MakeVariable("t"), y = MakeVariable("y");
+	Var x = Variable::Make("x"), t = Variable::Make("t"), y = Variable::Make("y");
 	VariableGroup vars{x,y};
 	griewank_osborn_sys.AddVariableGroup(vars); 
 
@@ -52,9 +53,9 @@ System Precon::CrossedPaths()
 	using Var = std::shared_ptr<node::Variable>;
 	
 	bertini::System crossed_paths_sys;
-	Var x = MakeVariable("x"), t = MakeVariable("t"), y = MakeVariable("y");
-	auto two = MakeInteger(2);
-	auto half = MakeRational("1/2");
+	Var x = Variable::Make("x"), t = Variable::Make("t"), y = Variable::Make("y");
+	auto two = Integer::Make(2);
+	auto half = Rational::Make("1/2");
 	VariableGroup vars{x,y};
 	crossed_paths_sys.AddVariableGroup(vars);
 	
@@ -70,8 +71,8 @@ System Precon::Sphere()
 	using Var = std::shared_ptr<node::Variable>;
 	
 	bertini::System sphere_sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y"), z = MakeVariable("z");
-	auto one = MakeInteger(1);
+	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
+	auto one = Integer::Make(1);
 
 	VariableGroup vars{x,y,z};
 	sphere_sys.AddVariableGroup(vars);

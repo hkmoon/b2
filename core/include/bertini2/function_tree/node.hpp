@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with node.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -24,8 +24,9 @@
 //  West Texas A&M University
 //  Spring, Summer 2015
 //
-// Dani Brake
-// University of Notre Dame
+//
+// silviana amethyst
+// University of Wisconsin - Eau Claire
 //
 //  Created by Collins, James B. on 4/30/15.
 
@@ -41,7 +42,7 @@
 #define BERTINI_NODE_BASE_HPP
 
 
-#include "bertini2/config.h"
+
 
 #include <iostream>
 #include <string>
@@ -50,15 +51,18 @@
 #include <boost/type_index.hpp>
 
 #include "bertini2/num_traits.hpp"
-
+#include "bertini2/detail/visitable.hpp"
+#include "bertini2/function_tree/forward_declares.hpp"
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/serialization/tracking.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/nvp.hpp>
 
-#include <deque>
 
 
 
@@ -69,7 +73,9 @@ namespace bertini {
 		class Variable;
 	}
 
-using VariableGroup = std::deque< std::shared_ptr<node::Variable> >;
+using VariableGroup = std::vector< std::shared_ptr<node::Variable> >;
+
+
 
 enum class VariableGroupType
 {
@@ -106,17 +112,17 @@ namespace detail{
 	};
 
 	template<>
-	struct FreshEvalSelector<mpfr>
+	struct FreshEvalSelector<mpfr_complex>
 	{
 		template<typename N>
-		static mpfr Run(N const& n, std::shared_ptr<Variable> const& diff_variable)
+		static mpfr_complex Run(N const& n, std::shared_ptr<Variable> const& diff_variable)
 		{
 			return n.FreshEval_mp(diff_variable);
 		}
 		
 		
 		template<typename N>
-		static void RunInPlace(mpfr& evaluation_value, N const& n, std::shared_ptr<Variable> const& diff_variable)
+		static void RunInPlace(mpfr_complex& evaluation_value, N const& n, std::shared_ptr<Variable> const& diff_variable)
 		{
 			n.FreshEval_mp(evaluation_value, diff_variable);
 		}
@@ -132,10 +138,10 @@ An interface for all nodes in a function tree, and for a function object as well
 
  \brief Abstract base class for the Bertini hybrid-precision (double-multiple) expression tree. 
  */
-class Node
+class Node : public virtual VisitableBase<>, public std::enable_shared_from_this<Node>
 {
 	friend detail::FreshEvalSelector<dbl>;
-	friend detail::FreshEvalSelector<mpfr>;
+	friend detail::FreshEvalSelector<mpfr_complex>;
 public:
 	
 	virtual ~Node() = default;
@@ -161,7 +167,7 @@ public:
 	 Template type is type of value you want returned.
 
 	 \return The value of the node.
-	 \tparam T The number type for return.  Must be one of the types stored in the Node class, currently dbl and mpfr.
+	 \tparam T The number type for return.  Must be one of the types stored in the Node class, currently dbl and mpfr_complex.
 	 */
 	template<typename T>
 	T Eval(std::shared_ptr<Variable> const& diff_variable = nullptr) const 
@@ -179,7 +185,7 @@ public:
 	 Template type is type of value you want returned.
 	 
 	 \return The value of the node.
-	 \tparam T The number type for return.  Must be one of the types stored in the Node class, currently dbl and mpfr.
+	 \tparam T The number type for return.  Must be one of the types stored in the Node class, currently dbl and mpfr_complex.
 	 */
 	template<typename T>
 	void EvalInPlace(T& eval_value, std::shared_ptr<Variable> const& diff_variable = nullptr) const;
@@ -316,7 +322,7 @@ protected:
 	//Stores the current value of the node in all required types
 	//We must hard code in all types that we want here.
 	//TODO: Initialize this to some default value, second = false
-	mutable std::tuple< std::pair<dbl,bool>, std::pair<mpfr,bool> > current_value_;
+	mutable std::tuple< std::pair<dbl,bool>, std::pair<mpfr_complex,bool> > current_value_;
 	
 	
 	
@@ -325,14 +331,14 @@ protected:
 	/**
 	Overridden code for specific node types, for how to evaluate themselves.  Called from the wrapper Eval<>() call from Node, if so required (by resetting, etc).
 
-	If we had the ability to use template virtual functions, we would have.  However, this is impossible with current C++ without using experimental libraries, so we have two copies -- because there are two number types for Nodes, dbl and mpfr.
+	If we had the ability to use template virtual functions, we would have.  However, this is impossible with current C++ without using experimental libraries, so we have two copies -- because there are two number types for Nodes, dbl and mpfr_complex.
 	*/
 	virtual dbl FreshEval_d(std::shared_ptr<Variable> const&) const = 0;
 
 	/**
 	 Overridden code for specific node types, for how to evaluate themselves.  Called from the wrapper EvalInPlace<>() call from Node, if so required (by resetting, etc).
 	 
-	 If we had the ability to use template virtual functions, we would have.  However, this is impossible with current C++ without using experimental libraries, so we have two copies -- because there are two number types for Nodes, dbl and mpfr.
+	 If we had the ability to use template virtual functions, we would have.  However, this is impossible with current C++ without using experimental libraries, so we have two copies -- because there are two number types for Nodes, dbl and mpfr_complex.
 	 */
 	virtual void FreshEval_d(dbl& evaluation_value, std::shared_ptr<Variable> const&) const = 0;
 
@@ -340,16 +346,16 @@ protected:
 	/**
 	Overridden code for specific node types, for how to evaluate themselves.  Called from the wrapper Eval<>() call from Node, if so required (by resetting, etc).
 
-	If we had the ability to use template virtual functions, we would have.  However, this is impossible with current C++ without using experimental libraries, so we have two copies -- because there are two number types for Nodes, dbl and mpfr.
+	If we had the ability to use template virtual functions, we would have.  However, this is impossible with current C++ without using experimental libraries, so we have two copies -- because there are two number types for Nodes, dbl and mpfr_complex.
 	*/
-	virtual mpfr FreshEval_mp(std::shared_ptr<Variable> const&) const = 0;
+	virtual mpfr_complex FreshEval_mp(std::shared_ptr<Variable> const&) const = 0;
 	
 	/**
 	 Overridden code for specific node types, for how to evaluate themselves.  Called from the wrapper Eval<>() call from Node, if so required (by resetting, etc).
 	 
-	 If we had the ability to use template virtual functions, we would have.  However, this is impossible with current C++ without using experimental libraries, so we have two copies -- because there are two number types for Nodes, dbl and mpfr.
+	 If we had the ability to use template virtual functions, we would have.  However, this is impossible with current C++ without using experimental libraries, so we have two copies -- because there are two number types for Nodes, dbl and mpfr_complex.
 	 */
-	virtual void FreshEval_mp(mpfr& evaluation_value, std::shared_ptr<Variable> const&) const = 0;
+	virtual void FreshEval_mp(mpfr_complex& evaluation_value, std::shared_ptr<Variable> const&) const = 0;
 
 	
 	
@@ -371,6 +377,7 @@ private:
 
 	template <typename Archive>
 	void serialize(Archive& ar, const unsigned version) {
+		register_derived_node_types(ar);
 	}
 
 }; // re: class node
@@ -390,12 +397,47 @@ private:
 		return out;
 	}
 
+
+
+	// inherit from this to get a nice method of producing shared pointers to specific type, solving the diamond problem
+	//
+	// T is a derived type
+	//
+	// I adapted from:
+	// https://stackoverflow.com/questions/16082785/use-of-enable-shared-from-this-with-multiple-inheritance
+	//
+	template<typename T>
+	struct EnableSharedFromThisVirtual: public virtual Node
+	{
+
+	public:
+
+	    std::shared_ptr<T> shared_from_this() {
+	       return std::dynamic_pointer_cast<T>(Node::shared_from_this());
+	    }
+
+	    std::shared_ptr<const T> shared_from_this() const{
+	       return std::dynamic_pointer_cast<const T>(Node::shared_from_this());
+	    }
+
+
+
+		template <class ThisT>
+		std::shared_ptr<ThisT> downcast_shared_from_this(){
+			return std::dynamic_pointer_cast<ThisT>(Node::shared_from_this());
+		}
+
+		template <class ThisT>
+		std::shared_ptr<const ThisT> downcast_shared_from_this() const{
+			return std::dynamic_pointer_cast<const ThisT>(Node::shared_from_this());
+		}
+
+	};
+
+
+
 	} // re: namespace node
 } // re: namespace bertini
-
-
-
-
 
 
 

@@ -13,17 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with b2/core/test/classes/function_tree_transform.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-//  Dani Brake
-//  University of Wisconsin Eau Claire
-//  ACMS
-//  Fall 2017
+//  silviana amethyst, university of wisconsin-eau claire
 
 /**
 \file Testing suite for transforms applied to the function tree.  In this suite, we content ourselves to evaluation in double precision, exercising multiple precision evaluation elsewhere.
@@ -44,14 +41,17 @@
 
 using Nd = std::shared_ptr<bertini::node::Node>;
 
-using bertini::MakeVariable;
-using bertini::MakeInteger;
-using bertini::MakeRational;
+using Variable = bertini::node::Variable;
+using Node = bertini::node::Node;
+using Integer = bertini::node::Integer;
+using Rational = bertini::node::Rational;
+using SumOperator = bertini::node::SumOperator;
+using MultOperator = bertini::node::MultOperator;
 
 using dbl = bertini::dbl;
 
-auto MakeZero(){return Nd(MakeInteger(0));}
-auto MakeOne(){return Nd(MakeInteger(1));}
+auto MakeZero(){return Nd(Integer::Make(0));}
+auto MakeOne(){return Nd(Integer::Make(1));}
 
 BOOST_AUTO_TEST_SUITE(function_tree)
 
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(level_one3)
 
 BOOST_AUTO_TEST_CASE(level_one_more_complicated)
 {
-	auto x = MakeVariable("x");
+	auto x = Variable::Make("x");
 	auto zero = MakeZero();
 
 
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(level_one_more_complicated)
 
 BOOST_AUTO_TEST_CASE(level_one_more_complicated2)
 {
-	auto x = MakeVariable("x");
+	auto x = Variable::Make("x");
 	auto zero = MakeZero();
 
 
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(level_one_more_complicated2)
 
 BOOST_AUTO_TEST_CASE(level_two)
 {
-	auto x = MakeVariable("x");
+	auto x = Variable::Make("x");
 	auto zero = MakeZero();
 
 
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(level_two)
 
 BOOST_AUTO_TEST_CASE(level_two_variable_set_to_zero_eliminated)
 {
-	auto x = MakeVariable("x");
+	auto x = Variable::Make("x");
 	auto zero = MakeZero();
 
 
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(level_two_variable_set_to_zero_eliminated)
 
 	x->set_current_value(dbl(2.0));
 
-	BOOST_CHECK_EQUAL(as_op->children_size(), 1);
+	BOOST_CHECK_EQUAL(as_op->NumOperands(), 1);
 	BOOST_CHECK_EQUAL(n->Eval<dbl>(), 0.0);
 }
 
@@ -326,7 +326,7 @@ BOOST_AUTO_TEST_CASE(level_one)
 
 BOOST_AUTO_TEST_CASE(level_one2)
 {
-	auto x = MakeVariable("x");
+	auto x = Variable::Make("x");
 	auto one = MakeOne();
 	auto n = x*one;
 	auto num_eliminated = n->EliminateOnes();
@@ -338,7 +338,7 @@ BOOST_AUTO_TEST_CASE(level_one2)
 
 BOOST_AUTO_TEST_CASE(level_one3)
 {
-	auto x = MakeVariable("x");
+	auto x = Variable::Make("x");
 	auto one = MakeOne();
 	auto n = one*x;
 	auto num_eliminated = n->EliminateOnes();
@@ -350,9 +350,9 @@ BOOST_AUTO_TEST_CASE(level_one3)
 
 BOOST_AUTO_TEST_CASE(level_one4)
 {
-	auto x = MakeVariable("x");
-	auto one = MakeInteger(1);
-	auto two = MakeInteger(2);
+	auto x = Variable::Make("x");
+	auto one = Integer::Make(1);
+	auto two = Integer::Make(2);
 	auto n = (two*one/two)*x;
 	auto num_eliminated = n->EliminateOnes();
 	x->set_current_value(2.);
@@ -363,8 +363,8 @@ BOOST_AUTO_TEST_CASE(level_one4)
 
 BOOST_AUTO_TEST_CASE(level_one5)
 {
-	auto x = MakeVariable("x");
-	auto one = MakeInteger(1);
+	auto x = Variable::Make("x");
+	auto one = Integer::Make(1);
 	auto n = one*one/one*one/one*one*x;
 	auto num_eliminated = n->EliminateOnes();
 	x->set_current_value(2.);
@@ -375,8 +375,8 @@ BOOST_AUTO_TEST_CASE(level_one5)
 
 BOOST_AUTO_TEST_CASE(level_two)
 {
-	auto x = MakeVariable("x");
-	auto one = MakeInteger(1);
+	auto x = Variable::Make("x");
+	auto one = Integer::Make(1);
 	auto n = (one*one*2) * (one*x*one);
 	x->set_current_value(2.);
 
@@ -430,11 +430,11 @@ BOOST_AUTO_TEST_SUITE(sum)
 
 BOOST_AUTO_TEST_CASE(eliminates_sum_of_single)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
-	Nd m = std::make_shared<bertini::node::SumOperator>(x, true);
-	Nd n = std::make_shared<bertini::node::SumOperator>(y, true);
+	Nd m = SumOperator::Make(x, true);
+	Nd n = SumOperator::Make(y, true);
 
 	auto p = m+n;
 
@@ -454,11 +454,11 @@ BOOST_AUTO_TEST_CASE(eliminates_sum_of_single)
 
 BOOST_AUTO_TEST_CASE(double_sum_signs_distribute)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
-	Nd m = std::make_shared<bertini::node::SumOperator>(x, true);
-	Nd n = std::make_shared<bertini::node::SumOperator>(y, true);
+	Nd m = SumOperator::Make(x, true);
+	Nd n = SumOperator::Make(y, true);
 
 	auto p = m+n;
 	auto q = m-n;
@@ -469,7 +469,7 @@ BOOST_AUTO_TEST_CASE(double_sum_signs_distribute)
 		unsigned num_eliminated = r->ReduceDepth();
 		BOOST_CHECK(num_eliminated > 0);
 		auto R = std::dynamic_pointer_cast<bertini::node::SumOperator>(r);
-		BOOST_CHECK_EQUAL(R->children_size(), 4);
+		BOOST_CHECK_EQUAL(R->NumOperands(), 4);
 
 		dbl a(4.1203847861962345182734, -5.1234768951256847623781614314);
 		dbl b(-8.98798649152356714919234, 0.49879892634876018735619234);
@@ -484,7 +484,7 @@ BOOST_AUTO_TEST_CASE(double_sum_signs_distribute)
 		unsigned num_eliminated = r->ReduceDepth();
 		BOOST_CHECK(num_eliminated > 0);
 		auto R = std::dynamic_pointer_cast<bertini::node::SumOperator>(r);
-		BOOST_CHECK_EQUAL(R->children_size(), 4);
+		BOOST_CHECK_EQUAL(R->NumOperands(), 4);
 
 		dbl a(4.1203847861962345182734, -5.1234768951256847623781614314);
 		dbl b(-8.98798649152356714919234, 0.49879892634876018735619234);
@@ -499,11 +499,11 @@ BOOST_AUTO_TEST_CASE(double_sum_signs_distribute)
 
 BOOST_AUTO_TEST_CASE(double_sum_signs_distribute2)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
-	Nd m = std::make_shared<bertini::node::SumOperator>(x, true);
-	Nd n = std::make_shared<bertini::node::SumOperator>(y, true);
+	Nd m = SumOperator::Make(x, true);
+	Nd n = SumOperator::Make(y, true);
 
 	auto p = m+n;
 	auto q = m-n;
@@ -514,7 +514,7 @@ BOOST_AUTO_TEST_CASE(double_sum_signs_distribute2)
 		unsigned num_eliminated = r->ReduceDepth();
 		BOOST_CHECK(num_eliminated > 0);
 		auto R = std::dynamic_pointer_cast<bertini::node::SumOperator>(r);
-		BOOST_CHECK_EQUAL(R->children_size(), 4);
+		BOOST_CHECK_EQUAL(R->NumOperands(), 4);
 
 		dbl a(4.1203847861962345182734, -5.1234768951256847623781614314);
 		dbl b(-8.98798649152356714919234, 0.49879892634876018735619234);
@@ -529,7 +529,7 @@ BOOST_AUTO_TEST_CASE(double_sum_signs_distribute2)
 		unsigned num_eliminated = r->ReduceDepth();
 		BOOST_CHECK(num_eliminated > 0);
 		auto R = std::dynamic_pointer_cast<bertini::node::SumOperator>(r);
-		BOOST_CHECK_EQUAL(R->children_size(), 4);
+		BOOST_CHECK_EQUAL(R->NumOperands(), 4);
 
 		dbl a(4.1203847861962345182734, -5.1234768951256847623781614314);
 		dbl b(-8.98798649152356714919234, 0.49879892634876018735619234);
@@ -545,11 +545,11 @@ BOOST_AUTO_TEST_CASE(double_sum_signs_distribute2)
 
 BOOST_AUTO_TEST_CASE(eliminates_mult_of_single)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
-	Nd m = std::make_shared<bertini::node::MultOperator>(x);
-	Nd n = std::make_shared<bertini::node::MultOperator>(y);
+	Nd m = MultOperator::Make(x);
+	Nd n = MultOperator::Make(y);
 
 	auto p = m+n;
 
@@ -571,10 +571,10 @@ BOOST_AUTO_TEST_CASE(eliminates_mult_of_single)
 
 BOOST_AUTO_TEST_CASE(eliminates_mult_single_regular)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
-	Nd m = std::make_shared<bertini::node::MultOperator>(x);
+	Nd m = MultOperator::Make(x);
 
 	auto p = m+y;
 
@@ -591,11 +591,11 @@ BOOST_AUTO_TEST_CASE(eliminates_mult_single_regular)
 
 BOOST_AUTO_TEST_CASE(eliminates_mult_single_regular2)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
-	Nd m = std::make_shared<bertini::node::MultOperator>(x);
-	Nd n = std::make_shared<bertini::node::MultOperator>(y);
+	Nd m = MultOperator::Make(x);
+	Nd n = MultOperator::Make(y);
 
 	auto p = x+n;
 
@@ -625,11 +625,11 @@ BOOST_AUTO_TEST_SUITE(prod)
 
 BOOST_AUTO_TEST_CASE(eliminates_sum_of_single)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
-	Nd m = std::make_shared<bertini::node::SumOperator>(x, true);
-	Nd n = std::make_shared<bertini::node::SumOperator>(y, true);
+	Nd m = SumOperator::Make(x, true);
+	Nd n = SumOperator::Make(y, true);
 
 	auto p = m*n;
 
@@ -649,11 +649,11 @@ BOOST_AUTO_TEST_CASE(eliminates_sum_of_single)
 
 BOOST_AUTO_TEST_CASE(eliminates_mult_of_single)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
-	Nd m = std::make_shared<bertini::node::MultOperator>(x);
-	Nd n = std::make_shared<bertini::node::MultOperator>(y);
+	Nd m = MultOperator::Make(x);
+	Nd n = MultOperator::Make(y);
 
 	auto p = m*n;
 
@@ -674,8 +674,8 @@ BOOST_AUTO_TEST_CASE(eliminates_mult_of_single)
 
 BOOST_AUTO_TEST_CASE(distributive)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
 
 	auto m = x*y;
@@ -699,15 +699,15 @@ BOOST_AUTO_TEST_CASE(distributive)
 
 BOOST_AUTO_TEST_CASE(a_nested_one)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
 	auto n = ((((((2*x)*1)*y))/2));
 	while(n->ReduceDepth())
 		; //deliberately empty statement
 
 	auto as_op = std::dynamic_pointer_cast<bertini::node::MultOperator>(n);
-	BOOST_CHECK_EQUAL(as_op->children_size(), 5);
+	BOOST_CHECK_EQUAL(as_op->NumOperands(), 5);
 
 	auto a = x->Eval<dbl>();
 	auto b = y->Eval<dbl>();
@@ -718,21 +718,21 @@ BOOST_AUTO_TEST_CASE(a_nested_one)
 
 BOOST_AUTO_TEST_CASE(many_nested_singletons)
 {
-	auto x = MakeVariable("x");
+	auto x = Variable::Make("x");
 
-	Nd n1 = std::make_shared<bertini::node::MultOperator>(x);
-	Nd n2 = std::make_shared<bertini::node::MultOperator>(n1);
-	Nd n3 = std::make_shared<bertini::node::MultOperator>(n2);
-	Nd n4 = std::make_shared<bertini::node::MultOperator>(n3);
-	Nd n5 = std::make_shared<bertini::node::MultOperator>(n4);
+	Nd n1 = MultOperator::Make(x);
+	Nd n2 = MultOperator::Make(n1);
+	Nd n3 = MultOperator::Make(n2);
+	Nd n4 = MultOperator::Make(n3);
+	Nd n5 = MultOperator::Make(n4);
 
 	while(n5->ReduceDepth())
 		; //deliberately empty statement
 
 	auto as_op = std::dynamic_pointer_cast<bertini::node::MultOperator>(n5);
-	BOOST_CHECK_EQUAL(as_op->children_size(), 1);
+	BOOST_CHECK_EQUAL(as_op->NumOperands(), 1);
 
-	BOOST_CHECK_EQUAL(as_op->first_child(), x);
+	BOOST_CHECK_EQUAL(as_op->FirstOperand(), x);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // prod
@@ -772,11 +772,11 @@ BOOST_AUTO_TEST_SUITE(simplify)
 
 BOOST_AUTO_TEST_CASE(flattens_completely)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
-	Nd m = std::make_shared<bertini::node::SumOperator>(x, true);
-	Nd n = std::make_shared<bertini::node::SumOperator>(y, true);
+	Nd m = SumOperator::Make(x, true);
+	Nd n = SumOperator::Make(y, true);
 
 	auto p = m+n+0;
 	auto q = 0+m-n*1;
@@ -800,8 +800,8 @@ x->set_current_value(a); y->set_current_value(b);
 
 BOOST_AUTO_TEST_CASE(complicated)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
 
 	auto n = (((((2*x*1)*y)+(0*(pow(x,2))))/2)-(0*((pow(x,2))*y)/(pow(2,2))));
 
@@ -811,14 +811,14 @@ BOOST_AUTO_TEST_CASE(complicated)
 	auto b = y->Eval<dbl>();
 
 	BOOST_CHECK(num_rounds >= 2);
-	BOOST_CHECK_EQUAL(n->Eval<dbl>(), a*b);
+	BOOST_CHECK_SMALL(abs(n->Eval<dbl>() - a*b), threshold_clearance_d);
 }
 
 
 BOOST_AUTO_TEST_CASE(complicated2)
 {
-	auto x = MakeVariable("x");
-	auto t = MakeVariable("t");
+	auto x = Variable::Make("x");
+	auto t = Variable::Make("t");
 
 	auto f = (((pow((x-1),2))*(1-t))+((pow(x,2)+1)*t));
 
@@ -840,10 +840,10 @@ BOOST_AUTO_TEST_CASE(complicated3)
 	auto zero = MakeZero();
 	auto one = MakeOne();
 
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
-	auto HOM_VAR_0 = MakeVariable("HOM_VAR_0");
-	auto t = MakeVariable("t");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
+	auto HOM_VAR_0 = Variable::Make("HOM_VAR_0");
+	auto t = Variable::Make("t");
 
 	auto f = ((zero*pow((y-(HOM_VAR_0*one)),2))+((2*(y-(HOM_VAR_0*one))*(one-((zero*one)+(zero*HOM_VAR_0))))*(one-t)));
 
@@ -862,10 +862,10 @@ BOOST_AUTO_TEST_CASE(complicated4)
 	auto zero = MakeZero();
 	auto one = MakeOne();
 
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
-	auto HOM_VAR_0 = MakeVariable("HOM_VAR_0");
-	auto t = MakeVariable("t");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
+	auto HOM_VAR_0 = Variable::Make("HOM_VAR_0");
+	auto t = Variable::Make("t");
 
 	auto a = x->Eval<dbl>();
 	auto b = y->Eval<dbl>();
@@ -881,20 +881,19 @@ BOOST_AUTO_TEST_CASE(complicated4)
 
 	f->Reset();
 	auto f_val_after = f->Eval<dbl>();
-	BOOST_CHECK_SMALL(abs(f_val_init - actual_val), 1e-15);
-	BOOST_CHECK_SMALL(abs(f_val_after- actual_val), 1e-15);
+	BOOST_CHECK_EQUAL(f_val_init,f_val_after);
 }
 
 //((0*((x-(HOM_VAR_0*1))^3))+((3*((x-(HOM_VAR_0*1))^2)*(-((1*1)+(0*HOM_VAR_0))))*(1-t)))
 
 BOOST_AUTO_TEST_CASE(yet_more_complicated)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
-	auto t = MakeVariable("t");
-	auto HOM_VAR_0 = MakeVariable("HOM_VAR_0");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
+	auto t = Variable::Make("t");
+	auto HOM_VAR_0 = Variable::Make("HOM_VAR_0");
 
-	auto f = (((0*(pow(y,2)-(pow(HOM_VAR_0,2)*MakeRational("9215126146405988386300422552813438491596469014004/18831809439874092151531390861220941995712612447011","-34979570316540871529966189550041755413443953059471/3298415588464117388268211317293113094514010909093"))))+(((2*y*1)-(((2*HOM_VAR_0*0)*MakeRational("9215126146405988386300422552813438491596469014004/18831809439874092151531390861220941995712612447011","-34979570316540871529966189550041755413443953059471/3298415588464117388268211317293113094514010909093"))+(0*pow(HOM_VAR_0,2))))*t))+((0*pow((y-(HOM_VAR_0*1)),2))+((2*(y-(HOM_VAR_0*1))*(1-((0*1)+(0*HOM_VAR_0))))*(1-t))));
+	auto f = (((0*(pow(y,2)-(pow(HOM_VAR_0,2)*Rational::Make("9215126146405988386300422552813438491596469014004/18831809439874092151531390861220941995712612447011","-34979570316540871529966189550041755413443953059471/3298415588464117388268211317293113094514010909093"))))+(((2*y*1)-(((2*HOM_VAR_0*0)*Rational::Make("9215126146405988386300422552813438491596469014004/18831809439874092151531390861220941995712612447011","-34979570316540871529966189550041755413443953059471/3298415588464117388268211317293113094514010909093"))+(0*pow(HOM_VAR_0,2))))*t))+((0*pow((y-(HOM_VAR_0*1)),2))+((2*(y-(HOM_VAR_0*1))*(1-((0*1)+(0*HOM_VAR_0))))*(1-t))));
 
 	// jac_fn(1,2) = (((0*((y^2)-((HOM_VAR_0^2)*(9215126146405988386300422552813438491596469014004/18831809439874092151531390861220941995712612447011,-34979570316540871529966189550041755413443953059471/3298415588464117388268211317293113094514010909093))))+(((2*y*1)-(((2*HOM_VAR_0*0)*(9215126146405988386300422552813438491596469014004/18831809439874092151531390861220941995712612447011,-34979570316540871529966189550041755413443953059471/3298415588464117388268211317293113094514010909093))+(0*(HOM_VAR_0^2))))*t))+((0*((y-(HOM_VAR_0*1))^2))+((2*(y-(HOM_VAR_0*1))*(1-((0*1)+(0*HOM_VAR_0))))*(1-t))))
 

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with python/test/endgame_test.py.  If not, see <http://www.gnu.org/licenses/>.
 #
-#  Copyright(C) 2016 by Bertini2 Development Team
+#  Copyright(C) Bertini2 Development Team
 #
 #  See <http://www.gnu.org/licenses/> for a copy of the license,
 #  as well as COPYING.  Bertini2 is provided with permitted
@@ -21,25 +21,44 @@
 
 #  individual authors of this file include:
 #
-#   Dani Brake
+#   silviana amethyst
 #   University of Notre Dame
 #
+#  silviana amethyst
+#  UWEC
+#  Spring 2018
+#
+
 
 
 __author__ = 'ofloveandhate'
 
-from pybertini import *
-from pybertini.function_tree.symbol import *
-from pybertini.function_tree.root import *
-from pybertini.function_tree import *
-from pybertini.tracking import *
-from pybertini.tracking.config import *
-from pybertini.endgame import *
-from pybertini.endgame.config import *
+
+
+if __name__ == '__main__':
+    run_tests = True
+else:
+    run_tests = False
+
+
+from bertini import *
+from bertini.function_tree.symbol import *
+from bertini.function_tree.root import *
+from bertini.function_tree import *
+from bertini.tracking import *
+from bertini.tracking.config import *
+from bertini.endgame import *
+from bertini.endgame.config import *
 
 import unittest
 import numpy as np
 import pdb
+import sys
+
+import bertini.system.start_system as ss
+import bertini.multiprec as mp
+from bertini.multiprec import Float as mpfr_float
+from bertini.multiprec import Complex as mpfr_complex
 
 
 class EndgameTest(unittest.TestCase):
@@ -52,9 +71,9 @@ class EndgameTest(unittest.TestCase):
         x = Variable("x");
         y = Variable("y");
         t = Variable("t");
-        #
+
         sys = System();
-        #
+
         var_grp = VariableGroup();
         var_grp.append(x);
         var_grp.append(y);
@@ -70,7 +89,7 @@ class EndgameTest(unittest.TestCase):
         self.assertEqual(sys.is_patched(), 1)
         self.assertEqual(sys.is_homogeneous(), 1)
 
-        td = TotalDegree(sys);
+        td = ss.TotalDegree(sys);
 
         self.assertEqual(td.is_patched(), 1)
         self.assertEqual(td.is_homogeneous(), 1)
@@ -81,13 +100,10 @@ class EndgameTest(unittest.TestCase):
         final_system = (1-t)*sys + gamma*t*td;
         final_system.add_path_variable(t);
 
-        print(final_system)
         prec_config = AMPConfig(final_system);
 
         stepping_pref = SteppingConfig();
         newton_pref = NewtonConfig();
-
-
 
         tracker = AMPTracker(final_system);
 
@@ -95,39 +111,56 @@ class EndgameTest(unittest.TestCase):
         tracker.precision_setup(prec_config);
 
         num_paths_to_track = td.num_start_points();
-        n = int(str(num_paths_to_track));
+        n = int(str(num_paths_to_track)); # this line sucks, wtf.
 
         t_start = mpfr_complex(1);
         t_endgame_boundary = mpfr_complex("0.1");
         t_final = mpfr_complex(0);
 
-        bdry_points = [VectorXmp() for i in range(n)]
+        bdry_points = []
+
         for i in range(n):
             default_precision(self.ambient_precision);
             final_system.precision(self.ambient_precision);
-            start_point = td.start_pointmp(i);
+            start_point = td.start_point_mp(i);
 
-            bdry_pt = VectorXmp();
+            bdry_pt = np.array( np.zeros( (3)).astype(np.int64),dtype=mpfr_complex)
+
             track_success_code = tracker.track_path(bdry_pt,t_start, t_endgame_boundary, start_point);
-            bdry_points[i] = bdry_pt;
+            bdry_points.append(bdry_pt);
 
             self.assertEqual(track_success_code, SuccessCode.Success)
-
 
 
         tracker.setup(Predictor.HeunEuler, 1e-6, 1e5, stepping_pref, newton_pref);
         my_endgame = AMPCauchyEG(tracker);
 
 
-        final_homogenized_solutions = [VectorXmp() for i in range(n)]
+
+        final_homogenized_solutions = [np.empty(dtype=mpfr_complex, shape=(3,)) for i in range(n)]
+
         for i in range(n):
-            default_precision(bdry_points[i][0].precision());
-            final_system.precision(bdry_points[i][0].precision());
-            track_success_code = my_endgame.run(mpfr_complex(t_endgame_boundary),bdry_points[i]);
-            final_homogenized_solutions[i] = my_endgame.final_approximation();
-            print(final_system.dehomogenize_point(final_homogenized_solutions[i]));
+            default_precision(bdry_points[i][0].precision);
+            final_system.precision(bdry_points[i][0].precision);
+
+            bdry_time = mpfr_complex(t_endgame_boundary)
+
+            track_success_code = my_endgame.run(bdry_time,bdry_points[i]) # should be bdry_pts[i], not XXX
+
+            final_homogenized_solutions[i] = my_endgame.final_approximation()
+
             self.assertEqual(track_success_code, SuccessCode.Success)
 
+        dehomogenized_solns = [sys.dehomogenize_point(soln) for soln in final_homogenized_solutions]
 
-if __name__ == '__main__':
-    unittest.main();
+        exact_soln = np.array([mpfr_complex(1), mpfr_complex(1)])
+
+        for soln in dehomogenized_solns:
+            assert mp.abs(np.sqrt(np.sum((exact_soln - soln)**2))) < 1e-10
+
+
+
+if run_tests:
+
+    pgnm = 'this_argument_is_ignored_but_necessary'
+    unittest.main(argv=[pgnm], exit=False)

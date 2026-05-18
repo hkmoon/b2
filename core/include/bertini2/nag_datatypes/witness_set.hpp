@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with bertini2/nag_datatypes/witness_set.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -226,7 +226,7 @@ public:
 			*/
 			bool IsConsistent() const
 			{
-				return (GetSystem().NumVariables() - GetSystem().NumFunctions()) == GetSlice().Dimension();
+				return (GetSystem().NumVariables() - GetSystem().NumNaturalFunctions()) == GetSlice().Dimension();
 			}
 
 

@@ -1,27 +1,29 @@
 //This file is part of Bertini 2.
 //
-//bertini2/nag_algorithms/zero_dim_solve/policies.hpp is free software: you can redistribute it and/or modify
+//bertini2/nag_algorithms/common/policies.hpp is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
 //the Free Software Foundation, either version 3 of the License, or
 //(at your option) any later version.
 //
-//bertini2/nag_algorithms/zero_dim_solve/policies.hpp is distributed in the hope that it will be useful,
+//bertini2/nag_algorithms/common/policies.hpp is distributed in the hope that it will be useful,
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 //
 //You should have received a copy of the GNU General Public License
-//along with bertini2/nag_algorithms/zero_dim_solve/policies.hpp.  If not, see <http://www.gnu.org/licenses/>.
+//along with bertini2/nag_algorithms/common/policies.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
+// individual authors of this file include:
+// silviana amethyst, university of wisconsin-eau claire
 
 /**
-\file bertini2/nag_algorithms/zero_dim_solve/policies.hpp 
+\file bertini2/nag_algorithms/common/policies.hpp 
 
 \brief Provides some policies for the zero dim algorithm.
 
@@ -195,9 +197,9 @@ public:
 			static
 			void FormHomotopy(SystemType & homotopy, SystemType const& target, StartSystemType const& start, std::string const& path_variable_name)
 			{
-				auto t = MakeVariable(path_variable_name); 
+				auto t = node::Variable::Make(path_variable_name); 
 
-				homotopy = (1-t)*target + MakeRational(node::Rational::Rand())*t*start;
+				homotopy = (1-t)*target + node::Rational::Make(node::Rational::Rand())*t*start;
 				homotopy.AddPathVariable(t);
 			}
 

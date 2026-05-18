@@ -13,23 +13,17 @@
 //You should have received a copy of the GNU General Public License
 //along with differentiate_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 //
 //  Created by Collins, James B. on 4/30/15.
 //  Copyright (c) 2015 West Texas A&M University. All rights reserved.
-//
-// also modified by
-//  Dani Brake
-//  University of Notre Dame
-//  ACMS
-//  Spring, Summer 2015, Spring, Summer 2017
 
 #include <iostream>
 
@@ -63,10 +57,9 @@ using Variable = bertini::node::Variable;
 using Node = bertini::node::Node;
 using Function = bertini::node::Function;
 using Jacobian = bertini::node::Jacobian;
-using bertini::MakeVariable;
-using bertini::MakeJacobian;
+
 using dbl = bertini::dbl;
-using mpfr = bertini::mpfr;
+using mpfr = bertini::mpfr_complex;
 using mpfr_float = bertini::mpfr_float;
 /////////// Basic Operations Alone ///////////////////
 
@@ -75,6 +68,7 @@ BOOST_AUTO_TEST_CASE(just_diff_a_function){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
@@ -99,6 +93,7 @@ BOOST_AUTO_TEST_CASE(diff_3xyz){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
@@ -135,7 +130,7 @@ BOOST_AUTO_TEST_CASE(diff_3xyz){
 	BOOST_CHECK(fabs(dz->Eval<mpfr>().real() / exact_mpfr[2].real() -1) < threshold_clearance_mp);
 	BOOST_CHECK(fabs(dz->Eval<mpfr>().imag() / exact_mpfr[2].imag() -1) < threshold_clearance_mp);
 
-	var_mpfr << bertini::complex::rand(),bertini::complex::rand(),bertini::complex::rand();
+	var_mpfr << bertini::multiprecision::rand(),bertini::multiprecision::rand(),bertini::multiprecision::rand();
 	sys.SetVariables<mpfr>(var_mpfr);
 	exact_mpfr[0] = 3*var_mpfr(1)*var_mpfr(2);
 	exact_mpfr[1] = 3*var_mpfr(0)*var_mpfr(2);
@@ -162,6 +157,7 @@ BOOST_AUTO_TEST_CASE(diff_constant){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -209,6 +205,7 @@ BOOST_AUTO_TEST_CASE(diff_sum_xyz_constant){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -255,6 +252,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_times_z_cubed){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -272,7 +270,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_times_z_cubed){
 
 
 	std::vector<dbl> exact_dbl = {2.0*xnum_dbl*pow(ynum_dbl,3.0), 3.0*pow(ynum_dbl*xnum_dbl,2.0), 0.0};
-	std::vector<mpfr> exact_mpfr = {mpfr("2.0")*xnum_mpfr*pow(ynum_mpfr,3.0),mpfr("3.0")*pow(ynum_mpfr,2)*pow(xnum_mpfr,2.0),mpfr("0.0")};
+	std::vector<mpfr> exact_mpfr = {mpfr("2.0")*xnum_mpfr*pow(ynum_mpfr,3),mpfr("3.0")*pow(ynum_mpfr,2)*pow(xnum_mpfr,2),mpfr("0.0")};
 
 	
 
@@ -327,6 +325,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_over_y_cubed){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -347,7 +346,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_over_y_cubed){
 
 
 	std::vector<dbl> exact_dbl = {2.0*xnum_dbl/pow(ynum_dbl,3.0), -3.0*pow(xnum_dbl,2.0)/pow(ynum_dbl,4.0), 0.0};
-	std::vector<mpfr> exact_mpfr = {mpfr("2.0")*xnum_mpfr/pow(ynum_mpfr,3.0),mpfr("-3.0")*pow(xnum_mpfr,2.0)/pow(ynum_mpfr,4.0),mpfr("0.0")};
+	std::vector<mpfr> exact_mpfr = {mpfr("2.0")*xnum_mpfr/pow(ynum_mpfr,3),mpfr("-3.0")*pow(xnum_mpfr,2)/pow(ynum_mpfr,4),mpfr("0.0")};
 
 	BOOST_CHECK(fabs(dx->Eval<dbl>().real() - exact_dbl[0].real() ) < threshold_clearance_d);
 	BOOST_CHECK(fabs(dx->Eval<dbl>().imag() - exact_dbl[0].imag() ) < threshold_clearance_d);
@@ -373,6 +372,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_times_lx_plus_numl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -419,6 +419,7 @@ BOOST_AUTO_TEST_CASE(diff_2y_over_ly_squared_minus_numl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -466,6 +467,7 @@ BOOST_AUTO_TEST_CASE(diff_sin_x){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -512,6 +514,7 @@ BOOST_AUTO_TEST_CASE(diff_cos_y){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -558,6 +561,7 @@ BOOST_AUTO_TEST_CASE(diff_tan_z){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -603,6 +607,7 @@ BOOST_AUTO_TEST_CASE(diff_exp_x){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -647,6 +652,7 @@ BOOST_AUTO_TEST_CASE(diff_log_x){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -692,6 +698,7 @@ BOOST_AUTO_TEST_CASE(diff_sqrt_y){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -739,6 +746,7 @@ BOOST_AUTO_TEST_CASE(diff_lz_plus_3l_cubed){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -784,6 +792,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_plus_y_squared_plus_z_squared){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -833,6 +842,7 @@ BOOST_AUTO_TEST_CASE(diff_sin_lx_squared_times_yl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -877,6 +887,7 @@ BOOST_AUTO_TEST_CASE(diff_cos_lx_squaredl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -920,6 +931,7 @@ BOOST_AUTO_TEST_CASE(diff_tan_lx_over_zl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -961,16 +973,16 @@ BOOST_AUTO_TEST_CASE(diff_tan_lx_over_zl){
 
 BOOST_AUTO_TEST_CASE(arcsine_differentiate)
 {
-	std::shared_ptr<Variable> x = MakeVariable("x");
+	std::shared_ptr<Variable> x = Variable::Make("x");
 	auto N = asin(pow(x,2)+1);
 	auto dx = N->Differentiate(x);
 
 	x->set_current_value<dbl>(xnum_dbl);
-	x->set_current_value<mpfr>(bertini::complex(xstr_real,xstr_imag));
+	x->set_current_value<mpfr>(bertini::mpfr_complex(xstr_real,xstr_imag));
 
 	//(2*x)/(1 - (x^2 + 1)^2)^(1/2)
 	dbl exact_dbl = 2.0*xnum_dbl / pow(1.0 - pow((xnum_dbl*xnum_dbl + 1.0),2),0.5);
-	mpfr exact_mpfr = bertini::complex(2.0)*xnum_mpfr / pow(bertini::complex(1.0) - pow(xnum_mpfr*xnum_mpfr + bertini::complex(1.0),2),mpfr(0.5));
+	mpfr exact_mpfr = bertini::mpfr_complex(2.0)*xnum_mpfr / pow(bertini::mpfr_complex(1.0) - pow(xnum_mpfr*xnum_mpfr + bertini::mpfr_complex(1.0),2),mpfr(0.5));
 
 	BOOST_CHECK(fabs(dx->Eval<dbl>().real() / exact_dbl.real() -1) < threshold_clearance_d);
 	BOOST_CHECK(fabs(dx->Eval<dbl>().imag() / exact_dbl.imag() -1) < threshold_clearance_d);
@@ -981,15 +993,15 @@ BOOST_AUTO_TEST_CASE(arcsine_differentiate)
 
 BOOST_AUTO_TEST_CASE(arccosine_differentiate)
 {
-	std::shared_ptr<Variable> x = MakeVariable("x");
+	std::shared_ptr<Variable> x = Variable::Make("x");
 	auto N = acos(pow(x,2)+1);
 	auto dx = N->Differentiate(x);
 
 	x->set_current_value<dbl>(xnum_dbl);
-	x->set_current_value<mpfr>(bertini::complex(xstr_real,xstr_imag));
+	x->set_current_value<mpfr>(bertini::mpfr_complex(xstr_real,xstr_imag));
 
 	dbl exact_dbl = -2.0*xnum_dbl / pow(1.0 - pow((xnum_dbl*xnum_dbl + 1.0),2),0.5);
-	mpfr exact_mpfr = -bertini::complex(2.0)*xnum_mpfr / pow(bertini::complex(1.0) - pow(xnum_mpfr*xnum_mpfr + bertini::complex(1.0),2),mpfr(0.5));
+	mpfr exact_mpfr = -bertini::mpfr_complex(2.0)*xnum_mpfr / pow(bertini::mpfr_complex(1.0) - pow(xnum_mpfr*xnum_mpfr + bertini::mpfr_complex(1.0),2),mpfr(0.5));
 
 	BOOST_CHECK(fabs(dx->Eval<dbl>().real() / exact_dbl.real() -1) < threshold_clearance_d);
 	BOOST_CHECK(fabs(dx->Eval<dbl>().imag() / exact_dbl.imag() -1) < threshold_clearance_d);
@@ -999,17 +1011,17 @@ BOOST_AUTO_TEST_CASE(arccosine_differentiate)
 
 BOOST_AUTO_TEST_CASE(arctangent_differentiate)
 {
-	std::shared_ptr<Variable> x = MakeVariable("x");
+	std::shared_ptr<Variable> x = Variable::Make("x");
 	auto N = atan(pow(x,2)+1);
 	auto dx = N->Differentiate(x);
 
 
 	x->set_current_value<dbl>(xnum_dbl);
-	x->set_current_value<mpfr>(bertini::complex(xstr_real,xstr_imag));
+	x->set_current_value<mpfr>(bertini::mpfr_complex(xstr_real,xstr_imag));
 
 	//(2*x)/((x^2 + 1)^2 + 1)
 	dbl exact_dbl = 2.0*xnum_dbl / ( pow((xnum_dbl*xnum_dbl + 1.0),2) + 1.0);
-	mpfr exact_mpfr = bertini::complex(2.0)*xnum_mpfr / ( pow((xnum_mpfr*xnum_mpfr + bertini::complex(1.0)),2) + bertini::complex(1.0));
+	mpfr exact_mpfr = bertini::mpfr_complex(2.0)*xnum_mpfr / ( pow((xnum_mpfr*xnum_mpfr + bertini::mpfr_complex(1.0)),2) + bertini::mpfr_complex(1.0));
 
 	BOOST_CHECK(fabs(dx->Eval<dbl>().real() / exact_dbl.real() -1) < threshold_clearance_d);
 	BOOST_CHECK(fabs(dx->Eval<dbl>().imag() / exact_dbl.imag() -1) < threshold_clearance_d);
@@ -1024,8 +1036,8 @@ BOOST_AUTO_TEST_CASE(integer_power)
 
 	DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 
-	std::shared_ptr<Variable> x = MakeVariable("x");
-	std::shared_ptr<Variable> t = MakeVariable("t");
+	std::shared_ptr<Variable> x = Variable::Make("x");
+	std::shared_ptr<Variable> t = Variable::Make("t");
 
 	auto f = pow(x - 1,2)*(1-t) + (pow(x,2) + 1)*t;
 	auto dx = f->Differentiate(x);

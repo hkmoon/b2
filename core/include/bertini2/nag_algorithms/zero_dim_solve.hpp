@@ -1,27 +1,29 @@
 //This file is part of Bertini 2.
 //
-//bertini2/nag_algorithms/zero_dim_solve/algorithm.hpp is free software: you can redistribute it and/or modify
+//bertini2/nag_algorithms/zero_dim_solve.hpp is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
 //the Free Software Foundation, either version 3 of the License, or
 //(at your option) any later version.
 //
-//bertini2/nag_algorithms/zero_dim_solve/algorithm.hpp is distributed in the hope that it will be useful,
+//bertini2/nag_algorithms/zero_dim_solve.hpp is distributed in the hope that it will be useful,
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 //
 //You should have received a copy of the GNU General Public License
-//along with bertini2/nag_algorithms/zero_dim_solve/algorithm.hpp.  If not, see <http://www.gnu.org/licenses/>.
+//along with bertini2/nag_algorithms/zero_dim_solve.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license,
 // as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
+// individual authors of this file include:
+// silviana amethyst, university of wisconsin-eau claire
 
 /**
-\file bertini2/nag_algorithms/zero_dim_solve/algorithm.hpp
+\file bertini2/nag_algorithms/zero_dim_solve.hpp
 
 \brief Provides the algorithm for computing all zero-dimensional solutions for an algberaic system.
 */
@@ -36,6 +38,7 @@
 #include "bertini2/io/generators.hpp"
 
 #include "bertini2/detail/configured.hpp"
+#include "bertini2/detail/observable.hpp"
 
 #include "bertini2/nag_algorithms/common/algorithm_base.hpp"
 #include "bertini2/nag_algorithms/common/config.hpp"
@@ -84,6 +87,152 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 };
 
 
+
+
+using SolnIndT = typename SolnCont<dbl_complex>::size_type;
+
+
+/// metadata structs
+
+struct AlgorithmMetaData
+{	
+	
+	SolnIndT number_path_failures = 0;
+	SolnIndT number_path_successes = 0;
+	SolnIndT number_paths_tracked = 0;
+
+	std::chrono::system_clock::time_point start_time;
+	std::chrono::microseconds elapsed_time;
+};
+
+
+template<typename ComplexType>
+struct SolutionMetaData
+{
+	using SolnIndT = typename SolnCont<ComplexType>::size_type;
+
+	// only vaguely metadata.  artifacts of randomness or ordering
+	SolnIndT path_index;     		// path number of the solution
+	SolnIndT solution_index;      	// solution number
+
+	///// things computed across all of the solve
+	bool precision_changed = false;
+	ComplexType time_of_first_prec_increase;    // time value of the first increase in precision
+	decltype(DefaultPrecision()) max_precision_used = 0;
+
+	///// things computed in pre-endgame only
+	SuccessCode pre_endgame_success = SuccessCode::NeverStarted;     // success code
+
+
+	///// things computed in endgame only
+	NumErrorT condition_number; 				// the latest estimate on the condition number
+	NumErrorT newton_residual; 				// the latest newton residual
+	ComplexType final_time_used;   			// the final value of time tracked to
+	NumErrorT accuracy_estimate; 			// accuracy estimate between extrapolations
+	NumErrorT accuracy_estimate_user_coords;	// accuracy estimate between extrapolations, in natural coordinates
+	unsigned cycle_num;    						// cycle number used in extrapolations
+	SuccessCode endgame_success = SuccessCode::NeverStarted;      // success code
+
+
+	///// things added by post-processing
+	NumErrorT function_residual; 	// the latest function residual
+
+	int multiplicity = 1; 		// multiplicity
+	bool is_real;       		// real flag:  0 - not real, 1 - real
+	bool is_finite;     		// finite flag: -1 - no finite/infinite distinction, 0 - infinite, 1 - finite
+	bool is_singular;       		// singular flag: 0 - non-sigular, 1 - singular
+
+	bool operator==(const SolutionMetaData<ComplexType> & other){ 
+		bool result = 
+			this->path_index == other.path_index
+			 && this->solution_index == other.solution_index
+			 && this->precision_changed == other.precision_changed
+			 && this->time_of_first_prec_increase == other.time_of_first_prec_increase
+			 && this->max_precision_used == other.max_precision_used
+			 && this->pre_endgame_success == other.pre_endgame_success
+			 && this->condition_number == other.condition_number
+			 && this->newton_residual == other.newton_residual
+			 && this->final_time_used == other.final_time_used
+			 && this->accuracy_estimate == other.accuracy_estimate
+			 && this->accuracy_estimate_user_coords == other.accuracy_estimate_user_coords
+			 && this->cycle_num == other.cycle_num
+			 && this->endgame_success == other.endgame_success
+			 && this->function_residual == other.function_residual
+			 && this->multiplicity == other.multiplicity
+			 && this->is_real == other.is_real
+			 && this->is_finite == other.is_finite
+			 && this->is_singular == other.is_singular
+		;
+
+		return result; }
+};
+
+// this is for interoperability with vectors of these in the Python bindings, for better or for worse.
+template<typename NumT>
+std::ostream& operator<<(std::ostream & out, const SolutionMetaData<NumT> & meta){
+	out << "path_index = " << meta.path_index << std::endl;
+	out << "solution_index = " << meta.solution_index << std::endl;
+
+	out << "precision_changed = " << meta.precision_changed << std::endl;
+	out << "time_of_first_prec_increase = " << meta.time_of_first_prec_increase << std::endl;
+	out << "max_precision_used = " << meta.max_precision_used << std::endl;
+
+	out << "pre_endgame_success = " << meta.pre_endgame_success << std::endl;
+
+	out << "condition_number = " << meta.condition_number << std::endl;
+	out << "newton_residual = " << meta.newton_residual << std::endl;
+	out << "final_time_used = " << meta.final_time_used << std::endl;
+	out << "accuracy_estimate = " << meta.accuracy_estimate << std::endl;
+	out << "accuracy_estimate_user_coords = " << meta.accuracy_estimate_user_coords << std::endl;
+	out << "cycle_num = " << meta.cycle_num << std::endl;
+	out << "endgame_success = " << meta.endgame_success << std::endl;
+
+	out << "function_residual = " << meta.function_residual << std::endl;
+
+	out << "multiplicity = " << meta.multiplicity << std::endl;
+	out << "is_real = " << meta.is_real << std::endl;
+	out << "is_finite = " << meta.is_finite << std::endl;
+	out << "is_singular = " << meta.is_singular << std::endl;
+
+	return out;
+}
+
+
+template<typename ComplexType>
+struct EGBoundaryMetaData
+{	
+	using RealType = typename NumTraits<ComplexType>::Real;
+
+	Vec<ComplexType> path_point;
+	SuccessCode success_code = SuccessCode::NeverStarted;
+	RealType last_used_stepsize;
+
+	EGBoundaryMetaData() = default;
+	EGBoundaryMetaData(EGBoundaryMetaData const&) = default;
+	EGBoundaryMetaData(Vec<ComplexType> const& pt, SuccessCode const& code, RealType const& ss) :
+		path_point(pt), success_code(code), last_used_stepsize(ss)
+	{}
+	
+	bool operator==(const EGBoundaryMetaData<ComplexType> & other){
+		bool result = 
+			this->path_point == other.path_point
+			&& this->success_code == other.success_code
+			&& this->last_used_stepsize == other.last_used_stepsize
+		;
+
+		return result;
+	}
+};
+
+// this is for interoperability with vectors of these in the Python bindings, for better or for worse.
+template<typename NumT>
+std::ostream& operator<<(std::ostream & out, const EGBoundaryMetaData<NumT> & meta){
+	out << "path_point = " << meta.path_point << std::endl;
+	out << "success_code = " << meta.success_code << std::endl;
+	out << "last_used_stepsize = " << meta.last_used_stepsize << std::endl;
+	return out;
+}
+
 /**
 \brief the basic zero dim algorithm, which solves a system.
 */
@@ -92,12 +241,19 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 					template<typename,typename> class SystemManagementP>
 		struct ZeroDim :
 							public virtual AnyZeroDim,
-							public Observable<>,
+							public Observable,
 							public SystemManagementP<SystemType, StartSystemType>,
 							public detail::Configured<
 								typename AlgoTraits< ZeroDim<TrackerType, EndgameType, SystemType, StartSystemType, SystemManagementP>>::NeededConfigs>
 		{
-			BERTINI_DEFAULT_VISITABLE();
+			// these usings are for getters in python
+			using TrackerT          = TrackerType;
+			using EndgameT          = EndgameType;
+			using SystemT           = SystemType;
+			using StartSystemT       = StartSystemType;
+
+
+
 
 /// a bunch of using statements to reduce typing.
 			using BaseComplexType 	= typename tracking::TrackerTraits<TrackerType>::BaseComplexType;
@@ -106,8 +262,6 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 			using PrecisionConfig 	= typename tracking::TrackerTraits<TrackerType>::PrecisionConfig;
 
 			using SolnIndT 			= typename SolnCont<BaseComplexType>::size_type;
-
-
 
 			using SystemManagementPolicy = SystemManagementP<SystemType, StartSystemType>;
 
@@ -125,82 +279,14 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 			using ZeroDimConf = ZeroDimConfig<BaseComplexType>;
 			using AutoRetrack = AutoRetrackConfig;
 
-/// metadata structs
 
-			struct AlgorithmMetaData
-			{
-				SolnIndT number_path_failures = 0;
-				SolnIndT number_path_successes = 0;
-				SolnIndT number_paths_tracked = 0;
-
-				std::chrono::system_clock::time_point start_time;
-				std::chrono::microseconds elapsed_time;
-			};
-
-
-
-			struct SolutionMetaData
-			{
-
-				// only vaguely metadata.  artifacts of randomness or ordering
-				SolnIndT path_index;     		// path number of the solution
-				SolnIndT solution_index;      	// solution number
-
-				///// things computed across all of the solve
-				bool precision_changed = false;
-				BaseComplexType time_of_first_prec_increase;    // time value of the first increase in precision
-				decltype(DefaultPrecision()) max_precision_used = 0;
-
-
-
-				///// things computed in pre-endgame only
-				SuccessCode pre_endgame_success = SuccessCode::NeverStarted;     // success code
-
-
-
-
-
-				///// things computed in endgame only
-				NumErrorT condition_number; 				// the latest estimate on the condition number
-				NumErrorT newton_residual; 				// the latest newton residual
-				BaseComplexType final_time_used;   			// the final value of time tracked to
-				NumErrorT accuracy_estimate; 			// accuracy estimate between extrapolations
-				NumErrorT accuracy_estimate_user_coords;	// accuracy estimate between extrapolations, in natural coordinates
-				unsigned cycle_num;    						// cycle number used in extrapolations
-				SuccessCode endgame_success = SuccessCode::NeverStarted;      // success code
-
-
-
-
-				///// things added by post-processing
-				NumErrorT function_residual; 	// the latest function residual
-
-				int multiplicity = 1; 		// multiplicity
-				bool is_real;       		// real flag:  0 - not real, 1 - real
-				bool is_finite;     		// finite flag: -1 - no finite/infinite distinction, 0 - infinite, 1 - finite
-				bool is_singular;       		// singular flag: 0 - non-sigular, 1 - singular
-			};
-
-
-			struct EGBoundaryMetaData
-			{
-				Vec<BaseComplexType> path_point;
-				SuccessCode success_code = SuccessCode::NeverStarted;
-				BaseRealType last_used_stepsize;
-
-				EGBoundaryMetaData() = default;
-				EGBoundaryMetaData(EGBoundaryMetaData const&) = default;
-				EGBoundaryMetaData(Vec<BaseComplexType> const& pt, SuccessCode const& code, BaseRealType const& ss) :
-					path_point(pt), success_code(code), last_used_stepsize(ss)
-				{}
-					
-			};
-
+			using EGBoundaryMetaDataT = EGBoundaryMetaData<BaseComplexType>;
+			using SolutionMetaDataT = SolutionMetaData<BaseComplexType>;
 
 
 // a few more using statements
 
-			using MidpathType = MidpathChecker<BaseRealType, BaseComplexType, EGBoundaryMetaData>;
+			using MidpathType = MidpathChecker<BaseRealType, BaseComplexType, EGBoundaryMetaData<BaseComplexType>>;
 
 			using SystemManagementPolicy::TargetSystem;
 			using SystemManagementPolicy::StartSystem;
@@ -527,8 +613,8 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 					// if you can think of a way to replace this `if` with something meta, please do so.
 					if (tracking::TrackerTraits<TrackerType>::IsAdaptivePrec)
 					{
-						GetTracker().AddObserver(&first_prec_rec_);
-						GetTracker().AddObserver(&min_max_prec_);
+						GetTracker().AddObserver(first_prec_rec_);
+						GetTracker().AddObserver(min_max_prec_);
 					}
 
 					auto& smd = solution_final_metadata_[soln_ind];
@@ -544,7 +630,7 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 				Vec<BaseComplexType> result;
 				auto tracking_success = GetTracker().TrackPath(result, t_start, t_endgame_boundary, start_point);
 
-				solutions_at_endgame_boundary_[soln_ind] = EGBoundaryMetaData({ result, tracking_success, GetTracker().CurrentStepsize() });
+				solutions_at_endgame_boundary_[soln_ind] = EGBoundaryMetaDataT({ result, tracking_success, GetTracker().CurrentStepsize() });
 
 					smd.pre_endgame_success = tracking_success;
 
@@ -557,8 +643,8 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 							smd.time_of_first_prec_increase = first_prec_rec_.TimeOfIncrease();
 						}
 						else
-						GetTracker().RemoveObserver(&first_prec_rec_);
-						GetTracker().RemoveObserver(&min_max_prec_);
+						GetTracker().RemoveObserver(first_prec_rec_);
+						GetTracker().RemoveObserver(min_max_prec_);
 						using std::max;
 						smd.max_precision_used =
 							max(smd.max_precision_used, min_max_prec_.MaxPrecision());
@@ -631,8 +717,8 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 					if (tracking::TrackerTraits<TrackerType>::IsAdaptivePrec)
 					{
 						if (!smd.precision_changed)
-							GetTracker().AddObserver(&first_prec_rec_);
-						GetTracker().AddObserver(&min_max_prec_);
+							GetTracker().AddObserver(first_prec_rec_);
+						GetTracker().AddObserver(min_max_prec_);
 					}
 
 				const auto& bdry_point = solutions_at_endgame_boundary_[soln_ind].path_point;
@@ -641,10 +727,14 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 				GetTracker().SetStepSize(solutions_at_endgame_boundary_[soln_ind].last_used_stepsize);
 				GetTracker().ReinitializeInitialStepSize(false);
 
-				DefaultPrecision(Precision(bdry_point));
-				// we make these fresh so they are in the correct precision to start.
+				auto start_prec = Precision(bdry_point);
+
+				DefaultPrecision(start_prec);
+
 				BaseComplexType t_end = this->template Get<ZeroDimConf>().target_time;
+
 				BaseComplexType t_endgame_boundary = this->template Get<ZeroDimConf>().endgame_boundary;
+				Precision(t_endgame_boundary,start_prec);
 
 				auto eg_success = GetEndgame().Run(t_endgame_boundary, bdry_point, t_end);
 
@@ -664,8 +754,8 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 								smd.time_of_first_prec_increase = first_prec_rec_.TimeOfIncrease();
 							}
 						}
-						GetTracker().RemoveObserver(&first_prec_rec_);
-						GetTracker().RemoveObserver(&min_max_prec_);
+						GetTracker().RemoveObserver(first_prec_rec_);
+						GetTracker().RemoveObserver(min_max_prec_);
 						using std::max;
 						smd.max_precision_used =
 							max(smd.max_precision_used, min_max_prec_.MaxPrecision());
@@ -681,11 +771,11 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 					smd.condition_number = GetTracker().LatestConditionNumber();
 					smd.newton_residual = GetTracker().LatestNormOfStep();
 
-					smd.accuracy_estimate = GetEndgame().template ApproximateError();
+					smd.accuracy_estimate = GetEndgame().ApproximateError();
 					smd.accuracy_estimate_user_coords =
 						static_cast<NumErrorT>( (TargetSystem().DehomogenizePoint(solutions_post_endgame_[soln_ind]) -
 						TargetSystem().DehomogenizePoint(GetEndgame().template PreviousApproximation<BaseComplexType>())).template lpNorm<Eigen::Infinity>() );
-					smd.cycle_num = GetEndgame().template CycleNumber();
+					smd.cycle_num = GetEndgame().CycleNumber();
 					// end metadata gathering
 			}
 
@@ -757,9 +847,9 @@ struct AnyZeroDim : public virtual AnyAlgorithm
 
 
 			/// computed data
-			SolnCont< EGBoundaryMetaData > solutions_at_endgame_boundary_; // the BaseRealType is the last used stepsize
+			SolnCont< EGBoundaryMetaDataT > solutions_at_endgame_boundary_; // the BaseRealType is the last used stepsize
 			SolnCont<Vec<BaseComplexType> > solutions_post_endgame_;
-			SolnCont<SolutionMetaData> solution_final_metadata_;
+			SolnCont<SolutionMetaDataT> solution_final_metadata_;
 
 
 		}; // struct ZeroDim

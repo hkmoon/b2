@@ -13,25 +13,19 @@
 //You should have received a copy of the GNU General Public License
 //along with system_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 
 //  system_test.cpp
 //
 //  Created by Collins, James B. on 4/30/15.
 //  Copyright (c) 2015 West Texas A&M University. All rights reserved.
-//
-// also modified by
-//  Dani Brake
-//  University of Notre Dame
-//  ACMS
-//  Spring, Summer 2015, Spring 2017
 
 /**
 \file system_test.cpp Unit testing for the bertini::System class.
@@ -47,12 +41,16 @@
 
 #include "externs.hpp"
 
+namespace utf = boost::unit_test;
 
+using Variable = bertini::node::Variable;
 
 
 BOOST_AUTO_TEST_SUITE(system_class)
 
 using Var = std::shared_ptr<bertini::node::Variable>;
+
+using mpfr = bertini::mpfr_complex;
 
 using namespace bertini;
 /**
@@ -181,7 +179,7 @@ BOOST_AUTO_TEST_CASE(system_parse_around_the_unit_circle_alt)
 */
 BOOST_AUTO_TEST_CASE(system_differentiate_x)
 {
-	Var x = MakeVariable("x");
+	Var x = Variable::Make("x");
 	auto f1 = pow(x,2);
 	auto f2 = x-1;
 
@@ -206,8 +204,8 @@ BOOST_AUTO_TEST_CASE(system_differentiate_x)
 */
 BOOST_AUTO_TEST_CASE(system_differentiate_x_and_y)
 {
-	Var x = MakeVariable("x");
-	Var y = MakeVariable("y");
+	Var x = Variable::Make("x");
+	Var y = Variable::Make("y");
 	auto f1 = pow(x,2)*y/2;
 	auto f2 = x-y;
 
@@ -232,8 +230,8 @@ BOOST_AUTO_TEST_CASE(system_differentiate_x_and_y)
 */
 BOOST_AUTO_TEST_CASE(system_differentiate_x_and_t)
 {
-	Var x = MakeVariable("x");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var t = Variable::Make("t");
 	auto f1 = (1-t)*x + t*(1-x);
 	auto f2 = x-t;
 
@@ -246,7 +244,7 @@ BOOST_AUTO_TEST_CASE(system_differentiate_x_and_t)
 	Vec<dbl> v(1);
 	v << 1.0;
 	dbl time(0.5,0.2);
-	auto J = S.Jacobian(v,time);
+	bertini::Mat<dbl> J = S.Jacobian(v,time);
 
 	BOOST_CHECK_THROW(S.Jacobian(v), std::runtime_error);
 }
@@ -260,11 +258,11 @@ BOOST_AUTO_TEST_CASE(system_differentiate_x_and_t)
 */
 BOOST_AUTO_TEST_CASE(system_homogenize_multiple_variable_groups)
 {
-	Var x1 = MakeVariable("x1");
-	Var x2 = MakeVariable("x2");
+	Var x1 = Variable::Make("x1");
+	Var x2 = Variable::Make("x2");
 
-	Var y1 = MakeVariable("y1");
-	Var y2 = MakeVariable("y2");
+	Var y1 = Variable::Make("y1");
+	Var y2 = Variable::Make("y2");
 
 
 	bertini::VariableGroup v1{x1, x2};
@@ -298,11 +296,11 @@ BOOST_AUTO_TEST_CASE(system_homogenize_multiple_variable_groups)
 */
 BOOST_AUTO_TEST_CASE(system_reorder_by_degree_decreasing)
 {
-	Var x1 = MakeVariable("x1");
-	Var x2 = MakeVariable("x2");
+	Var x1 = Variable::Make("x1");
+	Var x2 = Variable::Make("x2");
 
-	Var y1 = MakeVariable("y1");
-	Var y2 = MakeVariable("y2");
+	Var y1 = Variable::Make("y1");
+	Var y2 = Variable::Make("y2");
 
 
 	bertini::VariableGroup v1{x1, x2};
@@ -341,11 +339,11 @@ BOOST_AUTO_TEST_CASE(system_reorder_by_degree_decreasing)
 */
 BOOST_AUTO_TEST_CASE(system_reorder_by_degree_increasing)
 {
-	Var x1 = MakeVariable("x1");
-	Var x2 = MakeVariable("x2");
+	Var x1 = Variable::Make("x1");
+	Var x2 = Variable::Make("x2");
 
-	Var y1 = MakeVariable("y1");
-	Var y2 = MakeVariable("y2");
+	Var y1 = Variable::Make("y1");
+	Var y2 = Variable::Make("y2");
 
 
 	bertini::VariableGroup v1{x1, x2};
@@ -445,9 +443,9 @@ BOOST_AUTO_TEST_CASE(system_evaluate_mpfr)
 
 BOOST_AUTO_TEST_CASE(system_jacobian)
 {
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
-	auto z = MakeVariable("z");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
+	auto z = Variable::Make("z");
 
 	System sys;
 
@@ -465,13 +463,22 @@ BOOST_AUTO_TEST_CASE(system_jacobian)
 
 	auto J = sys.Jacobian(v);
 
-	BOOST_CHECK_SMALL(abs(J(0,0)- 2.*a*pow(b,3)*pow(c,4)), 1e-15);
-	BOOST_CHECK_SMALL(abs(J(0,1)- 3.*pow(a,2)*pow(b,2)*pow(c,4)), 1e-15);
-	BOOST_CHECK_SMALL(abs(J(0,2)- 4.*pow(a,2)*pow(b,3)*pow(c,3)), 1e-15);
 
-	BOOST_CHECK_SMALL(abs(J(1,0)- 3.*pow(a,2)*pow(b,4)*pow(c,5)), 1e-15);
-	BOOST_CHECK_SMALL(abs(J(1,1)- 4.*pow(a,3)*pow(b,3)*pow(c,5)), 1e-15);
-	BOOST_CHECK_SMALL(abs(J(1,2)- 5.*pow(a,3)*pow(b,4)*pow(c,4)), 1e-15);
+	BOOST_CHECK_SMALL(J(0,0).real() - (2.*a*pow(b,3)*pow(c,4)).real(),        1e-15);
+	BOOST_CHECK_SMALL(J(0,1).real() - (3.*pow(a,2)*pow(b,2)*pow(c,4)).real(), 1e-15);
+	BOOST_CHECK_SMALL(J(0,2).real() - (4.*pow(a,2)*pow(b,3)*pow(c,3)).real(), 1e-15);
+
+	BOOST_CHECK_SMALL(J(1,0).real() - (3.*pow(a,2)*pow(b,4)*pow(c,5)).real(), 1e-15);
+	BOOST_CHECK_SMALL(J(1,1).real() - (4.*pow(a,3)*pow(b,3)*pow(c,5)).real(), 1e-15);
+	BOOST_CHECK_SMALL(J(1,2).real() - (5.*pow(a,3)*pow(b,4)*pow(c,4)).real(), 1e-15);
+
+	BOOST_CHECK_SMALL(J(0,0).imag() - (2.*a*pow(b,3)*pow(c,4)).imag(),        1e-15);
+	BOOST_CHECK_SMALL(J(0,1).imag() - (3.*pow(a,2)*pow(b,2)*pow(c,4)).imag(), 1e-15);
+	BOOST_CHECK_SMALL(J(0,2).imag() - (4.*pow(a,2)*pow(b,3)*pow(c,3)).imag(), 1e-15);
+
+	BOOST_CHECK_SMALL(J(1,0).imag() - (3.*pow(a,2)*pow(b,4)*pow(c,5)).imag(), 1e-15);
+	BOOST_CHECK_SMALL(J(1,1).imag() - (4.*pow(a,3)*pow(b,3)*pow(c,5)).imag(), 1e-15);
+	BOOST_CHECK_SMALL(J(1,2).imag() - (5.*pow(a,3)*pow(b,4)*pow(c,4)).imag(), 1e-15);
 
 
 }
@@ -484,16 +491,16 @@ BOOST_AUTO_TEST_CASE(system_jacobian)
 BOOST_AUTO_TEST_CASE(add_two_systems)
 {
 	bertini::System sys1, sys2;
-	Var x = MakeVariable("x"), y = MakeVariable("y");
+	Var x = Variable::Make("x"), y = Variable::Make("y");
 
 	VariableGroup vars;
 	vars.push_back(x); vars.push_back(y);
 
-	sys1.AddVariableGroup(vars);  
+	sys1.AddVariableGroup(vars);
 	sys1.AddFunction(y+1);
 	sys1.AddFunction(x*y);
 
-	sys2.AddVariableGroup(vars);  
+	sys2.AddVariableGroup(vars);
 	sys2.AddFunction(-y-1);
 	sys2.AddFunction(-x*y);
 
@@ -522,6 +529,306 @@ BOOST_AUTO_TEST_CASE(add_two_systems)
 }
 
 
+/**
+\class bertini::System
+\test \b add_two_systems_evaluated_in_mpfr Sibling of add_two_systems, but
+exercises the Vec<mpfr> evaluation path. This is the C++ analog of the
+Python test_add_systems that surfaced the macos-15-intel SIGABRT — the C++
+suite previously only covered the Vec<dbl> path.
+*/
+BOOST_AUTO_TEST_CASE(add_two_systems_evaluated_in_mpfr)
+{
+	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
+
+	bertini::System sys1, sys2;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys1.AddVariableGroup(vars);
+	sys1.AddFunction(y+1);
+	sys1.AddFunction(x*y);
+
+	sys2.AddVariableGroup(vars);
+	sys2.AddFunction(-y-1);
+	sys2.AddFunction(-x*y);
+
+	sys1+=sys2;
+
+	Vec<mpfr> values(2);
+	values << mpfr(2), mpfr(3);
+
+	auto v = sys1.Eval(values);
+
+	BOOST_CHECK_EQUAL(v(0), mpfr(0));
+	BOOST_CHECK_EQUAL(v(1), mpfr(0));
+}
+
+
+/**
+\class bertini::System
+\test \b add_system_to_self_doubles_under_function_tree_eval Self-add of a
+System should double every function. Forces FunctionTree eval to bypass any
+SLP caching, isolating the question "does the symbolic mutation in
+operator+= work for an aliased rhs?" to just the function-tree level.
+*/
+BOOST_AUTO_TEST_CASE(add_system_to_self_doubles_under_function_tree_eval)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys.AddVariableGroup(vars);
+	sys.AddFunction(y+1);
+	sys.AddFunction(x*y);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
+
+	Vec<dbl> values(2);
+	values << dbl(2.0), dbl(3.0);
+	auto before = sys.Eval(values);   // [4, 6]
+
+	sys += sys;                       // self-add
+
+	auto after = sys.Eval(values);    // expected [8, 12]
+	BOOST_CHECK_EQUAL(after(0), 2.0 * before(0));
+	BOOST_CHECK_EQUAL(after(1), 2.0 * before(1));
+}
+
+
+/**
+\class bertini::System
+\test \b operator_plus_equals_invalidates_slp_cache System::operator+=
+mutates each Function's entry_node_ via SetRoot. The cached
+StraightLineProgram (the default eval method) is built lazily on first
+Differentiate(); if we don't invalidate is_differentiated_ here, a
+subsequent Eval reads stale values. Pin this so it doesn't regress.
+*/
+BOOST_AUTO_TEST_CASE(operator_plus_equals_invalidates_slp_cache)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys.AddVariableGroup(vars);
+	sys.AddFunction(y+1);
+	sys.AddFunction(x*y);
+
+	Vec<dbl> values(2);
+	values << dbl(2.0), dbl(3.0);
+	(void) sys.Eval(values);          // primes the SLP cache: [y+1, x*y]
+
+	sys += sys;                       // mutates tree to [2(y+1), 2xy] but cache stale
+
+	auto after = sys.Eval(values);    // expected [8, 12], currently [4, 6]
+	BOOST_CHECK_EQUAL(after(0), dbl(8.0));
+	BOOST_CHECK_EQUAL(after(1), dbl(12.0));
+}
+
+
+/**
+\class bertini::System
+\test \b operator_mult_equals_invalidates_slp_cache Sibling of the
+operator+= cache-invalidation test. operator*= multiplies each function
+by a Node and must also invalidate is_differentiated_.
+*/
+BOOST_AUTO_TEST_CASE(operator_mult_equals_invalidates_slp_cache)
+{
+	using bertini::node::Float;
+
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys.AddVariableGroup(vars);
+	sys.AddFunction(x+y);
+
+	Vec<dbl> values(2);
+	values << dbl(1.0), dbl(2.0);
+	(void) sys.Eval(values);          // primes SLP for f = x+y
+
+	sys *= Float::Make("3.0");        // f should now be 3*(x+y)
+
+	auto after = sys.Eval(values);    // expected [9], currently [3]
+	BOOST_CHECK_EQUAL(after(0), dbl(9.0));
+}
+
+
+/**
+\class bertini::System
+\test \b reorder_functions_decreasing_invalidates_slp_cache The function
+ordering inside the SLP corresponds to the order of functions_ at SLP
+build time. ReorderFunctionsByDegreeDecreasing swaps entries in functions_
+and must invalidate is_differentiated_ so the SLP is rebuilt to match.
+*/
+BOOST_AUTO_TEST_CASE(reorder_functions_decreasing_invalidates_slp_cache)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+	sys.AddVariableGroup(vars);
+
+	sys.AddFunction(x+y);             // degree 1, initially at position 0
+	sys.AddFunction(x*y);             // degree 2, initially at position 1
+
+	Vec<dbl> values(2);
+	values << dbl(2.0), dbl(3.0);
+	(void) sys.Eval(values);          // primes SLP with the [degree1, degree2] order
+
+	sys.ReorderFunctionsByDegreeDecreasing();   // now [degree2, degree1] = [x*y, x+y]
+
+	auto after = sys.Eval(values);
+	BOOST_CHECK_EQUAL(after(0), dbl(6.0));      // x*y at position 0
+	BOOST_CHECK_EQUAL(after(1), dbl(5.0));      // x+y at position 1
+}
+
+
+/**
+\class bertini::System
+\test \b reorder_functions_increasing_invalidates_slp_cache Sibling of the
+decreasing test. Reorders an already-cached system into ascending degree
+order and verifies the SLP follows.
+*/
+BOOST_AUTO_TEST_CASE(reorder_functions_increasing_invalidates_slp_cache)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+	sys.AddVariableGroup(vars);
+
+	sys.AddFunction(x*y);             // degree 2, initially at position 0
+	sys.AddFunction(x+y);             // degree 1, initially at position 1
+
+	Vec<dbl> values(2);
+	values << dbl(2.0), dbl(3.0);
+	(void) sys.Eval(values);          // primes SLP with the [degree2, degree1] order
+
+	sys.ReorderFunctionsByDegreeIncreasing();   // now [degree1, degree2] = [x+y, x*y]
+
+	auto after = sys.Eval(values);
+	BOOST_CHECK_EQUAL(after(0), dbl(5.0));      // x+y at position 0
+	BOOST_CHECK_EQUAL(after(1), dbl(6.0));      // x*y at position 1
+}
+
+
+/**
+\class bertini::System
+\test \b eval_wrong_size_input_throws Verifies that passing a variable
+vector of the wrong size to System::Eval throws std::runtime_error rather
+than reading past the end or producing garbage.
+*/
+BOOST_AUTO_TEST_CASE(eval_wrong_size_input_throws)
+{
+	bertini::System sys;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	sys.AddVariableGroup(vars);
+	sys.AddFunction(x+y);
+
+	Vec<dbl> too_small(1);
+	too_small << dbl(1.0);
+	BOOST_CHECK_THROW(sys.Eval(too_small), std::runtime_error);
+
+	Vec<dbl> too_big(3);
+	too_big << dbl(1.0), dbl(2.0), dbl(3.0);
+	BOOST_CHECK_THROW(sys.Eval(too_big), std::runtime_error);
+}
+
+
+/**
+\class bertini::System
+\test \b add_systems_chain Verifies operator+= return-by-reference and that
+chained += accumulates correctly. C++ groups `a += b += c` as `a += (b += c)`,
+so b is mutated to b+c, then a becomes a+b+c.
+*/
+BOOST_AUTO_TEST_CASE(add_systems_chain)
+{
+	bertini::System sys1, sys2, sys3;
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+
+	VariableGroup vars;
+	vars.push_back(x); vars.push_back(y);
+
+	for (auto* s : {&sys1, &sys2, &sys3})
+		s->AddVariableGroup(vars);
+
+	sys1.AddFunction(x);       sys1.AddFunction(y);
+	sys2.AddFunction(y);       sys2.AddFunction(x);
+	sys3.AddFunction(x*y);     sys3.AddFunction(x+y);
+
+	sys1 += sys2 += sys3;      // sys2 becomes sys2+sys3; sys1 becomes sys1+sys2+sys3
+
+	Vec<dbl> v(2);
+	v << dbl(2.0), dbl(3.0);
+
+	// sys1 originally: [x, y] = [2, 3]
+	// sys2 originally: [y, x] = [3, 2]
+	// sys3 originally: [xy, x+y] = [6, 5]
+	// sys1 final:      [2+3+6, 3+2+5] = [11, 10]
+	auto v1 = sys1.Eval(v);
+	BOOST_CHECK_EQUAL(v1(0), dbl(11.0));
+	BOOST_CHECK_EQUAL(v1(1), dbl(10.0));
+
+	// sys2 final:      [3+6, 2+5] = [9, 7]
+	auto v2 = sys2.Eval(v);
+	BOOST_CHECK_EQUAL(v2(0), dbl(9.0));
+	BOOST_CHECK_EQUAL(v2(1), dbl(7.0));
+}
+
+
+/**
+\class bertini::System
+\test \b add_incompatible_systems_throws Exercises the four guard clauses in
+System::operator+= for mismatched function count, variable count, and
+variable group count. Each branch should throw std::runtime_error.
+*/
+BOOST_AUTO_TEST_CASE(add_incompatible_systems_throws)
+{
+	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
+
+	VariableGroup vars2; vars2.push_back(x); vars2.push_back(y);
+	VariableGroup vars3; vars3.push_back(x); vars3.push_back(y); vars3.push_back(z);
+
+	// Mismatched function count: 2 fns vs 1 fn, same vars.
+	{
+		bertini::System a, b;
+		a.AddVariableGroup(vars2);  a.AddFunction(x);  a.AddFunction(y);
+		b.AddVariableGroup(vars2);  b.AddFunction(x+y);
+		BOOST_CHECK_THROW(a += b, std::runtime_error);
+	}
+
+	// Mismatched variable count: 2 vars vs 3 vars, same fn count.
+	{
+		bertini::System a, b;
+		a.AddVariableGroup(vars2);  a.AddFunction(x+y);
+		b.AddVariableGroup(vars3);  b.AddFunction(x+y+z);
+		BOOST_CHECK_THROW(a += b, std::runtime_error);
+	}
+
+	// Mismatched variable group count: one VG of 2 vs two VGs of 1 each.
+	{
+		VariableGroup vg_x; vg_x.push_back(x);
+		VariableGroup vg_y; vg_y.push_back(y);
+		bertini::System a, b;
+		a.AddVariableGroup(vars2);              a.AddFunction(x+y);
+		b.AddVariableGroup(vg_x);  b.AddVariableGroup(vg_y);  b.AddFunction(x+y);
+		BOOST_CHECK_THROW(a += b, std::runtime_error);
+	}
+}
+
 
 /**
 \class bertini::System
@@ -529,8 +836,8 @@ BOOST_AUTO_TEST_CASE(add_two_systems)
 */
 BOOST_AUTO_TEST_CASE(system_differentiate_wrt_time_linear)
 {
-	Var x = MakeVariable("x");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var t = Variable::Make("t");
 	auto f1 = (1-t)*x + t*(1-x);
 	auto f2 = x-t;
 
@@ -545,8 +852,8 @@ BOOST_AUTO_TEST_CASE(system_differentiate_wrt_time_linear)
 	dbl time(0.5,0.2);
 	auto dS_dt = S.TimeDerivative(v,time);
 
-	BOOST_CHECK( abs(dS_dt(0) - dbl(-1) ) < threshold_clearance_d);
-	BOOST_CHECK( abs(dS_dt(1) - dbl(-1) ) < threshold_clearance_d);
+	BOOST_CHECK_CLOSE( dS_dt(0).real(), dbl(-1).real(), threshold_clearance_d);
+	BOOST_CHECK_CLOSE( dS_dt(1).imag(), dbl(-1).imag(), threshold_clearance_d);
 
 
 }
@@ -562,7 +869,7 @@ BOOST_AUTO_TEST_CASE(system_differentiate_wrt_time_linear)
 BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_one_aff_group)
 {
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y");
+	Var x = Variable::Make("x"), y = Variable::Make("y");
 	VariableGroup vars{x, y};
 	sys.AddVariableGroup(vars);
 
@@ -587,8 +894,8 @@ BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_one_aff_group)
 BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_two_aff_groups)
 {
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y");
-	Var z = MakeVariable("z"), w = MakeVariable("w");
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+	Var z = Variable::Make("z"), w = Variable::Make("w");
 	VariableGroup vars{x, y};
 	VariableGroup vars2{z, w};
 	sys.AddVariableGroup(vars);
@@ -621,9 +928,9 @@ BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_two_aff_groups)
 BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_two_aff_groups_one_hom_group)
 {
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y");
-	Var z = MakeVariable("z"), w = MakeVariable("w");
-	Var h1 = MakeVariable("h1"), h2 = MakeVariable("h2");
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+	Var z = Variable::Make("z"), w = Variable::Make("w");
+	Var h1 = Variable::Make("h1"), h2 = Variable::Make("h2");
 	VariableGroup vars{x, y};
 	VariableGroup vars2{h1,h2};
 	VariableGroup vars3{z, w};
@@ -662,7 +969,7 @@ BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_two_aff_groups_one_hom_group)
 BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_one_hom_group)
 {
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y");
+	Var x = Variable::Make("x"), y = Variable::Make("y");
 	VariableGroup vars{x, y};
 	sys.AddHomVariableGroup(vars);
 
@@ -687,8 +994,8 @@ BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_one_hom_group)
 BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_one_hom_group_two_ungrouped_vars)
 {
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y");
-	Var z = MakeVariable("z"), w = MakeVariable("w");
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+	Var z = Variable::Make("z"), w = Variable::Make("w");
 	VariableGroup vars{x, y};
 
 	sys.AddHomVariableGroup(vars);
@@ -717,10 +1024,10 @@ BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_one_hom_group_two_ungrouped_vars)
 BOOST_AUTO_TEST_CASE(system_dehomogenize_FIFO_one_aff_group_two_ungrouped_vars_another_aff_grp_hom_grp)
 {
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y");
-	Var z = MakeVariable("z"), w = MakeVariable("w");
-	Var h1 = MakeVariable("h1"), h2 = MakeVariable("h2");
-	Var u1 = MakeVariable("u1"), u2 = MakeVariable("u2");
+	Var x = Variable::Make("x"), y = Variable::Make("y");
+	Var z = Variable::Make("z"), w = Variable::Make("w");
+	Var h1 = Variable::Make("h1"), h2 = Variable::Make("h2");
+	Var u1 = Variable::Make("u1"), u2 = Variable::Make("u2");
 
 	VariableGroup vars{x,y};
 	VariableGroup vars2{z,w};
@@ -775,8 +1082,8 @@ BOOST_AUTO_TEST_CASE(system_estimate_coeff_bound_linear)
 {
 	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 
-	Var x = MakeVariable("x");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var t = Variable::Make("t");
 
 	bertini::System S;
 	S.AddUngroupedVariable(x);
@@ -799,7 +1106,7 @@ BOOST_AUTO_TEST_CASE(system_estimate_coeff_bound_quartic)
 	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y"), z = MakeVariable("z");
+	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
 
 	VariableGroup vars{x,y,z};
 
@@ -824,7 +1131,7 @@ BOOST_AUTO_TEST_CASE(system_estimate_coeff_bound_homogenized_quartic)
 	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y"), z = MakeVariable("z");
+	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
 
 	VariableGroup vars{x,y,z};
 
@@ -849,8 +1156,8 @@ BOOST_AUTO_TEST_CASE(system_estimate_degree_bound_linear)
 {
 	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 
-	Var x = MakeVariable("x");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var t = Variable::Make("t");
 
 	bertini::System S;
 	S.AddUngroupedVariable(x);
@@ -872,7 +1179,7 @@ BOOST_AUTO_TEST_CASE(system_estimate_degree_bound_quartic)
 	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y"), z = MakeVariable("z");
+	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
 
 	VariableGroup vars{x,y,z};
 
@@ -897,7 +1204,7 @@ BOOST_AUTO_TEST_CASE(system_multiply_by_node)
 	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 
 	bertini::System sys1, sys2;
-	Var x = MakeVariable("x"), y = MakeVariable("y"), z = MakeVariable("z");
+	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
 
 	VariableGroup vars{x,y,z};
 
@@ -911,7 +1218,7 @@ BOOST_AUTO_TEST_CASE(system_multiply_by_node)
 	sys2.AddFunction(pow(x,3)+x*y+bertini::node::E());
 	sys2.AddFunction(pow(x,2)*pow(y,2)+x*y*z*z - 1);
 
-	Var t = MakeVariable("t");
+	Var t = Variable::Make("t");
 
 	auto sys_copy1 = t*sys1;
 	auto sys_copy2 = (1-t)*sys2;
@@ -928,7 +1235,7 @@ BOOST_AUTO_TEST_CASE(system_multiply_by_node)
 BOOST_AUTO_TEST_CASE(concatenate_two_systems)
 {
 	bertini::System sys1, sys2;
-	Var x = MakeVariable("x"), y = MakeVariable("y"), z = MakeVariable("z");
+	Var x = Variable::Make("x"), y = Variable::Make("y"), z = Variable::Make("z");
 
 	VariableGroup vars{x,y,z};
 
@@ -945,7 +1252,7 @@ BOOST_AUTO_TEST_CASE(concatenate_two_systems)
 
 	auto sys3 = Concatenate(sys1, sys2);
 
-	BOOST_CHECK_EQUAL(sys3.NumFunctions(),6);
+	BOOST_CHECK_EQUAL(sys3.NumNaturalFunctions(),6);
 }
 
 /**
@@ -965,7 +1272,7 @@ BOOST_AUTO_TEST_CASE(parsed_system_evaluates_correctly)
 	values(0) = dbl(2.0);
 	values(1) = dbl(3.0);
 	
-	Vec<dbl> v(2);
+	Vec<dbl> v(sys.NumNaturalFunctions());
 	sys.EvalInPlace(v, values);
 	
 	BOOST_CHECK_EQUAL(v(0), 36.0);
@@ -987,8 +1294,8 @@ BOOST_AUTO_TEST_CASE(parsed_system_evaluates_correctly)
 
 BOOST_AUTO_TEST_CASE(variable_group_sizes_and_degrees_homvargrp)
 {
-	Var x = MakeVariable("x");
-	Var y = MakeVariable("y");
+	Var x = Variable::Make("x");
+	Var y = Variable::Make("y");
 
 	System sys;
 
@@ -1011,8 +1318,8 @@ BOOST_AUTO_TEST_CASE(variable_group_sizes_and_degrees_homvargrp)
 
 BOOST_AUTO_TEST_CASE(variable_group_sizes_and_degrees_affvargrp)
 {
-	Var x = MakeVariable("x");
-	Var y = MakeVariable("y");
+	Var x = Variable::Make("x");
+	Var y = Variable::Make("y");
 
 	System sys;
 
@@ -1046,8 +1353,8 @@ BOOST_AUTO_TEST_CASE(clone_system_new_variables_evaluation)
 	bertini::DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 	auto sys = bertini::system::Precon::GriewankOsborn();
 	Vec<mpfr> x1(2), x2(2);
-	x1(0) = bertini::RandomUnit(CLASS_TEST_MPFR_DEFAULT_DIGITS);
-	x1(1) = bertini::RandomUnit(CLASS_TEST_MPFR_DEFAULT_DIGITS);
+	x1(0) = bertini::multiprecision::RandomUnit(CLASS_TEST_MPFR_DEFAULT_DIGITS);
+	x1(1) = bertini::multiprecision::RandomUnit(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 
 	auto f = sys.Eval(x1);
 

@@ -13,14 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with pool_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 
 
 //pool_test.cpp
@@ -34,19 +34,14 @@
 #define BOOST_TEST_MODULE "Bertini 2 Object Pool Testing"
 #include <boost/test/unit_test.hpp>
 
+#define BERTINI_TEST_MODULE "pools"
 
-#include "logging.hpp"
-
-
-using sec_level = boost::log::trivial::severity_level;
-
-using LoggingInit = bertini::LoggingInit;
 
 
 #include "bertini2/pool/system.hpp"
+#include "test/utility/enable_logging.hpp"
 
-
-BOOST_GLOBAL_FIXTURE( LoggingInit );
+using Variable = bertini::node::Variable;
 
 BOOST_AUTO_TEST_SUITE(system_pool)
 
@@ -64,9 +59,9 @@ BOOST_AUTO_TEST_CASE(make_nonpointer_system_and_add_to_pool)
 	SystemPool sp;
 
 	System sys;
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
-	auto z = MakeVariable("z");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
+	auto z = Variable::Make("z");
 	
 	sys.AddVariableGroup(VariableGroup({x,y,z}));  
 	sys.AddFunction(x);
@@ -82,11 +77,11 @@ BOOST_AUTO_TEST_CASE(make_nonpointer_system_and_add_to_pool)
 BOOST_AUTO_TEST_CASE(make_new_sys_from_pool)
 {
 	SystemPool sp;
-	std::shared_ptr<System> sys = sp.NewObj();
+	std::shared_ptr<System> sys = sp.Make();
 
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
-	auto z = MakeVariable("z");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
+	auto z = Variable::Make("z");
 	
 	sys->AddVariableGroup(VariableGroup({x,y,z}));  
 	sys->AddFunction(x);
@@ -100,9 +95,9 @@ BOOST_AUTO_TEST_CASE(add_ptr_sys_to_pool)
 	SystemPool sp;
 	std::shared_ptr<System> sys = std::make_shared<System>();
 
-	auto x = MakeVariable("x");
-	auto y = MakeVariable("y");
-	auto z = MakeVariable("z");
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
+	auto z = Variable::Make("z");
 	
 	sys->AddVariableGroup(VariableGroup({x,y,z}));  
 	sys->AddFunction(x);

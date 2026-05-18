@@ -13,14 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with mhom.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 
 #include "bertini2/system/start/user.hpp"
 
@@ -33,59 +33,58 @@ namespace bertini {
 	namespace start_system {
 
 		// constructor for User start system, from any other *suitable* system.
-		User::User(System const& s)
+		User::User(System const& s, SampCont<dbl> const& solns) : user_system_(s), solns_in_dbl_(true)
 		{
-
-			if (s.NumHomVariableGroups() > 0)
-				throw std::runtime_error("a homogeneous variable group is present.  currently unallowed");
-
-
-			if (s.NumTotalFunctions() != s.NumVariables())
-				throw std::runtime_error("attempting to construct total degree start system from non-square target system");
-
-			if (s.HavePathVariable())
-				throw std::runtime_error("attempting to construct total degree start system, but target system has path varible declared already");			
-
-			if (!s.IsPolynomial())
-				throw std::runtime_error("attempting to construct total degree start system from non-polynomial target system");
+			std::get<SampCont<dbl>>(solns_) = solns;
 		}
 
-		
-		User& User::operator*=(Nd const& n)
+		User::User(System const& s, SampCont<mpfr_complex> const& solns) : user_system_(s), solns_in_dbl_(false)
 		{
-			*this *= n;
-			return *this;
+			std::get<SampCont<mpfr_complex>>(solns_) = solns;
 		}
+				
 		
-		
-
 		unsigned long long User::NumStartPoints() const
 		{
-			return 0;
+			if (solns_in_dbl_)
+				return std::get<SampCont<dbl>>(solns_).size();
+			else
+				return std::get<SampCont<mpfr_complex>>(solns_).size();
 		}
 
 
 		
 		Vec<dbl> User::GenerateStartPoint(dbl,unsigned long long index) const
 		{
-			Vec<dbl> start_point(NumVariables());
+			if (solns_in_dbl_)
+				return std::get<SampCont<dbl>>(solns_)[index];
+			else
+			{
+				const auto& r = std::get<SampCont<mpfr_complex>>(solns_)[index];
+				Vec<dbl> pt(r.size());
+				for (unsigned ii=0; ii<r.size(); ++ii)
+					pt(ii) = dbl(r(ii));
 
-			return start_point;
+				return pt;
+			}
 		}
 
 
-		Vec<mpfr> User::GenerateStartPoint(mpfr,unsigned long long index) const
+		Vec<mpfr_complex> User::GenerateStartPoint(mpfr_complex,unsigned long long index) const
 		{
-			Vec<mpfr> start_point(NumVariables());
+			if (solns_in_dbl_)
+			{
+				const auto& r = std::get<SampCont<dbl>>(solns_)[index];
+				Vec<mpfr_complex> pt(r.size());
+				for (unsigned ii=0; ii<r.size(); ++ii)
+					pt(ii) = static_cast<mpfr_complex>(r(ii));
 
-			return start_point;
-		}
-
-		inline
-		User operator*(User td, std::shared_ptr<node::Node> const& n)
-		{
-			td *= n;
-			return td;
+				return pt;
+			}
+			else
+			{
+				return std::get<SampCont<mpfr_complex>>(solns_)[index];
+			}
 		}
 
 	} // namespace start_system

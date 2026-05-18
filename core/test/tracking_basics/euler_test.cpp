@@ -13,14 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with euler_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 
 
 
@@ -29,10 +29,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include <boost/multiprecision/mpfr.hpp>
-#include "limbo.hpp"
-#include "mpfr_complex.hpp"
+#include "bertini2/mpfr_complex.hpp"
 
-#include "trackers/ode_predictors.hpp"
+#include "bertini2/trackers/ode_predictors.hpp"
 
 
 
@@ -52,19 +51,19 @@ using Float = bertini::node::Float;
 using ExplicitRKPredictor = bertini::tracking::predict::ExplicitRKPredictor;
 
 using Var = std::shared_ptr<Variable>;
-using bertini::MakeVariable;
+
 using VariableGroup = bertini::VariableGroup;
 
 
 using dbl = std::complex<double>;
-using mpfr = bertini::complex;
+using mpfr = bertini::mpfr_complex;
 using mpfr_float = bertini::mpfr_float;
 
 
 template<typename NumType> using Vec = bertini::Vec<NumType>;
 template<typename NumType> using Mat = bertini::Mat<NumType>;
 using bertini::DefaultPrecision;
-
+using bertini::Precision;
 
 BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 {
@@ -83,7 +82,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 	
 	
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+	Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 	
 	VariableGroup vars{x,y};
 	
@@ -113,7 +112,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 	unsigned num_steps_since_last_condition_number_computation = 1;
 	unsigned frequency_of_CN_estimation = 1;
 	
-	std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+	std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 	
 	auto success_code = predictor->Predict(euler_prediction_result,
 										   size_proportion,
@@ -152,7 +151,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -182,7 +181,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		unsigned num_steps_since_last_condition_number_computation = 1;
 		unsigned frequency_of_CN_estimation = 1;
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(euler_prediction_result,
 											   size_proportion,
@@ -226,7 +225,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -255,7 +254,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		unsigned num_steps_since_last_condition_number_computation = 1;
 		unsigned frequency_of_CN_estimation = 1;
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(euler_prediction_result,
 											   sys,
@@ -294,7 +293,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -323,7 +322,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		unsigned num_steps_since_last_condition_number_computation = 1;
 		unsigned frequency_of_CN_estimation = 1;
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(euler_prediction_result,
 											   sys,
@@ -358,7 +357,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -382,7 +381,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		Vec<dbl> prediction_result;
 		
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(prediction_result,
 											   sys,
@@ -418,7 +417,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -442,7 +441,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		Vec<mpfr> prediction_result;
 		
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(prediction_result,
 											   sys,
@@ -474,7 +473,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -501,7 +500,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		Vec<dbl> prediction_result;
 		
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(prediction_result,
 											   size_proportion,
@@ -535,7 +534,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -562,7 +561,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		Vec<mpfr> prediction_result;
 		
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(prediction_result,
 											   size_proportion,
@@ -596,7 +595,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -624,7 +623,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		Vec<dbl> prediction_result;
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(prediction_result,
 											   size_proportion,
@@ -658,7 +657,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -685,7 +684,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		Vec<mpfr> prediction_result;
 		
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(prediction_result,
 											   size_proportion,
@@ -722,7 +721,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -733,8 +732,6 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		sys.AddFunction( t*(pow(x,2)-1) + (1-t)*(pow(x,2) + pow(y,2) - 4) );
 		sys.AddFunction( t*(y-1) + (1-t)*(2*x + 5*y) );
 		
-		std::cout << "setting AMP config\n";
-
 		auto AMP = bertini::tracking::AMPConfigFrom(sys);
 		
 		BOOST_CHECK_EQUAL(AMP.degree_bound,2);
@@ -753,7 +750,7 @@ BOOST_AUTO_TEST_CASE(circle_line_euler_double)
 		unsigned num_steps_since_last_condition_number_computation = 1;
 		unsigned frequency_of_CN_estimation = 1;
 		
-		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(sys);
+		std::shared_ptr<ExplicitRKPredictor> predictor = std::make_shared< ExplicitRKPredictor >(bertini::tracking::Predictor::Euler,sys);
 		
 		auto success_code = predictor->Predict(euler_prediction_result,
 											   size_proportion,

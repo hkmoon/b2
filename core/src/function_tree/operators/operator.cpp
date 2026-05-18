@@ -13,18 +13,18 @@
 //You should have received a copy of the GNU General Public License
 //along with operator.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 // Jeb Collins, West Texas A&M
 
 
-#include "function_tree/operators/operator.hpp"
+#include "bertini2/function_tree/operators/operator.hpp"
 
 
 namespace bertini {
@@ -33,26 +33,26 @@ namespace node{
 void UnaryOperator::Reset() const
 {
 	Node::ResetStoredValues();
-	child_->Reset();
+	operand_->Reset();
 }
 
-void UnaryOperator::SetChild(std::shared_ptr<Node> new_child)
+void UnaryOperator::SetOperand(std::shared_ptr<Node> n)
 {
-	child_ = new_child;
+	operand_ = n;
 }
 
 
 //Return the only child for the unary operator
-std::shared_ptr<Node> UnaryOperator::first_child() const
+std::shared_ptr<Node> UnaryOperator::Operand() const
 {
-	return child_;
+	return operand_;
 }
 
 
 
 int UnaryOperator::Degree(std::shared_ptr<Variable> const& v) const
 {
-	return child_->Degree(v);
+	return operand_->Degree(v);
 }
 
 
@@ -84,7 +84,7 @@ std::vector<int> UnaryOperator::MultiDegree(VariableGroup const& vars) const
 
 void UnaryOperator::Homogenize(VariableGroup const& vars, std::shared_ptr<Variable> const& homvar)
 {
-	child_->Homogenize(vars, homvar);
+	operand_->Homogenize(vars, homvar);
 }
 
 
@@ -121,10 +121,10 @@ bool UnaryOperator::IsHomogeneous(VariableGroup const& vars) const
  */
 void UnaryOperator::precision(unsigned int prec) const
 {
-	auto& val_pair = std::get< std::pair<mpfr,bool> >(current_value_);
+	auto& val_pair = std::get< std::pair<mpfr_complex,bool> >(current_value_);
 	val_pair.first.precision(prec);
 
-	child_->precision(prec);
+	operand_->precision(prec);
 }
 
 
@@ -138,15 +138,15 @@ void UnaryOperator::precision(unsigned int prec) const
 void NaryOperator::Reset() const
 {
 	Node::ResetStoredValues();
-	for (const auto& ii : children_)
+	for (const auto& ii : operands_)
 		ii->Reset();
 
 }
 
-// Add a child onto the container for this operator
-void NaryOperator::AddChild(std::shared_ptr<Node> child)
+// Add an operand onto the container for this operator
+void NaryOperator::AddOperand(std::shared_ptr<Node> n)
 {
-	children_.push_back(std::move(child));
+	operands_.push_back(std::move(n));
 }
 
 
@@ -154,14 +154,14 @@ void NaryOperator::AddChild(std::shared_ptr<Node> child)
 
 
 
-size_t NaryOperator::children_size() const
+size_t NaryOperator::NumOperands() const
 {
-	return children_.size();
+	return operands_.size();
 }
 
-std::shared_ptr<Node> NaryOperator::first_child() const
+std::shared_ptr<Node> NaryOperator::FirstOperand() const
 {
-	return children_[0];
+	return operands_[0];
 }
 
 
@@ -174,12 +174,12 @@ std::shared_ptr<Node> NaryOperator::first_child() const
  */
 void NaryOperator::precision(unsigned int prec) const
 {
-	auto& val_pair = std::get< std::pair<mpfr,bool> >(current_value_);
+	auto& val_pair = std::get< std::pair<mpfr_complex,bool> >(current_value_);
 	val_pair.first.precision(prec);
 	
 	this->PrecisionChangeSpecific(prec);
 
-	for (const auto& iter : children_)
+	for (const auto& iter : operands_)
 		iter->precision(prec);
 }
 

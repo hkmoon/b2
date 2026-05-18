@@ -13,14 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with fixed_multiple_cauchy_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 // Tim Hodges, Colorado State University
 
 
@@ -33,8 +33,7 @@
 #include "bertini2/endgames/fixed_prec_endgame.hpp"
 #include "bertini2/endgames/cauchy.hpp"
 
-//THIS NEEDS TO BE IMPLEMENTED
-// #include "bertini2/endgames/observers.hpp"
+#include "bertini2/endgames/observers.hpp"
 #include "bertini2/trackers/observers.hpp"
 
 
@@ -44,12 +43,12 @@ BOOST_AUTO_TEST_SUITE(fixed_multiple_cauchy_endgame)
 
 BOOST_AUTO_TEST_SUITE(generic_tests_precision_16)
 
-using namespace bertini::tracking;
+
 using namespace bertini::endgame;
 
-using TrackerType = MultiplePrecisionTracker; // select a tracker type
+using TrackerType = bertini::tracking::MultiplePrecisionTracker; // select a tracker type
 using TestedEGType = EndgameSelector<TrackerType>::Cauchy;
-auto TestedPredictor = Predictor::HeunEuler;
+auto TestedPredictor = bertini::tracking::Predictor::HeunEuler;
 unsigned ambient_precision = bertini::DoublePrecision();
 
 #include "test/endgames/generic_cauchy_test.hpp"
@@ -61,12 +60,12 @@ BOOST_AUTO_TEST_SUITE_END() // generic tests at some precision
 
 BOOST_AUTO_TEST_SUITE(generic_tests_precision_30)
 
-using namespace bertini::tracking;
+
 using namespace bertini::endgame;
 
-using TrackerType = MultiplePrecisionTracker; // select a tracker type
+using TrackerType = bertini::tracking::MultiplePrecisionTracker; // select a tracker type
 using TestedEGType = EndgameSelector<TrackerType>::Cauchy;
-auto TestedPredictor = Predictor::HeunEuler;
+auto TestedPredictor = bertini::tracking::Predictor::HeunEuler;
 unsigned ambient_precision = 30;
 
 #include "test/endgames/generic_cauchy_test.hpp"
@@ -78,12 +77,12 @@ BOOST_AUTO_TEST_SUITE_END() // generic tests at some precision
 
 BOOST_AUTO_TEST_SUITE(generic_tests_precision_50)
 
-using namespace bertini::tracking;
+
 using namespace bertini::endgame;
 
-using TrackerType = MultiplePrecisionTracker; // select a tracker type
+using TrackerType = bertini::tracking::MultiplePrecisionTracker; // select a tracker type
 using TestedEGType = EndgameSelector<TrackerType>::Cauchy;
-auto TestedPredictor = Predictor::HeunEuler;
+auto TestedPredictor = bertini::tracking::Predictor::HeunEuler;
 unsigned ambient_precision = 50;
 
 #include "test/endgames/generic_cauchy_test.hpp"

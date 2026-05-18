@@ -13,14 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with path_observers.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 
 
 
@@ -50,10 +50,10 @@ using Variable = bertini::node::Variable;
 using Var = std::shared_ptr<Variable>;
 
 using VariableGroup = bertini::VariableGroup;
-using bertini::MakeVariable;
+
 
 using dbl = std::complex<double>;
-using mpfr = bertini::complex;
+using mpfr = bertini::mpfr_complex;
 using mpfr_float = bertini::mpfr_float;
 
 
@@ -67,9 +67,9 @@ BOOST_AUTO_TEST_CASE(accumulate_single_path_square_root)
 	DefaultPrecision(16);
 	using namespace bertini::tracking;
 
-	Var x = MakeVariable("x");
-	Var y = MakeVariable("y");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var y = Variable::Make("y");
+	Var t = Variable::Make("t");
 
 	System sys;
 
@@ -103,16 +103,15 @@ BOOST_AUTO_TEST_CASE(accumulate_single_path_square_root)
 	Vec<mpfr> start_point(2);
 	Vec<mpfr> end_point;
 
-	bertini::SuccessCode tracking_success;
 
 	AMPPathAccumulator<AMPTracker> path_accumulator;
 	PrecisionAccumulator<AMPTracker> precision_accumulator;
 
-	tracker.AddObserver(&path_accumulator);
-	tracker.AddObserver(&precision_accumulator);
+	tracker.AddObserver(path_accumulator);
+	tracker.AddObserver(precision_accumulator);
 
 	start_point << mpfr(1), mpfr(1);
-	tracking_success = tracker.TrackPath(end_point,
+	bertini::SuccessCode tracking_success = tracker.TrackPath(end_point,
 	                  t_start, t_end, start_point);	
 }
 
@@ -124,9 +123,9 @@ BOOST_AUTO_TEST_CASE(some_other_thing_square_root)
 	DefaultPrecision(16);
 	using namespace bertini::tracking;
 
-	Var x = MakeVariable("x");
-	Var y = MakeVariable("y");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var y = Variable::Make("y");
+	Var t = Variable::Make("t");
 
 	System sys;
 
@@ -164,7 +163,7 @@ BOOST_AUTO_TEST_CASE(some_other_thing_square_root)
 
 	GoryDetailLogger<AMPTracker> tons_of_detail;
 
-	tracker.AddObserver(&tons_of_detail);
+	tracker.AddObserver(tons_of_detail);
 
 	start_point << mpfr(1), mpfr(1);
 	tracking_success = tracker.TrackPath(end_point,
@@ -179,9 +178,9 @@ BOOST_AUTO_TEST_CASE(union_of_observers)
 	DefaultPrecision(16);
 	using namespace bertini::tracking;
 
-	Var x = MakeVariable("x");
-	Var y = MakeVariable("y");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var y = Variable::Make("y");
+	Var t = Variable::Make("t");
 
 	System sys;
 
@@ -213,16 +212,15 @@ BOOST_AUTO_TEST_CASE(union_of_observers)
 	mpfr t_end(0);
 	
 	Vec<mpfr> start_point(2);
+	start_point << mpfr(1), mpfr(1);
+
 	Vec<mpfr> end_point;
 
-	bertini::SuccessCode tracking_success;
-
 	bertini::MultiObserver<AMPTracker, GoryDetailLogger> agglomeration;
+	tracker.AddObserver(agglomeration);
 
-	tracker.AddObserver(&agglomeration);
-
-	start_point << mpfr(1), mpfr(1);
-	tracking_success = tracker.TrackPath(end_point,
+	
+	bertini::SuccessCode tracking_success = tracker.TrackPath(end_point,
 	                  t_start, t_end, start_point);
 
 }

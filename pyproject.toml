@@ -1,0 +1,40 @@
+[project]
+name = "bertini2"
+version = "2.0.1" 
+requires-python = ">= 3.9"
+readme = "README.md"
+dependencies = ["numpy"]
+authors = [
+    {name="Bertini Team"}
+]
+maintainers=[
+    {name="silviana amethyst", email="amethyst@mpi-cbg.de"}
+]
+description = "Software for numerical algebraic geometry"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.urls]
+Repository = "https://github.com/bertiniteam/b2"
+
+[build-system]
+requires = [
+    "scikit-build-core","numpy"
+]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+wheel.packages = ["python/bertini"]
+wheel.expand-macos-universal-tags = true
+wheel.install-dir = "bertini"
+build-dir = "bld/"
+editable.mode = "redirect"
+
+[tool.scikit-build.cmake]
+args = ["-DINSTALL_DOCUMENTATION=OFF", "-DCMAKE_DISABLE_FIND_PACKAGE_Doxygen=ON"]
+build-type = "Release"
+
+[tool.pytest.ini_options]
+testpaths = ["python/test"]
+pythonpath = ["python/test"]

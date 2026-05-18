@@ -13,14 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with fixed_precision_tracker_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 
 
 
@@ -45,10 +45,10 @@ using Variable = bertini::node::Variable;
 using Var = std::shared_ptr<Variable>;
 
 using VariableGroup = bertini::VariableGroup;
-using bertini::MakeVariable;
+
 
 using dbl = std::complex<double>;
-using mpfr = bertini::complex;
+using mpfr = bertini::mpfr_complex;
 using mpfr_float = bertini::mpfr_float;
 
 
@@ -61,8 +61,8 @@ BOOST_AUTO_TEST_CASE(double_tracker_track_linear)
 	DefaultPrecision(100);
 	using namespace bertini::tracking;
 
-	Var y = MakeVariable("y");
-	Var t = MakeVariable("t");
+	Var y = Variable::Make("y");
+	Var t = Variable::Make("t");
 
 	System sys;
 
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(double_tracker_track_linear)
 	Vec<dbl> y_end;
 
 	auto obs = GoryDetailLogger<DoublePrecisionTracker>();
-		tracker.AddObserver(&obs);
+		tracker.AddObserver(obs);
 
 	auto code = tracker.TrackPath(y_end, t_start, t_end, y_start);
 	BOOST_CHECK(code==bertini::SuccessCode::Success);
@@ -111,8 +111,8 @@ BOOST_AUTO_TEST_CASE(multiple_100_tracker_track_linear)
 	DefaultPrecision(100);
 	using namespace bertini::tracking;
 
-	Var y = MakeVariable("y");
-	Var t = MakeVariable("t");
+	Var y = Variable::Make("y");
+	Var t = Variable::Make("t");
 
 	System sys;
 
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(multiple_100_tracker_track_linear)
 					newton_preferences);
 
 	GoryDetailLogger<MultiplePrecisionTracker> tons_of_detail;
-	tracker.AddObserver(&tons_of_detail);
+	tracker.AddObserver(tons_of_detail);
 
 	
 	mpfr t_start(1);

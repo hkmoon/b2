@@ -13,15 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with typelist.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// Dani Brake
-// University of Notre Dame
+// silviana amethyst, university of wisconsin-eau claire
 
 
 /**
@@ -63,19 +62,28 @@ struct TypeList {
 
 
 /**
-\brief Concatenate two typelists, get via ::type
+\brief Concatenate two typelists
+
+Get resulting TypeList via something like `ListCat< TypeList<int>,TypeList<double> >::type`
 */
 template <typename ...Ts>
 struct ListCat {};
 
 
-
+/**
+ \brief A specialization of ListCat for joining two lists
+ */
 template <typename ...Ts, typename ... Rs>
 struct ListCat <TypeList<Ts...>, TypeList<Rs...>>
 {
 	using type = TypeList<Ts..., Rs...>;
 };
 
+/**
+ \brief A specialization of ListCat for joining 3+ lists
+
+ This specialization works via recursion
+ */
 template <typename ...Ps, typename ... Qs, typename ... Rs>
 struct ListCat <TypeList<Ps...>, TypeList<Qs...>, TypeList<Rs...>>
 {

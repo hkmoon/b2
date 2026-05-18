@@ -27,10 +27,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include <boost/multiprecision/mpfr.hpp>
-#include "limbo.hpp"
-#include "mpfr_complex.hpp"
+#include "bertini2/mpfr_complex.hpp"
 
-#include "trackers/ode_predictors.hpp"
+#include "bertini2/trackers/ode_predictors.hpp"
 
 
 
@@ -49,15 +48,14 @@ using Variable = bertini::node::Variable;
 using Float = bertini::node::Float;
 using ExplicitRKPredictor = bertini::tracking::predict::ExplicitRKPredictor;
 
-using bertini::MakeVariable;
-using bertini::MakeFloat;
+
 using Var = std::shared_ptr<Variable>;
 
 using VariableGroup = bertini::VariableGroup;
 
 
 using dbl = std::complex<double>;
-using mpfr = bertini::complex;
+using mpfr = bertini::mpfr_complex;
 using mpfr_float = bertini::mpfr_float;
 
 
@@ -81,7 +79,7 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 	
 	
 	bertini::System sys;
-	Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+	Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 	
 	VariableGroup vars{x,y};
 	
@@ -164,7 +162,7 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -243,8 +241,8 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
-		std::shared_ptr<Float> half = MakeFloat("0.5");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
+		std::shared_ptr<Float> half = Float::Make("0.5");
 		
 		VariableGroup vars{x,y};
 		
@@ -323,8 +321,8 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
-		std::shared_ptr<Float> half = MakeFloat("0.5");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
+		std::shared_ptr<Float> half = Float::Make("0.5");
 		
 		VariableGroup vars{x,y};
 		
@@ -402,7 +400,7 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -467,7 +465,7 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -529,7 +527,7 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -591,7 +589,7 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -653,7 +651,7 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		
@@ -716,7 +714,7 @@ BOOST_AUTO_TEST_CASE(circle_line_heun_double)
 		
 		
 		bertini::System sys;
-		Var x = MakeVariable("x"), y = MakeVariable("y"), t = MakeVariable("t");
+		Var x = Variable::Make("x"), y = Variable::Make("y"), t = Variable::Make("t");
 		
 		VariableGroup vars{x,y};
 		

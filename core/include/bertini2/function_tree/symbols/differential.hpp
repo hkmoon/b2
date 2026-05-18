@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with differential.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -24,8 +24,7 @@
 //  West Texas A&M University
 //  Spring, Summer 2015
 //
-// Dani Brake
-// University of Notre Dame
+// silviana amethyst, university of wisconsin-eau claire
 //
 //  Created by Collins, James B. on 4/30/15.
 //
@@ -59,17 +58,26 @@ namespace node{
 
 	This class represents differentials.  These are produced in the course of differentiation of a non-constant expression tree.
 	*/
-	class Differential : public virtual NamedSymbol
+	class Differential : public virtual NamedSymbol, public virtual EnableSharedFromThisVirtual<Differential>
 	{
 	public:
-		
+		BERTINI_DEFAULT_VISITABLE()
 
 
+		template<typename... Ts> 
+		static 
+		std::shared_ptr<Differential> Make(Ts&& ...ts){ 
+			return std::shared_ptr<Differential>( new Differential(ts...) );
+		}
+
+
+	private:
 		/**
 		 Input shared_ptr to a Variable.
 		 */
 		Differential(std::shared_ptr<const Variable> diff_variable, std::string var_name);
 
+	public:
 
 		void Reset() const override;
 
@@ -125,9 +133,9 @@ namespace node{
 		void FreshEval_d(dbl& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const override;
 
 
-		mpfr FreshEval_mp(std::shared_ptr<Variable> const& diff_variable) const override;
+		mpfr_complex FreshEval_mp(std::shared_ptr<Variable> const& diff_variable) const override;
 		
-		void FreshEval_mp(mpfr& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const override;
+		void FreshEval_mp(mpfr_complex& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const override;
 
 
 

@@ -1,37 +1,40 @@
 //This file is part of Bertini 2.
 //
-//tracking/observers.hpp is free software: you can redistribute it and/or modify
+//trackers/observers.hpp is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
 //the Free Software Foundation, either version 3 of the License, or
 //(at your option) any later version.
 //
-//tracking/observers.hpp is distributed in the hope that it will be useful,
+//trackers/observers.hpp is distributed in the hope that it will be useful,
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 //
 //You should have received a copy of the GNU General Public License
-//along with tracking/observers.hpp.  If not, see <http://www.gnu.org/licenses/>.
+//along with trackers/observers.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license,
 // as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 
 
 /**
-\file tracking/observers.hpp
+\file include/bertini2/trackers/observers.hpp
 
-\brief Contains the tracking/observers base types
+\brief Contains the trackers/observers base types
 */
 
 #pragma once
 
 #include "bertini2/trackers/events.hpp"
+
+#include "bertini2/detail/observer.hpp"
+
 #include "bertini2/trackers/base_tracker.hpp"
 #include "bertini2/logging.hpp"
 #include <boost/type_index.hpp>
@@ -63,16 +66,14 @@ namespace bertini {
 						precision_increased_ = true;
 						next_precision_ = next;
 						time_of_first_increase_ = t.CurrentTime();
-						t.RemoveObserver(this);
+						t.RemoveObserver(*this);
 					}
 
 				}
 			}
 
 
-			virtual void Visit(TrackerT const& t) override
-			{
-			}
+
 
 		public:
 
@@ -95,6 +96,8 @@ namespace bertini {
 			{
 				return time_of_first_increase_;
 			}
+
+			virtual ~FirstPrecisionRecorder() = default;
 
 		private:
 
@@ -129,8 +132,7 @@ namespace bertini {
 			}
 
 
-			virtual void Visit(TrackerT const& t) override
-			{}
+
 
 		public:
 
@@ -150,6 +152,8 @@ namespace bertini {
 			void MaxPrecision(unsigned m)
 			{ max_precision_ = m;}
 
+			virtual ~MinMaxPrecisionRecorder() = default;
+
 		private:
 
 			unsigned min_precision_ = std::numeric_limits<unsigned>::max();
@@ -168,21 +172,18 @@ namespace bertini {
 				const TrackingEvent<EmitterT>* p = dynamic_cast<const TrackingEvent<EmitterT>*>(&e);
 				if (p)
 				{
-					Visit(p->Get());
+					precisions_.push_back(p->Get().CurrentPrecision());
 				}
 			}
 
-
-			virtual void Visit(TrackerT const& t) override
-			{
-				precisions_.push_back(t.CurrentPrecision());
-			}
 
 		public:
 			const std::vector<unsigned>& Precisions() const
 			{
 				return precisions_;
 			}
+
+			virtual ~PrecisionAccumulator() = default;
 
 		private:
 			std::vector<unsigned> precisions_;
@@ -203,24 +204,21 @@ namespace bertini {
 				const EventT<EmitterT>* p = dynamic_cast<const EventT<EmitterT>*>(&e);
 				if (p)
 				{
-					Visit(p->Get());
+					path_.push_back(p->Get().CurrentPoint());
 				}
 			}
 
 
-			virtual void Visit(TrackerT const& t) override
-			{
-				path_.push_back(t.CurrentPoint());
-			}
-
 		public:
-			const std::vector<Vec<mpfr> >& Path() const
+			const std::vector<Vec<mpfr_complex> >& Path() const
 			{
 				return path_;
 			}
 
+			virtual ~AMPPathAccumulator() = default;
+
 		private:
-			std::vector<Vec<mpfr> > path_;
+			std::vector<Vec<mpfr_complex> > path_;
 		};
 
 
@@ -231,6 +229,8 @@ namespace bertini {
 		public:
 
 			using EmitterT = typename TrackerTraits<TrackerT>::EventEmitterType;
+
+			virtual ~GoryDetailLogger() = default;
 
 			virtual void Observe(AnyEvent const& e) override
 			{
@@ -244,7 +244,7 @@ namespace bertini {
 						<< "\n from\tx = \n" << p->StartPoint()
 						<< "\n tracking system " << p->Get().GetSystem() << "\n\n";
 				}
-				else if (auto p = dynamic_cast<const Initializing<EmitterT,mpfr>*>(&e))
+				else if (auto p = dynamic_cast<const Initializing<EmitterT,mpfr_complex>*>(&e))
 				{
 					BOOST_LOG_TRIVIAL(severity_level::debug) << std::setprecision(p->Get().GetSystem().precision())
 						 << "initializing in multiprecision, tracking path\nfrom\tt = " << p->StartTime() << "\nto\tt = " << p->EndTime() << "\n from\tx = \n" << p->StartPoint()
@@ -293,18 +293,18 @@ namespace bertini {
 
 
 
-				else if (auto p = dynamic_cast<const SuccessfulPredict<EmitterT,mpfr>*>(&e))
+				else if (auto p = dynamic_cast<const SuccessfulPredict<EmitterT,mpfr_complex>*>(&e))
 				{
-					BOOST_LOG_TRIVIAL(severity_level::trace) << std::setprecision(Precision(p->ResultingPoint())) << "prediction successful (mpfr), result:\n" << p->ResultingPoint();
+					BOOST_LOG_TRIVIAL(severity_level::trace) << std::setprecision(Precision(p->ResultingPoint())) << "prediction successful (mpfr_complex), result:\n" << p->ResultingPoint();
 				}
 				else if (auto p = dynamic_cast<const SuccessfulPredict<EmitterT,dbl>*>(&e))
 				{
 					BOOST_LOG_TRIVIAL(severity_level::trace) << std::setprecision(Precision(p->ResultingPoint())) << "prediction successful (dbl), result:\n" << p->ResultingPoint();
 				}
 
-				else if (auto p = dynamic_cast<const SuccessfulCorrect<EmitterT,mpfr>*>(&e))
+				else if (auto p = dynamic_cast<const SuccessfulCorrect<EmitterT,mpfr_complex>*>(&e))
 				{
-					BOOST_LOG_TRIVIAL(severity_level::trace) << std::setprecision(Precision(p->ResultingPoint())) << "correction successful (mpfr), result:\n" << p->ResultingPoint();
+					BOOST_LOG_TRIVIAL(severity_level::trace) << std::setprecision(Precision(p->ResultingPoint())) << "correction successful (mpfr_complex), result:\n" << p->ResultingPoint();
 				}
 				else if (auto p = dynamic_cast<const SuccessfulCorrect<EmitterT,dbl>*>(&e))
 				{
@@ -334,8 +334,6 @@ namespace bertini {
 					BOOST_LOG_TRIVIAL(severity_level::debug) << "unlogged event, of type: " << boost::typeindex::type_id_runtime(e).pretty_name();
 			}
 
-			virtual void Visit(TrackerT const& t) override
-			{}
 		};
 
 
@@ -353,8 +351,7 @@ namespace bertini {
 					std::cout << "observed step failure" << std::endl;
 			}
 
-			virtual void Visit(TrackerT const& t) override
-			{}
+			virtual ~StepFailScreenPrinter() = default;
 		};
 
 	} //re: namespace tracking

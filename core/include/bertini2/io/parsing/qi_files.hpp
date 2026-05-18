@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with bertini2/io/parsing/qi_files.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license,
 // as well as COPYING.  Bertini2 is provided with permitted
@@ -34,18 +34,18 @@
 #include <boost/fusion/include/adapted.hpp>
 
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix.hpp>
+#include <boost/phoenix.hpp>
 
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_core.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/phoenix/core.hpp>
+#include <boost/phoenix/operator.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 
 #include <boost/phoenix/bind/bind_function.hpp>
 #include <boost/phoenix/object/construct.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include <boost/fusion/adapted/adt/adapt_adt.hpp>
 #include <boost/fusion/include/adapt_adt.hpp>

@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with bertini2/io/parsing/function_rules.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license,
 // as well as COPYING.  Bertini2 is provided with permitted
@@ -68,7 +68,7 @@ namespace {
 		template <typename... A>
 		typename result<A...>::type operator()(A&&... a) const
 		{
-			return std::make_shared<T>(std::forward<A>(a)...);
+			return T::Make(std::forward<A>(a)...);
 		}
 	};
 	

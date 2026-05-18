@@ -1,34 +1,34 @@
 //This file is part of Bertini 2.
 //
-//fixed_precision_utilities.hpp is free software: you can redistribute it and/or modify
+//include/bertini2/trackers/adaptive_precision_utilities.hpp is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
 //the Free Software Foundation, either version 3 of the License, or
 //(at your option) any later version.
 //
-//fixed_precision_utilities.hpp is distributed in the hope that it will be useful,
+//include/bertini2/trackers/adaptive_precision_utilities.hpp is distributed in the hope that it will be useful,
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 //
 //You should have received a copy of the GNU General Public License
-//along with fixed_precision_utilities.hpp.  If not, see <http://www.gnu.org/licenses/>.
+//along with include/bertini2/trackers/adaptive_precision_utilities.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 // Tim Hodges, Colorado State University
 
 /**
-\file tracking/adaptive_precision_utilities.hpp 
+\file include/bertini2/trackers/adaptive_precision_utilities.hpp 
 
 \brief Functions for dealing with precisions of objects, particularly in the context of adaptive precision.
 
-These definitions are provided for use in tracking and endgames.  This allows a uniform interface regardless of tracker details.
+These definitions are provided for use in trackers and endgames.  This allows a uniform interface regardless of tracker details.
 */
 
 #pragma once
@@ -45,7 +45,7 @@ namespace bertini{ namespace tracking { namespace adaptive{
 \param prec The new precision the samples should have.
 */
 inline
-void SetPrecision(SampCont<mpfr> & samples, unsigned prec)
+void SetPrecision(SampCont<mpfr_complex> & samples, unsigned prec)
 {
 	for (auto& s : samples)
 		for (unsigned ii=0; ii<s.size(); ii++)
@@ -59,7 +59,7 @@ void SetPrecision(SampCont<mpfr> & samples, unsigned prec)
 \param prec The new precision the times should have.
 */
 inline
-void SetPrecision(TimeCont<mpfr> & times, unsigned prec)
+void SetPrecision(TimeCont<mpfr_complex> & times, unsigned prec)
 {
 	for (auto& t : times)
 		t.precision(prec);
@@ -74,7 +74,7 @@ This is computed based on the first coordinate.  Length-zero samples will cause 
 \return The maximum precision among those samples.
 */
 inline
-unsigned MaxPrecision(SampCont<mpfr> const& samples)
+unsigned MaxPrecision(SampCont<mpfr_complex> const& samples)
 {
 	unsigned max_precision = 0;
 	for (const auto& s : samples)
@@ -90,7 +90,7 @@ unsigned MaxPrecision(SampCont<mpfr> const& samples)
 \return The maximum precision among those times.
 */
 inline
-unsigned MaxPrecision(TimeCont<mpfr> const& times)
+unsigned MaxPrecision(TimeCont<mpfr_complex> const& times)
 {
 	unsigned max_precision = 0;
 	for (const auto& t : times)
@@ -111,14 +111,14 @@ Cannot change precision of fixed precision hardware doubles.  This function is p
 \return The precision, which is now uniform.
 */
 inline
-unsigned EnsureAtUniformPrecision(TimeCont<dbl> & times, SampCont<dbl> & derivatives)
+unsigned EnsureAtUniformPrecision(TimeCont<dbl> & times, SampCont<dbl> & samples)
 {
 	return DoublePrecision();
 }
 
 
 /**
-\brief Changes precision of mpfr to highest needed precision for the samples.
+\brief Changes precision of mpfr_complex to highest needed precision for the samples.
 
 \param times Some times \f$\in \mathbb{C}\f$.
 \param samples Some space samples \f$\in \mathbb{C}^n\f$.
@@ -126,7 +126,7 @@ unsigned EnsureAtUniformPrecision(TimeCont<dbl> & times, SampCont<dbl> & derivat
 \return The precision, which is now uniform.
 */
 inline
-unsigned EnsureAtUniformPrecision(TimeCont<mpfr> & times, SampCont<mpfr> & samples)
+unsigned EnsureAtUniformPrecision(TimeCont<mpfr_complex> & times, SampCont<mpfr_complex> & samples)
 {
 	auto def_prec = DefaultPrecision();
 	if (std::any_of(begin(times),end(times),[=](auto const& p){return Precision(p)!=def_prec;}) 
@@ -146,7 +146,7 @@ unsigned EnsureAtUniformPrecision(TimeCont<mpfr> & times, SampCont<mpfr> & sampl
 
 
 /**
-\brief Changes precision of mpfr to highest needed precision for the samples.
+\brief Changes precision of mpfr_complex to highest needed precision for the samples.
 
 This function does NOT do any refinement, it merely changes the precision of default, and of the input objects.
 
@@ -157,7 +157,7 @@ This function does NOT do any refinement, it merely changes the precision of def
 \return The precision changed to.
 */
 inline
-unsigned EnsureAtUniformPrecision(TimeCont<mpfr> & times, SampCont<mpfr> & samples, SampCont<mpfr> & derivatives)
+unsigned EnsureAtUniformPrecision(TimeCont<mpfr_complex> & times, SampCont<mpfr_complex> & samples, SampCont<mpfr_complex> & derivatives)
 {
 	auto def_prec = DefaultPrecision();
 	if (std::any_of(begin(samples),end(samples),[=](auto const& p){return Precision(p)!=def_prec;}) 

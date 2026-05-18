@@ -16,7 +16,9 @@ stamp-h1
 config.*
 
 libtool
+
 Makefile
+!docs/Makefile
 
 b2_class_test
 test_tree_interactive
@@ -73,3 +75,18 @@ serialization_test*
 %src
 *.pyc
 .idea
+
+# Sphinx documentation
+docs/build/
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+
+
+# temporary files
+*.tmp
+
+build/

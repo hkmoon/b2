@@ -1,26 +1,26 @@
 //This file is part of Bertini 2.
 //
-//amp_endgame.hpp is free software: you can redistribute it and/or modify
+//prec_base.hpp is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
 //the Free Software Foundation, either version 3 of the License, or
 //(at your option) any later version.
 //
-//amp_endgame.hpp is distributed in the hope that it will be useful,
+//prec_base.hpp is distributed in the hope that it will be useful,
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 //
 //You should have received a copy of the GNU General Public License
-//along with amp_endgame.hpp.  If not, see <http://www.gnu.org/licenses/>.
+//along with prec_base.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 // Tim Hodges, Colorado State University
 
 
@@ -29,9 +29,9 @@
 
 
 /**
-\file base_endgame.hpp
+\file include/bertini2/endgames/prec_base.hpp
 
-\brief Contains parent class, Endgame, the parent class for all endgames.
+\brief Contains a parent class, EndgamePrecPolicyBase (an observable), from which the fixed double, fixed multiple, or adaptive precision endgames are derived.
 */
 
 
@@ -39,19 +39,20 @@ namespace bertini{ namespace endgame {
 
 
 /**
-\brief A common base type for various precision types, fixed and adaptive
+\brief A common base type for various precision types, fixed and adaptive.  The purpose of this is to maintain a uniform interface to the tracker that's being used, across endgame types.
 */
 template <typename TrackerT>
-class EndgamePrecPolicyBase
+class EndgamePrecPolicyBase : public virtual Observable
 {
 public:
 
 	using TrackerType = TrackerT;
 
+	explicit
 	EndgamePrecPolicyBase(TrackerT const& new_tracker) : tracker_(std::ref(new_tracker))
 	{}
 
-	~EndgamePrecPolicyBase() = default;
+	virtual ~EndgamePrecPolicyBase() = default;
 	
 	/**
 	Tell the endgame to use the given tracker.  Takes a reference.  
@@ -69,7 +70,7 @@ public:
 	\brief Getter for the tracker used inside an instance of the endgame. 
 	*/
 	inline
-	const TrackerT & GetTracker() const
+	const TrackerT& GetTracker() const
 	{
 		return tracker_.get();
 	}

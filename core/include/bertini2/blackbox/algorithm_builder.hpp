@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with bertini2/blackbox/algorithm_builder.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -21,10 +21,10 @@
 //
 // individual authors of this file include 
 //
-// Dani Brake, university of notre dame
+// silviana amethyst, university of wisconsin-eau claire
 
 /**
-\file bertini2/blackbox/algorithm_builder.hpp 
+\file include/bertini2/blackbox/algorithm_builder.hpp 
 
 \brief A type which determines which algorithms etc, to run, and sets them up.
 */

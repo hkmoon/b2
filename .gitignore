@@ -26,17 +26,21 @@ m4/ltsugar.m4
 m4/ltversion.m4
 m4/lt~obsolete.m4
 
-
+core/doc/html/
+core/doc/latex/
+bertini_*.log
 /config
 
 # Python folders
+python/build/
 /python/test/.idea
 /.deps/*
 
 # Python files
 *.pyc
 
-
+python/pybertini_*.log
+python/bertini_*.log
 
 *.dirstamp
 *.deps
@@ -76,3 +80,18 @@ m4/lt~obsolete.m4
 *.app
 python/autom4te.cache
 *.bak
+python/temp.py
+core/serialization_basic
+core/test/classes/serialization_basic
+python/conftest.cpp
+*.tar.gz
+python/src/UNKNOWN.egg-info/dependency_links.txt
+python/src/UNKNOWN.egg-info/PKG-INFO
+python/src/UNKNOWN.egg-info/SOURCES.txt
+python/src/UNKNOWN.egg-info/top_level.txt
+
+_skbuild/
+*/build/
+build/
+bld/
+build_mine/

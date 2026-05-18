@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with bertini2/nag_algorithms/output.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -219,6 +219,66 @@ struct Classic <ZeroDim<A,B,C,D,E>>
 
 
 };
+
+
+struct NonsingularSolutions
+{
+
+	
+	template<typename AlgoT>
+	static
+	auto Extract(AlgoT const& alg)
+	{
+		using BCT = typename AlgoTraits<AlgoT>::BaseComplexType;
+
+		const auto& sys = alg.TargetSystem();
+
+		SampCont<BCT> solns;
+
+		const auto& s = alg.FinalSolutions();
+		const auto& m = alg.FinalSolutionMetadata();
+		const auto n = s.size();
+		for (decltype(s.size()) ii{0}; ii<n; ++ii)
+		{
+			const auto& d = m[ii];
+			if (d.endgame_success == SuccessCode::Success &&
+				d.multiplicity==1)
+			{
+				solns.push_back(sys.DehomogenizePoint(s[ii]));
+			}	
+		}
+
+		return solns;
+	}
+};
+
+
+struct AllSolutions
+{
+
+	
+	template<typename AlgoT>
+	static
+	auto Extract(AlgoT const& alg)
+	{
+		using BCT = typename AlgoTraits<AlgoT>::BaseComplexType;
+
+		const auto& sys = alg.TargetSystem();
+
+		SampCont<BCT> solns;
+
+		const auto& s = alg.FinalSolutions();
+		const auto& m = alg.FinalSolutionMetadata();
+		const auto n = s.size();
+		for (decltype(s.size()) ii{0}; ii<n; ++ii)
+		{
+			solns.push_back(sys.DehomogenizePoint(s[ii]));
+		}
+
+		return solns;
+	}
+};
+
 
 } // namespace output
 } // namespace algorithm

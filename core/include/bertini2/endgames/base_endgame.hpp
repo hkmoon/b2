@@ -13,26 +13,28 @@
 //You should have received a copy of the GNU General Public License
 //along with base_endgame.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 // Tim Hodges, Colorado State University
 
 
 
-#ifndef BERTINI_TRACKING_BASE_ENDGAME_HPP
-#define BERTINI_TRACKING_BASE_ENDGAME_HPP
+#ifndef BERTINI_BASE_ENDGAME_HPP
+#define BERTINI_BASE_ENDGAME_HPP
 
 #pragma once
 /**
 \file base_endgame.hpp
 
 \brief Contains base class, Endgame.
+
+\defgroup endgame
 */
 
 #include <iostream>
@@ -40,7 +42,6 @@
 
 
 #include "bertini2/mpfr_complex.hpp"
-#include "bertini2/limbo.hpp"
 
 #include "bertini2/system/system.hpp"
 
@@ -49,6 +50,7 @@
 #include "bertini2/trackers/config.hpp"
 #include "bertini2/endgames/config.hpp"
 #include "bertini2/endgames/interpolation.hpp"
+#include "bertini2/endgames/events.hpp"
 
 #include "bertini2/logging.hpp"
 
@@ -62,6 +64,8 @@ namespace bertini{ namespace endgame {
 \class Endgame
 
 \brief Base endgame class for all endgames offered in Bertini2.
+
+\ingroup endgame
 
 \see PowerSeriesEndgame
 \see CauchyEndgame
@@ -86,7 +90,8 @@ Also, there are settings that will be kept at this level to not duplicate code.
 template<class FlavorT, class PrecT>
 class EndgameBase : 
 	public detail::Configured< typename AlgoTraits<FlavorT>::NeededConfigs >,
-	public PrecT
+	public PrecT,
+	public virtual Observable
 {
 public:
 	using TrackerType = typename PrecT::TrackerType;
@@ -94,6 +99,7 @@ public:
 	using BaseComplexType = typename tracking::TrackerTraits<TrackerType>::BaseComplexType;
 	using BaseRealType = typename tracking::TrackerTraits<TrackerType>::BaseRealType;
 
+	using EmitterType = FlavorT;
 
 protected:
 
@@ -115,8 +121,8 @@ protected:
 
 
 	// universal endgame state variables
-	mutable TupOfVec final_approximation_; 
-	mutable TupOfVec previous_approximation_; 
+	mutable Vec<BCT> final_approximation_; 
+	mutable Vec<BCT> previous_approximation_; 
 	mutable unsigned int cycle_number_ = 0; 
 	mutable NumErrorT approximate_error_;
 
@@ -131,7 +137,7 @@ protected:
 	*/
 	const FlavorT& AsFlavor() const
 	{
-		return static_cast<const FlavorT&>(*this);
+		return dynamic_cast<const FlavorT&>(*this);
 	}
 
 	/**
@@ -139,7 +145,7 @@ protected:
 	*/
 	FlavorT& AsFlavor()
 	{
-		return static_cast<FlavorT&>(*this);
+		return dynamic_cast<FlavorT&>(*this);
 	}
 
 public:
@@ -176,6 +182,7 @@ public:
 				// BOOST_LOG_TRIVIAL(severity_level::trace) << "refining failed, code " << int(refine_success);
 				return refine_success;
 			}
+			NotifyObservers(SampleRefined<EmitterType>(AsFlavor()));
 		}
 
 		if (tracking::TrackerTraits<TrackerType>::IsAdaptivePrec) // known at compile time
@@ -199,7 +206,9 @@ public:
 	void ChangePrecision(unsigned p)
 	{
 		AsFlavor().ChangePrecision(p);
-		PrecT::ChangePrecision();
+		PrecT::ChangePrecision(p);
+		ChangePrecision(this->final_approximation_,p);
+		ChangePrecision(this->previous_approximation_,p);
 	}
 
 
@@ -219,15 +228,17 @@ public:
 	}
 
 	explicit EndgameBase(TrackerType const& tr, const ConfigsAsTuple& settings ) :
-      	Configured( settings ), PrecT(tr)
+      	Configured( settings ), PrecT(tr), EndgamePrecPolicyBase<TrackerType>(tr)
    	{}
 
+
     template< typename... Ts >
-		EndgameBase(TrackerType const& tr, const Ts&... ts ) : EndgameBase(tr, Configs::Unpermute( ts... ) ) 
-		{}
+    explicit
+	EndgameBase(TrackerType const& tr, const Ts&... ts ) : EndgameBase(tr, Configs::Unpermute( ts... ) ) 
+	{}
 
 
-		inline unsigned CycleNumber() const { return cycle_number_;}
+	inline unsigned CycleNumber() const { return cycle_number_;}
 	inline void CycleNumber(unsigned c) { cycle_number_ = c;}
 	inline void IncrementCycleNumber(unsigned inc) { cycle_number_ += inc;}
 
@@ -259,7 +270,7 @@ public:
 	inline
 	const Vec<CT>& FinalApproximation() const 
 	{
-		return std::get<Vec<CT> >(final_approximation_);
+		return final_approximation_;
 	}
 
 	/**
@@ -269,7 +280,7 @@ public:
 	inline
 	const Vec<CT>& PreviousApproximation() const 
 	{
-		return std::get<Vec<CT> >(final_approximation_);
+		return previous_approximation_;
 	}
 
 	/**
@@ -307,7 +318,7 @@ public:
 	## Input
 
 	  		start_time: is the time when we start the endgame process usually this is .1
-			x_endgame: is the space value at start_time
+			x_endgame_start: is the space value at start_time
 			times: a deque of time values. These values will be templated to be CT 
 			samples: a deque of sample values that are in correspondence with the values in times. These values will be vectors with entries of CT. 
 
@@ -318,34 +329,34 @@ public:
 
 	## Details
 
-		The first sample will be (x_endgame) and the first time is start_time.
+		The first sample will be (x_endgame_start) and the first time is start_time.
 		From there we do a geometric progression using the sample factor (which by default is 1/2).
 		Hence, next_time = start_time * sample_factor.
 		We track then to the next_time and construct the next_sample.
 
 	\param start_time The time value at which we start the endgame. 
 	\param target_time The time value that we are trying to find a solution to. 
-	\param x_endgame The current space point at start_time.
+	\param x_endgame_start The current space point at start_time.
 	\param times A deque that will hold all the time values of the samples we are going to use to start the endgame. 
 	\param samples a deque that will hold all the samples corresponding to the time values in times. 
 
 	\tparam CT The complex number type.
 	*/	
 	template<typename CT>
-	SuccessCode ComputeInitialSamples(const CT & start_time,const CT & target_time, const Vec<CT> & x_endgame, TimeCont<CT> & times, SampCont<CT> & samples) // passed by reference to allow times to be filled as well.
+	SuccessCode ComputeInitialSamples(const CT & start_time,const CT & target_time, const Vec<CT> & x_endgame_start, TimeCont<CT> & times, SampCont<CT> & samples) // passed by reference to allow times to be filled as well.
 	{	
 		using RT = typename Eigen::NumTraits<CT>::Real;
 		assert(this->template Get<EndgameConfig>().num_sample_points>0 && "number of sample points must be positive");
 
 		if (tracking::TrackerTraits<TrackerType>::IsAdaptivePrec)
 		{
-			assert(Precision(start_time)==Precision(x_endgame) && "Computing initial samples requires input time and space with uniform precision");
+			assert(Precision(start_time)==Precision(x_endgame_start) && "Computing initial samples requires input time and space with uniform precision");
 		}
 
 		samples.clear();
 		times.clear();
 
-		samples.push_back(x_endgame);
+		samples.push_back(x_endgame_start);
 		times.push_back(start_time);
 
 		auto num_vars = this->GetSystem().NumVariables();
@@ -365,6 +376,7 @@ public:
 		return SuccessCode::Success;
 	}
 
+	virtual ~EndgameBase() = default;
 };
 			
 } }// end namespaces bertini

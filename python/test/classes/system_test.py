@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with python/test/system_test.py.  If not, see <http://www.gnu.org/licenses/>.
 # 
-#  Copyright(C) 2016 by Bertini2 Development Team
+#  Copyright(C) Bertini2 Development Team
 # 
 #  See <http://www.gnu.org/licenses/> for a copy of the license, 
 #  as well as COPYING.  Bertini2 is provided with permitted 
@@ -25,18 +25,29 @@
 #   West Texas A&M University
 #   Spring 2016
 # 
+#  silviana amethyst
+#  UWEC
+#  Spring 2018
+#
+
 
 
 __author__ = 'jcollins'
 
-from pybertini import *
-from pybertini.function_tree.symbol import *
-from pybertini.function_tree.root import *
-from pybertini.function_tree import *
+from bertini import *
+from bertini.function_tree.symbol import *
+from bertini.function_tree.root import *
+from bertini.function_tree import *
 import unittest
 import numpy as np
 import pdb
 
+import bertini as pb
+
+
+import bertini.multiprec as mp
+from bertini.multiprec import Float as mpfr_float
+from bertini.multiprec import Complex as mpfr_complex
 
 class SystemTest(unittest.TestCase):
     def setUp(self):
@@ -55,8 +66,13 @@ class SystemTest(unittest.TestCase):
         self.f = Function(self.x*self.y);
         #
         s = System();
-        s.add_ungrouped_variable(self.x);
-        s.add_ungrouped_variable(self.y);
+
+        vg = pb.VariableGroup()
+        vg.append(self.x)
+        vg.append(self.y)
+
+        s.add_variable_group(vg)
+
         s.add_function(self.f)
 
 
@@ -65,13 +81,17 @@ class SystemTest(unittest.TestCase):
         exact_imag = (-26.66705, -258.97936865)
         #
         s = System();
-        s.add_ungrouped_variable(self.x);
-        s.add_ungrouped_variable(self.y);
-        s.add_ungrouped_variable(self.z);
+
+        vg = pb.VariableGroup()
+        vg.append(self.x)
+        vg.append(self.y)
+        vg.append(self.z)
+        s.add_variable_group(vg)
+
         s.add_function(self.f)
         s.add_function(self.g)
         #
-        v = VectorXd.Zero(3);
+        v = np.array([complex(0),complex(0),complex(0)])
         v[0] = complex(3.5,2.89); v[1] = complex(-9.32,.0765); v[2] = complex(5.4,-2.13);
         #
         e = s.eval(v)
@@ -82,19 +102,19 @@ class SystemTest(unittest.TestCase):
         self.assertTrue(np.abs(e[1].imag - exact_imag[1]) < self.toldbl*np.abs(exact_imag[1]));
         #
         #
-        s = parse_system('function f1, f2; variable_group x,y,z; f1 = x*y; f2 = x^2*y - z*x;')
+        s = pb.parse.system('function f1, f2; variable_group x,y,z; f1 = x*y; f2 = x^2*y - z*x;')
         self.toldbl = mpfr_float('1e-27');
         exact_real = (mpfr_float('-32.841085'), mpfr_float('-62.9317230'))
         exact_imag = (mpfr_float('-26.66705'), mpfr_float('-196.39641065'))
         self.a = mpfr_complex('4.897', '1.23')
-        v = VectorXmp((mpfr_complex('3.5', '2.89'), mpfr_complex('-9.32', '.0765'), mpfr_complex('5.4', '-2.13')));
+        v = np.array((mpfr_complex('3.5', '2.89'), mpfr_complex('-9.32', '.0765'), mpfr_complex('5.4', '-2.13')));
         #
         e = s.eval(v)
         #
-        self.assertLessEqual(abs(e[0].real / exact_real[0]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[0].imag / exact_imag[0]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[1].real / exact_real[1]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[1].imag / exact_imag[1]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[0].real / exact_real[0]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[0].imag / exact_imag[0]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[1].real / exact_real[1]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[1].imag / exact_imag[1]-1) , self.toldbl);
 
 
 
@@ -107,17 +127,21 @@ class SystemTest(unittest.TestCase):
                       (-49.54549,20.230,-18.45733))
         #
         s = System();
-        s.add_ungrouped_variable(self.x);
-        s.add_ungrouped_variable(self.y);
-        s.add_ungrouped_variable(self.z);
+
+        vg = pb.VariableGroup()
+        vg.append(self.x)
+        vg.append(self.y)
+        vg.append(self.z)
+        s.add_variable_group(vg)
+
         s.add_function(self.f)
         s.add_function(self.g)
         #
-        v = VectorXd.Zero(3);
+        v = np.array([complex(0),complex(0),complex(0)])
         v[0] = complex(3.5,2.89); v[1] = complex(-9.32,.0765); v[2] = complex(5.4,-2.13);
         #
         s.differentiate();
-        e = s.jacobian(v)
+        e = s.eval_jacobian(v)
         #
         self.assertTrue(np.abs(e[0][0].real - exact_real[0][0]) <= self.toldbl*np.abs(exact_real[0][0]));
         self.assertTrue(np.abs(e[0][0].imag - exact_imag[0][0]) <= self.toldbl*np.abs(exact_imag[0][0]));
@@ -135,29 +159,29 @@ class SystemTest(unittest.TestCase):
         #
         #
         #
-        s = parse_system('function f1, f2; variable_group x,y,z; f1 = x*y; f2 = x^2*y - z*x;')
+        s = pb.parse.system('function f1, f2; variable_group x,y,z; f1 = x*y; f2 = x^2*y - z*x;')
         self.toldbl = mpfr_float('1e-27');
         exact_real = ((mpfr_float('-9.32'), mpfr_float('3.5'), mpfr_float('0')), \
                       (mpfr_float('-71.082170'),mpfr_float('3.8979'),mpfr_float('-3.5')))
         exact_imag = ((mpfr_float('.0765'), mpfr_float('2.89'), mpfr_float('0')),\
                       (mpfr_float('-51.20410'),mpfr_float('20.230'),mpfr_float('-2.89')))
-        v = VectorXmp((mpfr_complex('3.5', '2.89'), mpfr_complex('-9.32', '.0765'), mpfr_complex('5.4', '-2.13')));
+        v = np.array((mpfr_complex('3.5', '2.89'), mpfr_complex('-9.32', '.0765'), mpfr_complex('5.4', '-2.13')));
         #
         s.differentiate();
-        e = s.jacobian(v);
+        e = s.eval_jacobian(v);
         #
-        self.assertLessEqual(abs(e[0][0].real / exact_real[0][0]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[0][0].imag / exact_imag[0][0]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[0][1].real / exact_real[0][1]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[0][1].imag / exact_imag[0][1]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[0][2].real ) , self.toldbl);
-        self.assertLessEqual(abs(e[0][2].imag ) , self.toldbl);
-        self.assertLessEqual(abs(e[1][0].real / exact_real[1][0]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[1][0].imag / exact_imag[1][0]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[1][1].real / exact_real[1][1]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[1][1].imag / exact_imag[1][1]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[1][2].real / exact_real[1][2]-1) , self.toldbl);
-        self.assertLessEqual(abs(e[1][2].imag / exact_imag[1][2]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[0][0].real / exact_real[0][0]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[0][0].imag / exact_imag[0][0]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[0][1].real / exact_real[0][1]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[0][1].imag / exact_imag[0][1]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[0][2].real ) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[0][2].imag ) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[1][0].real / exact_real[1][0]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[1][0].imag / exact_imag[1][0]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[1][1].real / exact_real[1][1]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[1][1].imag / exact_imag[1][1]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[1][2].real / exact_real[1][2]-1) , self.toldbl);
+        self.assertLessEqual(mp.abs(e[1][2].imag / exact_imag[1][2]-1) , self.toldbl);
 
 
 
@@ -177,7 +201,7 @@ class SystemTest(unittest.TestCase):
         s2.add_function(-x*y)
         #
         s1 += s2;
-        values = VectorXd((2,3))
+        values = np.array((2,3))
         v = s1.eval(values)
         #
         self.assertEqual(v[0], 0.0)
@@ -192,12 +216,12 @@ class SystemTest(unittest.TestCase):
 
     def test_mult_system_node(self):
         tol_d = self.toldbl;
-        sys = parse_system('function f1, f2; variable_group x,y,z; f1 = x+2; f2 = y*y;')
+        sys = pb.parse.system('function f1, f2; variable_group x,y,z; f1 = x+2; f2 = y*y;')
         #
         z = Variable("z");
         sys *= Integer(2);
         #
-        vals = VectorXd((complex(-2.43,.21 ),complex(4.84, -1.94),complex(-6.48, -.731)))
+        vals = np.array((complex(-2.43,.21 ),complex(4.84, -1.94),complex(-6.48, -.731)))
         sysEval = sys.eval(vals);
         #
         self.assertLessEqual(np.abs(sysEval[0].real / (-.86)-1), tol_d)

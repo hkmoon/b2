@@ -13,18 +13,22 @@
 //You should have received a copy of the GNU General Public License
 //along with src/function_tree/roots/jacobian.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of notre dame
+// silviana amethyst, university of notre dame
 // Jeb Collins, West Texas A&M
+// 
+//  silviana amethyst
+//  UWEC
+//  Spring 2018
 
 
-#include "function_tree/roots/jacobian.hpp"
+#include "bertini2/function_tree/roots/jacobian.hpp"
 
 
 
@@ -32,28 +36,78 @@
 namespace bertini{
 namespace node{
 
-Function::Function(std::string new_name) : NamedSymbol(new_name)
+
+
+Handle::Handle(std::string const& new_name) : NamedSymbol(new_name)
 { }
 
 
-Function::Function(const std::shared_ptr<Node> & entry) : NamedSymbol("unnamed_function"), entry_node_(entry)
+Handle::Handle(const std::shared_ptr<Node> & entry, std::string const& name) : NamedSymbol(name), entry_node_(entry)
 {
 }
 
-const std::shared_ptr<Node> & Function::entry_node() const
+
+
+/**
+ Calls FreshEval on the entry node to the tree.
+ */
+dbl Handle::FreshEval_d(std::shared_ptr<Variable> const& diff_variable) const
 {
+	return entry_node_->Eval<dbl>(diff_variable);
+}
+
+/**
+ Calls FreshEval in place on the entry node to the tree.
+ */
+void Handle::FreshEval_d(dbl& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const
+{
+	entry_node_->EvalInPlace<dbl>(evaluation_value, diff_variable);
+}
+
+
+/**
+ Calls FreshEval on the entry node to the tree.
+ */
+mpfr_complex Handle::FreshEval_mp(std::shared_ptr<Variable> const& diff_variable) const
+{
+	return entry_node_->Eval<mpfr_complex>(diff_variable);
+}
+
+/**
+ Calls FreshEval in place on the entry node to the tree.
+ */
+void Handle::FreshEval_mp(mpfr_complex& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const
+{
+	entry_node_->EvalInPlace<mpfr_complex>(evaluation_value, diff_variable);
+}
+
+
+
+
+
+
+
+
+const std::shared_ptr<Node> & Handle::EntryNode() const
+{
+	assert (entry_node_!=nullptr);
+
 	return entry_node_;
 }
 
 
-void Function::print(std::ostream & target) const
+void Handle::print(std::ostream & target) const
 {
 	EnsureNotEmpty();
+	NamedSymbol::print(target);
+	target << " function (";
+
 	entry_node_->print(target);
+	target << ")";
 }
 
 
-void Function::Reset() const
+void Handle::Reset() const
 {
 	EnsureNotEmpty();
 	
@@ -61,12 +115,13 @@ void Function::Reset() const
 	entry_node_->Reset();
 }
 
-void Function::SetRoot(std::shared_ptr<Node> const& entry)
+
+void Handle::SetRoot(std::shared_ptr<Node> const& entry)
 {
 	entry_node_ = entry;
 }
 
-void Function::EnsureNotEmpty() const
+void Handle::EnsureNotEmpty() const
 {
 	if (entry_node_==nullptr)
 	{
@@ -74,7 +129,7 @@ void Function::EnsureNotEmpty() const
 	}
 }
 
-std::shared_ptr<Node> Function::Differentiate(std::shared_ptr<Variable> const& v) const
+std::shared_ptr<Node> Handle::Differentiate(std::shared_ptr<Variable> const& v) const
 {
 	return entry_node_->Differentiate(v);
 }
@@ -82,18 +137,18 @@ std::shared_ptr<Node> Function::Differentiate(std::shared_ptr<Variable> const& v
 /**
 Compute the degree of a node.  For functions, the degree is the degree of the entry node.
 */
-int Function::Degree(std::shared_ptr<Variable> const& v) const
+int Handle::Degree(std::shared_ptr<Variable> const& v) const
 {
 	return entry_node_->Degree(v);
 }
 
 
-int Function::Degree(VariableGroup const& vars) const
+int Handle::Degree(VariableGroup const& vars) const
 {
 	return entry_node_->Degree(vars);
 }
 
-std::vector<int> Function::MultiDegree(VariableGroup const& vars) const
+std::vector<int> Handle::MultiDegree(VariableGroup const& vars) const
 {
 	
 	std::vector<int> deg(vars.size());
@@ -105,12 +160,12 @@ std::vector<int> Function::MultiDegree(VariableGroup const& vars) const
 }
 
 
-void Function::Homogenize(VariableGroup const& vars, std::shared_ptr<Variable> const& homvar)
+void Handle::Homogenize(VariableGroup const& vars, std::shared_ptr<Variable> const& homvar)
 {
 	entry_node_->Homogenize(vars, homvar);
 }
 
-bool Function::IsHomogeneous(std::shared_ptr<Variable> const& v) const
+bool Handle::IsHomogeneous(std::shared_ptr<Variable> const& v) const
 {
 	return entry_node_->IsHomogeneous(v);
 }
@@ -118,7 +173,7 @@ bool Function::IsHomogeneous(std::shared_ptr<Variable> const& v) const
 /**
 Check for homogeneity, with respect to a variable group.
 */
-bool Function::IsHomogeneous(VariableGroup const& vars) const
+bool Handle::IsHomogeneous(VariableGroup const& vars) const
 {
 	return entry_node_->IsHomogeneous(vars);
 }
@@ -129,9 +184,9 @@ bool Function::IsHomogeneous(VariableGroup const& vars) const
  
  \param prec the number of digits to change precision to.
  */
-void Function::precision(unsigned int prec) const
+void Handle::precision(unsigned int prec) const
 {
-	auto& val_pair = std::get< std::pair<mpfr,bool> >(current_value_);
+	auto& val_pair = std::get< std::pair<mpfr_complex,bool> >(current_value_);
 	if (val_pair.first.precision()==prec)
 		return;
 	else{
@@ -142,38 +197,30 @@ void Function::precision(unsigned int prec) const
 }
 
 
-/**
- Calls FreshEval on the entry node to the tree.
- */
-dbl Function::FreshEval_d(std::shared_ptr<Variable> const& diff_variable) const
-{
-	return entry_node_->Eval<dbl>(diff_variable);
-}
-
-/**
- Calls FreshEval in place on the entry node to the tree.
- */
-void Function::FreshEval_d(dbl& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const
-{
-	entry_node_->EvalInPlace<dbl>(evaluation_value, diff_variable);
-}
 
 
-/**
- Calls FreshEval on the entry node to the tree.
- */
-mpfr Function::FreshEval_mp(std::shared_ptr<Variable> const& diff_variable) const
+
+
+
+
+
+
+
+
+
+
+
+
+Function::Function(std::string const& new_name) : Handle(new_name)
+{ }
+
+
+Function::Function(const std::shared_ptr<Node> & entry, std::string const& name) : Handle(entry, name)
 {
-	return entry_node_->Eval<mpfr>(diff_variable);
 }
 
-/**
- Calls FreshEval in place on the entry node to the tree.
- */
-void Function::FreshEval_mp(mpfr& evaluation_value, std::shared_ptr<Variable> const& diff_variable) const
-{
-	entry_node_->EvalInPlace<mpfr>(evaluation_value, diff_variable);
-}
+
+
 
 
 

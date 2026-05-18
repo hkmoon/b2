@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with zero_dim.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -24,7 +24,7 @@
 */
 
 // individual authors of this file include:
-// dani brake, university of notre dame
+// silviana amethyst
 
 #include "bertini2/system/precon.hpp"
 #include "bertini2/nag_algorithms/zero_dim_solve.hpp"
@@ -33,6 +33,8 @@
 #include <boost/test/unit_test.hpp>
 #include "bertini2/nag_algorithms/output.hpp"
 
+
+using Variable = bertini::node::Variable;
 
 BOOST_AUTO_TEST_SUITE(zero_dim)
 
@@ -62,7 +64,7 @@ BOOST_AUTO_TEST_CASE(can_run_griewank_osborn)
 
 	auto& tr = zd.GetTracker();
 	GoryDetailLogger<TrackerT> logger;
-	tr.AddObserver(&logger);
+	tr.AddObserver(logger);
 
 
 	auto eg = zd.GetFromEndgame<EndgameConfT>();
@@ -94,7 +96,7 @@ BOOST_AUTO_TEST_CASE(can_run_change_some_settings)
 	
 	auto& tr = zd.GetTracker();
 	GoryDetailLogger<TrackerT> logger;
-	tr.AddObserver(&logger);
+	tr.AddObserver(logger);
 
 	
 
@@ -123,7 +125,7 @@ BOOST_AUTO_TEST_CASE(reference_managed_systems_GO_nonhom)
 	auto sys = system::Precon::GriewankOsborn();
 	auto TD = start_system::TotalDegree(sys);
 
-	auto t = MakeVariable("t");
+	auto t = Variable::Make("t");
 	auto h = (1-t)* sys + t*TD;
 	h.AddPathVariable(t);
 
@@ -162,7 +164,7 @@ BOOST_AUTO_TEST_CASE(reference_managed_systems_GO)
 
 	auto TD = start_system::TotalDegree(sys);
 
-	auto t = MakeVariable("t");
+	auto t = Variable::Make("t");
 	auto h = (1-t)* sys + t*TD;
 	h.AddPathVariable(t);
 
@@ -180,7 +182,7 @@ BOOST_AUTO_TEST_CASE(reference_managed_systems_GO)
 
 	auto& tr = zd.GetTracker();
 	GoryDetailLogger<TrackerT> logger;
-	tr.AddObserver(&logger);
+	tr.AddObserver(logger);
 	
 	zd.Solve();
 

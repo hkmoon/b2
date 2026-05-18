@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with bertini2/io/parsing/system_rules.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license,
 // as well as COPYING.  Bertini2 is provided with permitted
@@ -347,7 +347,7 @@ namespace bertini {
 				 */
 				void MakeAndAddFunction(Fn & F, std::string str)
 				{
-					F = std::make_shared<Function>(str);
+					F = Function::Make(str);
 					encountered_symbols_.add(str, F);
 					encountered_functions_.add(str,F);
 				}
@@ -358,7 +358,7 @@ namespace bertini {
 				 */
 				void MakeAndAddVariable(Var & V, std::string str)
 				{
-					V = MakeVariable(str);
+					V = Variable::Make(str);
 					encountered_symbols_.add(str, V);
 				}
 				

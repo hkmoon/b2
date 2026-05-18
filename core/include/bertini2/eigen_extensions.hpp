@@ -13,17 +13,17 @@
 //You should have received a copy of the GNU General Public License
 //along with eigen_extensions.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
-// See <http://www.gnu.org/licenses/> for a copy of the license, 
-// as well as COPYING.  Bertini2 is provided with permitted 
+// See <http://www.gnu.org/licenses/> for a copy of the license,
+// as well as COPYING.  Bertini2 is provided with permitted
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, University of Wisconsin Eau Claire
+// silviana amethyst, University of Wisconsin Eau Claire
 
 /**
-\file eigen_extensions.hpp 
+\file eigen_extensions.hpp
 
 \brief Bertini extensions of the Eigen linear algebra library.
 */
@@ -34,22 +34,27 @@
 
 #include "bertini2/num_traits.hpp"
 
-
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>
 
+#define EIGEN_DENSEBASE_PLUGIN "bertini2/eigen_serialization_addon.hpp"
+
 #include <Eigen/Core>
 
+namespace {
+using mpfr_real = bertini::mpfr_float;
+using mpfr_complex = bertini::mpfr_complex;
+}
+
 namespace Eigen {
-	
-	using mpfr_float = bertini::mpfr_float;
-	template<> struct NumTraits<mpfr_float> : GenericNumTraits<mpfr_float> // permits to get the epsilon, dummy_precision, lowest, highest functions
+
+	template<> struct NumTraits<mpfr_real> : GenericNumTraits<mpfr_real> // permits to get the epsilon, dummy_precision, lowest, highest functions
 	{
-		
-		typedef mpfr_float Real;
-		typedef mpfr_float NonInteger;
-		typedef mpfr_float Nested;
+
+		typedef mpfr_real Real;
+		typedef mpfr_real NonInteger;
+		typedef mpfr_real Nested;
 		enum {
 			IsComplex = 0,
 			IsInteger = 0,
@@ -59,42 +64,48 @@ namespace Eigen {
 			AddCost = 30,
 			MulCost = 40
 		};
-		
-		
+
+
 		inline static Real highest() {
-			
-			return (mpfr_float(1) - epsilon()) * pow(mpfr_float(2),mpfr_get_emax()-1);//);//DefaultPrecision());
+
+			return (mpfr_real(1) - epsilon()) * pow(mpfr_real(2),mpfr_get_emax()-1);//);//DefaultPrecision());
 		}
-		
+
 		inline static Real lowest() {
 			return -highest();
 		}
-		
+
 		inline static Real dummy_precision()
 		{
 			using bertini::DefaultPrecision;
-			return pow( mpfr_float(10),-int(DefaultPrecision()-3));
+			return pow( mpfr_real(10),-int(DefaultPrecision()-3));
 		}
-		
+
 		inline static Real epsilon()
 		{
 			using bertini::DefaultPrecision;
-			return pow(mpfr_float(10),-int(DefaultPrecision()));
+			return pow(mpfr_real(10),-int(DefaultPrecision()));
+		}
+
+		static inline int digits10()
+		{
+			return bertini::DefaultPrecision();
+			// return internal::default_digits10_impl<T>::run();
 		}
 		//http://www.manpagez.com/info/mpfr/mpfr-2.3.2/mpfr_31.php
 	};
 
-	
-	template<typename Expr1,typename Expr2, typename Expr3> 
+
+	template<typename Expr1,typename Expr2, typename Expr3>
 	struct NumTraits<
 		boost::multiprecision::detail::expression<Expr1,
       	Expr2, Expr3, void, void>
-      		> : NumTraits<mpfr_float> // permits to get the epsilon, dummy_precision, lowest, highest functions
+      		> : NumTraits<mpfr_real> // permits to get the epsilon, dummy_precision, lowest, highest functions
 	{
-		
-		typedef mpfr_float Real;
-		typedef mpfr_float NonInteger;
-		typedef mpfr_float Nested;
+
+		typedef mpfr_real Real;
+		typedef mpfr_real NonInteger;
+		typedef mpfr_real Nested;
 
 		//http://www.manpagez.com/info/mpfr/mpfr-2.3.2/mpfr_31.php
 	};
@@ -102,17 +113,15 @@ namespace Eigen {
 
 
 	/**
-	 \brief This templated struct permits us to use the bertini::complex type in Eigen matrices.
+	 \brief This templated struct permits us to use the mpfr_complex type in Eigen matrices.
 
-	 Provides methods to get the epsilon, dummy_precision, lowest, highest functions, largely by inheritance from the NumTraits<mpfr_float> contained in mpfr_extensions.
+	 Provides methods to get the epsilon, dummy_precision, lowest, highest functions, largely by inheritance from the NumTraits<mpfr_real> contained in mpfr_extensions.
 	 */
-	template<> struct NumTraits<bertini::complex> : NumTraits<bertini::mpfr_float> 
+	template<> struct NumTraits<mpfr_complex> : NumTraits<mpfr_real>
 	{
-		using mpfr_float = bertini::mpfr_float;
-
-		typedef mpfr_float Real;
-		typedef mpfr_float NonInteger;
-		typedef bertini::complex Nested;// Nested;
+		typedef mpfr_real Real;
+		typedef mpfr_real NonInteger;
+		typedef mpfr_complex Nested;// Nested;
 		enum {
 			IsComplex = 1,
 			IsInteger = 0,
@@ -122,169 +131,129 @@ namespace Eigen {
 			AddCost = 2 * NumTraits<Real>::AddCost,
 			MulCost = 4 * NumTraits<Real>::MulCost + 2 * NumTraits<Real>::AddCost
 		};
-		
+
 	};
 
 	namespace internal {
 		template<>
-		struct abs2_impl<bertini::complex>
+		struct abs2_impl<mpfr_complex>
 		{
-			static inline mpfr_float run(const bertini::complex& x)
+			static inline mpfr_real run(const mpfr_complex& x)
 			{
 				return real(x)*real(x) + imag(x)*imag(x);
 			}
 		};
 
 
-		template<> inline bertini::complex random<bertini::complex>()
+		template<> inline mpfr_complex random<mpfr_complex>()
 		{
-			return bertini::complex::rand();
+			return bertini::multiprecision::rand();
 		}
 
-		template<> inline bertini::complex random<bertini::complex>(const bertini::complex& a, const bertini::complex& b)
+		template<> inline mpfr_complex random<mpfr_complex>(const mpfr_complex& a, const mpfr_complex& b)
 		{
-			return a + (b-a) * random<bertini::complex>();
+			return a + (b-a) * random<mpfr_complex>();
 		}
 
 		template<>
-		struct conj_helper<bertini::complex, bertini::complex, false, true>
+		struct conj_helper<mpfr_complex, mpfr_complex, false, true>
 		{
-			typedef bertini::complex Scalar;
+			typedef mpfr_complex Scalar;
 			EIGEN_STRONG_INLINE Scalar pmadd(const Scalar& x, const Scalar& y, const Scalar& c) const
 			{ return c + pmul(x,y); }
 
 			EIGEN_STRONG_INLINE Scalar pmul(const Scalar& x, const Scalar& y) const
-			{ return Scalar(numext::real(x)*numext::real(y) + numext::imag(x)*numext::imag(y), numext::imag(x)*numext::real(y) - numext::real(x)*numext::imag(y)); }
+			{ return Scalar(real(x)*real(y) + imag(x)*imag(y), imag(x)*real(y) - real(x)*imag(y)); }
 		};
 
 		template<>
-		struct conj_helper<bertini::complex, bertini::complex, true, false>
+		struct conj_helper<mpfr_complex, mpfr_complex, true, false>
 		{
-			typedef bertini::complex Scalar;
+			typedef mpfr_complex Scalar;
 			EIGEN_STRONG_INLINE Scalar pmadd(const Scalar& x, const Scalar& y, const Scalar& c) const
 			{ return c + pmul(x,y); }
 
 			EIGEN_STRONG_INLINE Scalar pmul(const Scalar& x, const Scalar& y) const
-			{ return Scalar(numext::real(x)*numext::real(y) + numext::imag(x)*numext::imag(y), numext::real(x)*numext::imag(y) - numext::imag(x)*numext::real(y)); }
+			{ return Scalar(real(x)*real(y) + imag(x)*imag(y), real(x)*imag(y) - imag(x)*real(y)); }
 		};
 
 		// see https://forum.kde.org/viewtopic.php?f=74&t=111176
 
 		//int
-		template<> 
-		struct scalar_product_traits<int,bertini::complex> 
+		template<>
+		struct scalar_product_traits<int,mpfr_complex>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
 
-		template<> 
-		struct scalar_product_traits<bertini::complex, int> 
+		template<>
+		struct scalar_product_traits<mpfr_complex, int>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
 
 		//long
-		template<> 
-		struct scalar_product_traits<long,bertini::complex> 
+		template<>
+		struct scalar_product_traits<long,mpfr_complex>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
 
-		template<> 
-		struct scalar_product_traits<bertini::complex, long> 
+		template<>
+		struct scalar_product_traits<mpfr_complex, long>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
 
 		//long long
-		template<> 
-		struct scalar_product_traits<long long,bertini::complex> 
+		template<>
+		struct scalar_product_traits<long long,mpfr_complex>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
 
-		template<> 
-		struct scalar_product_traits<bertini::complex, long long> 
+		template<>
+		struct scalar_product_traits<mpfr_complex, long long>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
 
 
-		//mpfr_float
-		template<> 
-		struct scalar_product_traits<bertini::mpfr_float,bertini::complex> 
+		//mpfr_real
+		template<>
+		struct scalar_product_traits<mpfr_real,mpfr_complex>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
 
-		template<> 
-		struct scalar_product_traits<bertini::complex, bertini::mpfr_float> 
+		template<>
+		struct scalar_product_traits<mpfr_complex, mpfr_real>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
 
 		//mpz_int
-		template<> 
-		struct scalar_product_traits<bertini::mpz_int,bertini::complex> 
+		template<>
+		struct scalar_product_traits<bertini::mpz_int,mpfr_complex>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
 
-		template<> 
-		struct scalar_product_traits<bertini::complex, bertini::mpz_int> 
+		template<>
+		struct scalar_product_traits<mpfr_complex, bertini::mpz_int>
 		{
 	    	enum { Defined = 1 };
-	    	typedef bertini::complex ReturnType;
+	    	typedef mpfr_complex ReturnType;
 		};
-		// template<> 
-		// struct scalar_product_traits<long,bertini::complex> 
-		// {
-	 //    	enum { Defined = 1 };
-	 //    	typedef bertini::complex ReturnType;
-		// };
-
-		// template<> 
-		// struct scalar_product_traits<bertini::complex, long> 
-		// {
-	 //    	enum { Defined = 1 };
-	 //    	typedef bertini::complex ReturnType;
-		// };
-
-		// template<> 
-		// struct scalar_product_traits<bertini::mpz_int,bertini::complex> 
-		// {
-	 //    	enum { Defined = 1 };
-	 //    	typedef bertini::complex ReturnType;
-		// };
-
-		// template<> 
-		// struct scalar_product_traits<bertini::complex, bertini::mpz_int> 
-		// {
-	 //    	enum { Defined = 1 };
-	 //    	typedef bertini::complex ReturnType;
-		// };
-
-		// now provide unary ops definitions using the above templates
-
-		// template<typename Derived>
-		// CwiseUnaryOp<internal::scalar_multiple2_op<int,bertini::complex>, const Derived>
-		// operator*(int& lhs, const DenseBase<Derived>& rhs) 
-		// {
-		// 	return CwiseUnaryOp<internal::scalar_multiple2_op<int,bertini::complex>, const Derived>
-		// 		(internal::scalar_multiple2_op<bertini::complex,int>(lhs), rhs.derived());
-		// }
-
-		
-
 
 	} // re: namespace internal
 } // re: namespace Eigen
@@ -301,7 +270,7 @@ namespace bertini {
 	template<typename NumType> using Vec = Eigen::Matrix<NumType, Eigen::Dynamic, 1>;
 	template<typename NumType> using Mat = Eigen::Matrix<NumType, Eigen::Dynamic, Eigen::Dynamic>;
 
-	
+
 	/**
 	\brief Checks whether the number of rows and columns are either 0
 	*/
@@ -314,7 +283,7 @@ namespace bertini {
 
 
 	/**
-	\brief Get the precision of an Eigen object. If the object is empty, it's the precision of a default-constructed Scalar.  If it actually has content, then it's the precision of the first element.  
+	\brief Get the precision of an Eigen object. If the object is empty, it's the precision of a default-constructed Scalar.  If it actually has content, then it's the precision of the first element.
 
 	If you require that the object be of uniform precision when you check, use PrecisionRequireUniform
 	*/
@@ -324,7 +293,7 @@ namespace bertini {
 	{
 		if (IsEmpty(v))
 			throw std::runtime_error("getting precision of empty object");
-		
+
 		return Precision(v(0,0));
 	}
 
@@ -355,26 +324,28 @@ namespace bertini {
 
 	/**
 	\brief Set the precision of an Eigen object.
+
+	\param v the matrix to change
+	\param prec the new precision
 	*/
 	template<typename Derived>
 	void Precision(Eigen::MatrixBase<Derived> & v, unsigned prec)
 	{
 		using bertini::Precision;
-		
 		for (int ii=0; ii<v.cols(); ++ii)
 			for (int jj=0; jj<v.rows(); ++jj)
 				Precision(v(jj,ii),prec);
 	}
 
-	
+
 
 	/**
 	 Test a numbers being very small.
 
-	 Compares the number against machine epsilon (or software epsilon if a multiple precision type), times 100.  
+	 Compares the number against machine epsilon (or software epsilon if a multiple precision type), times 100.
 
-	 \note Machine epsilon for doubles is about 1e-16, for mpfr_float, it's 10^-current precision.
-	 
+	 \note Machine epsilon for doubles is about 1e-16, for mpfr_real, it's 10^-current precision.
+
 	 \param testme The number to test
 
 	 \return true, if the number is very small.  False otherwise.
@@ -385,11 +356,11 @@ namespace bertini {
 	{
 		using std::abs;
 		return abs(testme) <= Eigen::NumTraits<T>::epsilon()*100;
-	} 
+	}
 
 	/**
 	\brief Check whether two values are very close to each other.
-	
+
 	\e The tolerance for being close
 	See \url http://www.boost.org/doc/libs/1_34_0/libs/test/doc/components/test_tools/floating_point_comparison.html, for example.
 	*/
@@ -407,10 +378,10 @@ namespace bertini {
 
 	/**
 	 Test two numbers for having large ratio.
-	
+
 	 The basis for comparison is Eigen's fuzzy precision, Eigen::NumTraits<T>::dummy_precision();
-	 
-	 \note For doubles, the threshold is 1e-12, for mpfr_float is 1e3*current precision.
+
+	 \note For doubles, the threshold is 1e-12, for mpfr_real is 1e3*current precision.
 
 	 \param numerator The numerator for the ratio.
 	 \param denomenator The denomenator for the ratio.
@@ -424,7 +395,7 @@ namespace bertini {
 		static_assert(!Eigen::NumTraits<T>::IsInteger, "IsLargeChange cannot be used safely on non-integral types");
 		using std::abs;
 		return abs(numerator/denomenator) >= 1/Eigen::NumTraits<T>::dummy_precision();
-	} 
+	}
 
 	enum class MatrixSuccessCode
 	{
@@ -434,7 +405,7 @@ namespace bertini {
 	};
 
 	/**
-	\brief Check the diagonal elements of an LU decomposition for small values and large ratios.  
+	\brief Check the diagonal elements of an LU decomposition for small values and large ratios.
 
 	\return Success if things are ok.  LargeChange or SmallValue if one is found.
 
@@ -453,7 +424,7 @@ namespace bertini {
 			// this loop won't test entry (0,0).  it's tested separately after.
 		for (unsigned int ii = LU.rows()-1; ii > 0; ii--)
 		{
-			if (IsSmallValue(LU(ii,ii))) 
+			if (IsSmallValue(LU(ii,ii)))
 			{
 				return MatrixSuccessCode::SmallValue;
 			}
@@ -465,7 +436,7 @@ namespace bertini {
 		}
 
 		// this line is the reason for the above assert on non-empty matrix.
-		if (IsSmallValue(LU(0,0))) 
+		if (IsSmallValue(LU(0,0)))
 		{
 			return MatrixSuccessCode::SmallValue;
 		}
@@ -482,11 +453,11 @@ namespace bertini {
 		using std::sqrt;
 		NumberType s, scale(1.0);
 		s = sqrt( (NumberType(1.0)-c) * (NumberType(1.0)+c) );
-		
-		
+
+
 		Eigen::Matrix<NumberType, Eigen::Dynamic, Eigen::Dynamic> A(mat_size,mat_size);
-		
-		
+
+
 		for (unsigned int ii=0; ii<mat_size; ii++) {
 			for (unsigned int jj=0; jj<ii; jj++) {
 				A(ii,jj) = NumberType(0.0);
@@ -495,19 +466,19 @@ namespace bertini {
 				A(ii,jj) = -c * NumberType(1.0);
 			}
 		}
-		
-		
+
+
 		for (unsigned int ii=0; ii<mat_size; ii++) {
 			A(ii,ii) += NumberType(1)+c;
 		}
-		
+
 		for (unsigned int jj=0; jj<mat_size; jj++){
 			for (unsigned int kk=0;kk<mat_size;kk++){
 				A(jj,kk) *= scale;
 			}
 			scale *= s;
 		}
-		
+
 		for (unsigned int jj=0;jj<mat_size;jj++){
 			for (unsigned int kk=0;kk<mat_size;kk++){
 				A(kk,jj)/= NumberType(jj) + NumberType(1);
@@ -528,7 +499,7 @@ namespace bertini {
 	*/
 	template <typename NumberType>
 	inline
-	Mat<NumberType> RandomOfUnits(uint rows, uint cols)
+	Mat<NumberType> RandomOfUnits(unsigned int rows, unsigned int cols)
 	{
 		return Mat<NumberType>(rows,cols).unaryExpr([](NumberType const& x) { return RandomUnit<NumberType>(); });
 	}
@@ -543,7 +514,7 @@ namespace bertini {
 	*/
 	template <typename NumberType>
 	inline
-	Vec<NumberType> RandomOfUnits(uint size)
+	Vec<NumberType> RandomOfUnits(unsigned int size)
 	{
 		return Vec<NumberType>(size).unaryExpr([](NumberType const& x) { return RandomUnit<NumberType>(); });
 	}
@@ -551,77 +522,76 @@ namespace bertini {
 }
 
 
-// the following code comes from
-// https://stackoverflow.com/questions/18382457/eigen-and-boostserialize
-// and adds support for serialization of Eigen types
-//
-// question asked by user Gabriel and answered by Shmuel Levine
-// answer code repeated here verbatim.
-// please update this comment if this code is changed, 
-// and post the modifications to the above referenced post on SO.
-namespace boost{
-    namespace serialization{
+// // the following code comes from
+// // https://stackoverflow.com/questions/18382457/eigen-and-boostserialize
+// // and adds support for serialization of Eigen types
+// //
+// // question asked by user Gabriel and answered by Shmuel Levine
+// // answer code repeated here verbatim.
+// // please update this comment if this code is changed,
+// // and post the modifications to the above referenced post on SO.
+// namespace boost{
+//     namespace serialization{
 
-        template<   class Archive, 
-                    class S, 
-                    int Rows_, 
-                    int Cols_, 
-                    int Ops_, 
-                    int MaxRows_, 
-                    int MaxCols_>
-        inline void save(
-            Archive & ar, 
-            const Eigen::Matrix<S, Rows_, Cols_, Ops_, MaxRows_, MaxCols_> & g, 
-            const unsigned int version)
-            {
-                int rows = g.rows();
-                int cols = g.cols();
+//         template<   class Archive,
+//                     class S,
+//                     int Rows_,
+//                     int Cols_,
+//                     int Ops_,
+//                     int MaxRows_,
+//                     int MaxCols_>
+//         inline void save(
+//             Archive & ar,
+//             const Eigen::Matrix<S, Rows_, Cols_, Ops_, MaxRows_, MaxCols_> & g,
+//             const unsigned int version)
+//             {
+//                 int rows = g.rows();
+//                 int cols = g.cols();
 
-                ar & rows;
-                ar & cols;
-                ar & boost::serialization::make_array(g.data(), rows * cols);
-            }
+//                 ar & rows;
+//                 ar & cols;
+//                 ar & boost::serialization::make_array(g.data(), rows * cols);
+//             }
 
-        template<   class Archive, 
-                    class S, 
-                    int Rows_,
-                    int Cols_,
-                    int Ops_, 
-                    int MaxRows_, 
-                    int MaxCols_>
-        inline void load(
-            Archive & ar, 
-            Eigen::Matrix<S, Rows_, Cols_, Ops_, MaxRows_, MaxCols_> & g, 
-            const unsigned int version)
-        {
-            int rows, cols;
-            ar & rows;
-            ar & cols;
-            g.resize(rows, cols);
-            ar & boost::serialization::make_array(g.data(), rows * cols);
-        }
+//         template<   class Archive,
+//                     class S,
+//                     int Rows_,
+//                     int Cols_,
+//                     int Ops_,
+//                     int MaxRows_,
+//                     int MaxCols_>
+//         inline void load(
+//             Archive & ar,
+//             Eigen::Matrix<S, Rows_, Cols_, Ops_, MaxRows_, MaxCols_> & g,
+//             const unsigned int version)
+//         {
+//             int rows, cols;
+//             ar & rows;
+//             ar & cols;
+//             g.resize(rows, cols);
+//             ar & boost::serialization::make_array(g.data(), rows * cols);
+//         }
 
-        template<   class Archive, 
-                    class S, 
-                    int Rows_, 
-                    int Cols_, 
-                    int Ops_, 
-                    int MaxRows_, 
-                    int MaxCols_>
-        inline void serialize(
-            Archive & ar, 
-            Eigen::Matrix<S, Rows_, Cols_, Ops_, MaxRows_, MaxCols_> & g, 
-            const unsigned int version)
-        {
-            split_free(ar, g, version);
-        }
+//         template<   class Archive,
+//                     class S,
+//                     int Rows_,
+//                     int Cols_,
+//                     int Ops_,
+//                     int MaxRows_,
+//                     int MaxCols_>
+//         inline void serialize(
+//             Archive & ar,
+//             Eigen::Matrix<S, Rows_, Cols_, Ops_, MaxRows_, MaxCols_> & g,
+//             const unsigned int version)
+//         {
+//             split_free(ar, g, version);
+//         }
 
 
-    } // namespace serialization
-} // namespace boost
+//     } // namespace serialization
+// } // namespace boost
 
 
 
 
 #endif
-

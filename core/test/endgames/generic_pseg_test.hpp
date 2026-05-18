@@ -13,14 +13,14 @@
 //You should have received a copy of the GNU General Public License
 //along with generic_pseg_test.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 // Tim Hodges, Colorado State University
 
 /**
@@ -40,13 +40,12 @@ using Variable = bertini::node::Variable;
 using Var = std::shared_ptr<Variable>;
 
 using VariableGroup = bertini::VariableGroup;
-using bertini::MakeVariable;
 
 using SuccessCode = bertini::SuccessCode;
 
 
 using dbl = bertini::dbl;
-using mpfr = bertini::complex;
+using mpfr = bertini::mpfr_complex;
 using mpfr_float = bertini::mpfr_float;
 using mpq_rational = bertini::mpq_rational;
 
@@ -245,7 +244,7 @@ BOOST_AUTO_TEST_CASE(compute_bound_on_cycle_num)
 	DefaultPrecision(ambient_precision);
 
 	bertini::System sys;
-	Var x = MakeVariable("x");
+	Var x = Variable::Make("x");
 	sys.AddFunction(pow(x-1,3));  //f(x) = (x-1)^3
 
 	VariableGroup vars{x};
@@ -347,8 +346,8 @@ BOOST_AUTO_TEST_CASE(compute_cycle_number)
 	DefaultPrecision(ambient_precision);
 
 	bertini::System sys;
-	Var x = MakeVariable("x");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var t = Variable::Make("t");
 	sys.AddFunction( pow(x-1,3) );  //f(x) = (x-1)^3 
 
 	VariableGroup vars{x};
@@ -438,7 +437,7 @@ BOOST_AUTO_TEST_CASE(compute_approximation_of_x_at_t0)
 
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), t = MakeVariable("t");
+	Var x = Variable::Make("x"), t = Variable::Make("t");
 	VariableGroup vars{x};
 	sys.AddVariableGroup(vars);
 	sys.AddPathVariable(t);
@@ -564,7 +563,7 @@ BOOST_AUTO_TEST_CASE(compute_initial_samples)
 	DefaultPrecision(ambient_precision);
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), t = MakeVariable("t");
+	Var x = Variable::Make("x"), t = Variable::Make("t");
 	VariableGroup vars{x};
 	sys.AddVariableGroup(vars); sys.AddPathVariable(t);
 	// Define homotopy system
@@ -648,7 +647,7 @@ BOOST_AUTO_TEST_CASE(compute_initial_samples_non_zero_target_time)
 	DefaultPrecision(ambient_precision);
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), t = MakeVariable("t");
+	Var x = Variable::Make("x"), t = Variable::Make("t");
 	VariableGroup vars{x};
 	sys.AddVariableGroup(vars); sys.AddPathVariable(t);
 	// Define homotopy system
@@ -738,7 +737,7 @@ BOOST_AUTO_TEST_CASE(pseg_full_run)
 	DefaultPrecision(ambient_precision);
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), t = MakeVariable("t");
+	Var x = Variable::Make("x"), t = Variable::Make("t");
 
 	sys.AddFunction( pow(x-1,3)*(1-t) + (pow(x,3)+1)*t);
 
@@ -794,7 +793,7 @@ BOOST_AUTO_TEST_CASE(pseg_full_run_non_zero_target_time)
 	DefaultPrecision(ambient_precision);
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), t = MakeVariable("t");
+	Var x = Variable::Make("x"), t = Variable::Make("t");
 
 	sys.AddFunction( pow(x-1,3)*(1-t) + (pow(x,3)+1)*t);
 
@@ -859,8 +858,8 @@ BOOST_AUTO_TEST_CASE(full_run_cycle_num_2)
 	DefaultPrecision(ambient_precision);
 
 	System sys;
-	Var x = MakeVariable("x");
-	Var t = MakeVariable("t"); 
+	Var x = Variable::Make("x");
+	Var t = Variable::Make("t"); 
 
 	sys.AddFunction( pow(x-1,2)*(1-t) + (pow(x,2)-1)*t);
 
@@ -927,7 +926,7 @@ BOOST_AUTO_TEST_CASE(full_run_multiple_variables)
 
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), t = MakeVariable("t"), y = MakeVariable("y");
+	Var x = Variable::Make("x"), t = Variable::Make("t"), y = Variable::Make("y");
 	VariableGroup vars{x,y};
 	sys.AddVariableGroup(vars); 
 	sys.AddPathVariable(t);
@@ -1017,7 +1016,7 @@ BOOST_AUTO_TEST_CASE(griewank_osborne)
 	DefaultPrecision(ambient_precision);
 
 	bertini::System sys;
-	Var x = MakeVariable("x"), t = MakeVariable("t"), y = MakeVariable("y");
+	Var x = Variable::Make("x"), t = Variable::Make("t"), y = Variable::Make("y");
 	VariableGroup vars{x,y};
 	sys.AddVariableGroup(vars); 
 	sys.AddPathVariable(t);
@@ -1114,9 +1113,9 @@ BOOST_AUTO_TEST_CASE(total_degree_start_system)
 	using namespace bertini::tracking;
 	DefaultPrecision(ambient_precision);
 
-	Var x = MakeVariable("x");
-	Var y = MakeVariable("y");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var y = Variable::Make("y");
+	Var t = Variable::Make("t");
 
 	System sys;
 
@@ -1141,7 +1140,7 @@ BOOST_AUTO_TEST_CASE(total_degree_start_system)
 	BOOST_CHECK(TD.IsHomogeneous());
 	BOOST_CHECK(TD.IsPatched());
 
-	//auto gamma = bertini::MakeRational(bertini::node::Rational::Rand());
+	//auto gamma = bertini::Rational::Make(bertini::node::Rational::Rand());
 	//gamma*
 	
 	auto final_system = (1-t)*sys + t*TD;
@@ -1161,17 +1160,20 @@ BOOST_AUTO_TEST_CASE(total_degree_start_system)
 	tracker.PrecisionSetup(precision_config);
 
 #ifdef B2_OBSERVE_TRACKERS
-			GoryDetailLogger<TrackerType> tons_of_detail;
-			tracker.AddObserver(&tons_of_detail);
+			bertini::tracking::GoryDetailLogger<TrackerType> tons_of_detail;
+			tracker.AddObserver(tons_of_detail);
 #endif
 
+
+// track to the endgame boundary
 	unsigned num_paths_to_run = 1;
 	BCT t_start(1), t_endgame_boundary(0.1);
-	std::vector<Vec<BCT> > homogenized_solutions;
+	std::vector<Vec<BCT> > endgame_boundary_solutions;
 	for (unsigned ii = 0; ii < num_paths_to_run; ++ii)
 	{
 		DefaultPrecision(ambient_precision);
 		final_system.precision(ambient_precision);
+		TD.precision(ambient_precision);
 		auto start_point = TD.StartPoint<BCT>(ii);
 
 		Vec<BCT> result;
@@ -1180,25 +1182,31 @@ BOOST_AUTO_TEST_CASE(total_degree_start_system)
 		tracking_success = tracker.TrackPath(result,t_start,t_endgame_boundary,start_point);
 		BOOST_CHECK(tracking_success==SuccessCode::Success);
 
-		homogenized_solutions.push_back(result);
+		endgame_boundary_solutions.push_back(result);
 	}
+
+
+
+// track during the endgames -- this is the main goal of this test -- the above is setup and sanity checking.
+
 
 	Vec<BCT> correct(2);
 	correct << BCT(1),BCT(1);
 
 	tracker.Setup(TestedPredictor,
-	              	1e-6, 1e5,
+	              	1e-6, 1e5, // the tracking tolerances
 					stepping_settings, newton_settings);
 
-	TestedEGType my_endgame(tracker);
+	TestedEGType my_endgame(tracker); // carries with it the system/homotopy we're tracking -- `final_system`, in this blob of code.  we set it above, before tracking to the endgame boundary
 
 
 
 	std::vector<Vec<BCT> > endgame_solutions;
 
 	unsigned num_successful_occurences = 0;
-	for (auto const& s : homogenized_solutions)
+	for (auto const& s : endgame_boundary_solutions)
 	{
+		Precision(t_endgame_boundary, Precision(s));
 		SuccessCode endgame_success = my_endgame.Run(t_endgame_boundary,s);
 		if(endgame_success == SuccessCode::Success)
 		{
@@ -1224,8 +1232,8 @@ BOOST_AUTO_TEST_CASE(parabola)
 	using namespace bertini::tracking;
 	DefaultPrecision(ambient_precision);
 
-	Var x = MakeVariable("x");
-	Var t = MakeVariable("t");
+	Var x = Variable::Make("x");
+	Var t = Variable::Make("t");
 
 	System sys;
 
@@ -1292,8 +1300,8 @@ BOOST_AUTO_TEST_CASE(pseg_full_run_nonzero_target_time)
 	DefaultPrecision(ambient_precision);
 
 	System sys;
-	Var x = MakeVariable("x");
-	Var t = MakeVariable("t"); 
+	Var x = Variable::Make("x");
+	Var t = Variable::Make("t"); 
 
 	sys.AddFunction(pow(x-1,3)*(1-t) + (pow(x,3)+1)*t);
 

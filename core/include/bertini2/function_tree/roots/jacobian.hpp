@@ -13,7 +13,7 @@
 //You should have received a copy of the GNU General Public License
 //along with jacobian.hpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
@@ -24,8 +24,11 @@
 //  West Texas A&M University
 //  Spring, Summer 2015
 //
-// Dani Brake
-// University of Notre Dame
+// silviana amethyst, university of wisconsin-eau claire
+//
+//  silviana amethyst
+//  UWEC
+//  Spring 2018
 //
 //  Created by Collins, James B. on 6/11/15.
 //
@@ -58,48 +61,54 @@ namespace node{
 
 		 This class defines a Jacobian tree.  It stores the entry node for a particular functions tree.
 		 */
-		class Jacobian : public virtual Function
+		class Jacobian : public virtual Handle, public virtual EnableSharedFromThisVirtual<Jacobian>
 		{
 			friend detail::FreshEvalSelector<dbl>;
-			friend detail::FreshEvalSelector<mpfr>;
+			friend detail::FreshEvalSelector<mpfr_complex>;
 		public:
-				/**
-				 */
-				Jacobian(const std::shared_ptr<Node> & entry);
-				
-				
-				/**
-				 Jacobians must be evaluated with EvalJ, so that when current_diff_variable changes
-				 the Jacobian is reevaluated.
-				 */
-				template<typename T>
-				T Eval(std::shared_ptr<Variable> const& diff_variable = nullptr) const = delete;
-				
-				
-				// Evaluate the node.  If flag false, just return value, if flag true
-				//  run the specific FreshEval of the node, then set flag to false.
-				template<typename T>
-				T EvalJ(std::shared_ptr<Variable> const& diff_variable) const;				
+			BERTINI_DEFAULT_VISITABLE()
+			
+
+			template<typename... Ts> 
+			static 
+			std::shared_ptr<Jacobian> Make(Ts&& ...ts){ 
+				return std::shared_ptr<Jacobian>( new Jacobian(ts...) );
+			}
+
+		private:
+			/**
+			 */
+			Jacobian(const std::shared_ptr<Node> & entry);
+			
+		public:
+
+			/**
+			 Jacobians must be evaluated with EvalJ, so that when current_diff_variable changes
+			 the Jacobian is reevaluated.
+			 */
+			template<typename T>
+			T Eval(std::shared_ptr<Variable> const& diff_variable = nullptr) const = delete;
+			
+			
+			// Evaluate the node.  If flag false, just return value, if flag true
+			//  run the specific FreshEval of the node, then set flag to false.
+			template<typename T>
+			T EvalJ(std::shared_ptr<Variable> const& diff_variable) const;				
 
 
-				// Evaluate the node.  If flag false, just return value, if flag true
-				//  run the specific FreshEval of the node, then set flag to false.
-				template<typename T>
-				void EvalJInPlace(T& eval_value, std::shared_ptr<Variable> const& diff_variable) const;
+			// Evaluate the node.  If flag false, just return value, if flag true
+			//  run the specific FreshEval of the node, then set flag to false.
+			template<typename T>
+			void EvalJInPlace(T& eval_value, std::shared_ptr<Variable> const& diff_variable) const;
 
 
-				/**
-				 The function which flips the fresh eval bit back to fresh.
-				 */
-				void Reset() const override;
-
-				
-				virtual ~Jacobian() = default;
-				
-				/**
-				\brief Default construction of a Jacobian node is forbidden
-				*/
-				Jacobian() = default;
+			
+			virtual ~Jacobian() = default;
+			
+			/**
+			\brief Default construction of a Jacobian node is forbidden
+			*/
+			Jacobian() = default;
 
 		private:
 
@@ -110,7 +119,7 @@ namespace node{
 	
 			template <typename Archive>
 			void serialize(Archive& ar, const unsigned version) {
-					ar & boost::serialization::base_object<Function>(*this);
+				ar & boost::serialization::base_object<Handle>(*this);
 			}
 		};
 		

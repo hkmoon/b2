@@ -27,17 +27,18 @@
 										"endgames_test",
 										"pool_test",
 										"generating_test",
-										"config.log",
 										"config.status",
 										"configure",
 										"*.trs",
-										"ltmain.sh"],
+										"ltmain.sh",
+										"*.tmp"],
 			"folder_exclude_patterns": [
 				".deps",
 				".libs",
 				"*.dtps",
 				"autom4te.cache",
-				"generated_documentation"]
+				"generated_documentation",
+				"Launch*"]
 		}
 	],
 

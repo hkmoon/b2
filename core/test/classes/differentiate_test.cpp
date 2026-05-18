@@ -13,23 +13,17 @@
 //You should have received a copy of the GNU General Public License
 //along with differentiate_test.cpp.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Copyright(C) 2015 - 2017 by Bertini2 Development Team
+// Copyright(C) Bertini2 Development Team
 //
 // See <http://www.gnu.org/licenses/> for a copy of the license, 
 // as well as COPYING.  Bertini2 is provided with permitted 
 // additional terms in the b2/licenses/ directory.
 
 // individual authors of this file include:
-// dani brake, university of wisconsin eau claire
+// silviana amethyst, university of wisconsin eau claire
 //
 //  Created by Collins, James B. on 4/30/15.
 //  Copyright (c) 2015 West Texas A&M University. All rights reserved.
-//
-// also modified by
-//  Dani Brake
-//  University of Notre Dame
-//  ACMS
-//  Spring, Summer 2015, Spring, Summer 2017
 
 #include <iostream>
 
@@ -61,10 +55,9 @@ using Variable = bertini::node::Variable;
 using Node = bertini::node::Node;
 using Function = bertini::node::Function;
 using Jacobian = bertini::node::Jacobian;
-using bertini::MakeVariable;
-using bertini::MakeJacobian;
+
 using dbl = bertini::dbl;
-using mpfr = bertini::mpfr;
+using mpfr = bertini::mpfr_complex;
 using mpfr_float = bertini::mpfr_float;
 
 /////////// Basic Operations Alone ///////////////////
@@ -74,10 +67,10 @@ BOOST_AUTO_TEST_CASE(just_diff_a_function){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
-
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 	for(auto vv : vars)
 	{
 		JFunc->EvalJ<dbl>(vv);
@@ -100,6 +93,7 @@ BOOST_AUTO_TEST_CASE(diff_3xyz){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -111,7 +105,7 @@ BOOST_AUTO_TEST_CASE(diff_3xyz){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	BOOST_CHECK_EQUAL(func->Degree(),3);
 
@@ -145,7 +139,7 @@ BOOST_AUTO_TEST_CASE(diff_3xyz){
 	BOOST_CHECK(fabs(JFunc->EvalJ<mpfr>(vars[2]).real() / exact_mpfr[2].real() -1) < threshold_clearance_mp);
 	BOOST_CHECK(fabs(JFunc->EvalJ<mpfr>(vars[2]).imag() / exact_mpfr[2].imag() -1) < threshold_clearance_mp);
 
-	var_mpfr << bertini::complex::rand(),bertini::complex::rand(),bertini::complex::rand();
+	var_mpfr << bertini::multiprecision::rand(),bertini::multiprecision::rand(),bertini::multiprecision::rand();
 	sys.SetVariables<mpfr>(var_mpfr);
 	exact_mpfr[0] = 3*var_mpfr(1)*var_mpfr(2);
 	exact_mpfr[1] = 3*var_mpfr(0)*var_mpfr(2);
@@ -170,6 +164,7 @@ BOOST_AUTO_TEST_CASE(diff_constant){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -181,7 +176,7 @@ BOOST_AUTO_TEST_CASE(diff_constant){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{0,0,0};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -217,6 +212,7 @@ BOOST_AUTO_TEST_CASE(diff_sum_xyz_constant){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -228,7 +224,7 @@ BOOST_AUTO_TEST_CASE(diff_sum_xyz_constant){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{1,1,1};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -271,6 +267,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_times_z_cubed){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -282,7 +279,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_times_z_cubed){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{2,3,0};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -296,7 +293,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_times_z_cubed){
 
 
 	std::vector<dbl> exact_dbl = {2.0*xnum_dbl*pow(ynum_dbl,3.0), 3.0*pow(ynum_dbl*xnum_dbl,2.0), 0.0};
-	std::vector<mpfr> exact_mpfr = {mpfr("2.0")*xnum_mpfr*pow(ynum_mpfr,3.0),mpfr("3.0")*pow(ynum_mpfr,2)*pow(xnum_mpfr,2.0),mpfr("0.0")};
+	std::vector<mpfr> exact_mpfr = {mpfr("2.0")*xnum_mpfr*pow(ynum_mpfr,3),mpfr("3.0")*pow(ynum_mpfr,2)*pow(xnum_mpfr,2),mpfr("0.0")};
 
 	
 
@@ -352,6 +349,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_over_y_cubed){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -363,7 +361,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_over_y_cubed){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{2,-1,0};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -379,7 +377,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_over_y_cubed){
 
 
 	std::vector<dbl> exact_dbl = {2.0*xnum_dbl/pow(ynum_dbl,3.0), -3.0*pow(xnum_dbl,2.0)/pow(ynum_dbl,4.0), 0.0};
-	std::vector<mpfr> exact_mpfr = {mpfr("2.0")*xnum_mpfr/pow(ynum_mpfr,3.0),mpfr("-3.0")*pow(xnum_mpfr,2.0)/pow(ynum_mpfr,4.0),mpfr("0.0")};
+	std::vector<mpfr> exact_mpfr = {mpfr("2.0")*xnum_mpfr/pow(ynum_mpfr,3),mpfr("-3.0")*pow(xnum_mpfr,2)/pow(ynum_mpfr,4),mpfr("0.0")};
 
 	BOOST_CHECK(fabs(JFunc->EvalJ<dbl>(vars[0]).real() - exact_dbl[0].real() ) < threshold_clearance_d);
 	BOOST_CHECK(fabs(JFunc->EvalJ<dbl>(vars[0]).imag() - exact_dbl[0].imag() ) < threshold_clearance_d);
@@ -406,6 +404,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_times_lx_plus_numl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -417,7 +416,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_times_lx_plus_numl){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{3,0,0};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -458,6 +457,7 @@ BOOST_AUTO_TEST_CASE(diff_2y_over_ly_squared_minus_numl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -469,7 +469,7 @@ BOOST_AUTO_TEST_CASE(diff_2y_over_ly_squared_minus_numl){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{0,-1,0};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -512,6 +512,7 @@ BOOST_AUTO_TEST_CASE(diff_sin_x){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -523,7 +524,7 @@ BOOST_AUTO_TEST_CASE(diff_sin_x){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{-1,0,0};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -539,20 +540,20 @@ BOOST_AUTO_TEST_CASE(diff_sin_x){
 	std::vector<dbl> exact_dbl = {cos(xnum_dbl), 0.0, 0.0};
 	std::vector<mpfr> exact_mpfr = {cos(xnum_mpfr),mpfr("0.0"),mpfr("0.0")};
 
-	BOOST_CHECK(fabs(JFunc->EvalJ<dbl>(vars[0]).real() - exact_dbl[0].real() ) < threshold_clearance_d);
-	BOOST_CHECK(fabs(JFunc->EvalJ<dbl>(vars[0]).imag() - exact_dbl[0].imag()) < threshold_clearance_d);
-	BOOST_CHECK(fabs(JFunc->EvalJ<mpfr>(vars[0]).real() - exact_mpfr[0].real() ) < threshold_clearance_mp);
-	BOOST_CHECK(fabs(JFunc->EvalJ<mpfr>(vars[0]).imag() - exact_mpfr[0].imag() ) < threshold_clearance_mp);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<dbl>(vars[0]).real(), exact_dbl[0].real(),  threshold_clearance_d);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<dbl>(vars[0]).imag(), exact_dbl[0].imag(),  threshold_clearance_d);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<mpfr>(vars[0]).real(), exact_mpfr[0].real(),  threshold_clearance_mp);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<mpfr>(vars[0]).imag(), exact_mpfr[0].imag(),  threshold_clearance_mp);
 
-	BOOST_CHECK(fabs(JFunc->EvalJ<dbl>(vars[1]).real() - exact_dbl[1].real() ) < threshold_clearance_d);
-	BOOST_CHECK(fabs(JFunc->EvalJ<dbl>(vars[1]).imag() - exact_dbl[1].imag()) < threshold_clearance_d);
-	BOOST_CHECK(fabs(JFunc->EvalJ<mpfr>(vars[1]).real() - exact_mpfr[1].real() ) < threshold_clearance_mp);
-	BOOST_CHECK(fabs(JFunc->EvalJ<mpfr>(vars[1]).imag() - exact_mpfr[1].imag() ) < threshold_clearance_mp);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<dbl>(vars[1]).real(), exact_dbl[1].real(),  threshold_clearance_d);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<dbl>(vars[1]).imag(), exact_dbl[1].imag(),  threshold_clearance_d);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<mpfr>(vars[1]).real(), exact_mpfr[1].real(),  threshold_clearance_mp);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<mpfr>(vars[1]).imag(), exact_mpfr[1].imag(),  threshold_clearance_mp);
 
-	BOOST_CHECK(fabs(JFunc->EvalJ<dbl>(vars[2]).real() - exact_dbl[2].real() ) < threshold_clearance_d);
-	BOOST_CHECK(fabs(JFunc->EvalJ<dbl>(vars[2]).imag() - exact_dbl[2].imag()) < threshold_clearance_d);
-	BOOST_CHECK(fabs(JFunc->EvalJ<mpfr>(vars[2]).real() - exact_mpfr[2].real() ) < threshold_clearance_mp);
-	BOOST_CHECK(fabs(JFunc->EvalJ<mpfr>(vars[2]).imag() - exact_mpfr[2].imag() ) < threshold_clearance_mp);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<dbl>(vars[2]).real(), exact_dbl[2].real(),  threshold_clearance_d);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<dbl>(vars[2]).imag(), exact_dbl[2].imag(),  threshold_clearance_d);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<mpfr>(vars[2]).real(), exact_mpfr[2].real(),  threshold_clearance_mp);
+	BOOST_CHECK_CLOSE( JFunc->EvalJ<mpfr>(vars[2]).imag(), exact_mpfr[2].imag(),  threshold_clearance_mp);
 }
 
 
@@ -564,6 +565,7 @@ BOOST_AUTO_TEST_CASE(diff_cos_y){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -575,7 +577,7 @@ BOOST_AUTO_TEST_CASE(diff_cos_y){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{0,-1,0};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -617,6 +619,7 @@ BOOST_AUTO_TEST_CASE(diff_tan_z){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -628,7 +631,7 @@ BOOST_AUTO_TEST_CASE(diff_tan_z){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	BOOST_CHECK_EQUAL(func->Degree(vars[0]),0);
 	BOOST_CHECK_EQUAL(func->Degree(vars[1]),0);
@@ -664,6 +667,7 @@ BOOST_AUTO_TEST_CASE(diff_exp_x){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -675,7 +679,7 @@ BOOST_AUTO_TEST_CASE(diff_exp_x){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 
 	BOOST_CHECK_EQUAL(func->Degree(vars[0]),-1);
@@ -713,6 +717,7 @@ BOOST_AUTO_TEST_CASE(diff_log_x){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -725,7 +730,7 @@ BOOST_AUTO_TEST_CASE(diff_log_x){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	BOOST_CHECK_EQUAL(func->Degree(vars[0]),-1);
 	BOOST_CHECK_EQUAL(func->Degree(vars[1]),-1);
@@ -762,6 +767,7 @@ BOOST_AUTO_TEST_CASE(diff_sqrt_y){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -773,7 +779,7 @@ BOOST_AUTO_TEST_CASE(diff_sqrt_y){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 
 	BOOST_CHECK_EQUAL(func->Degree(vars[0]),0);
@@ -813,6 +819,7 @@ BOOST_AUTO_TEST_CASE(diff_lz_plus_3l_cubed){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -824,7 +831,7 @@ BOOST_AUTO_TEST_CASE(diff_lz_plus_3l_cubed){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{0,0,3};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -867,6 +874,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_plus_y_squared_plus_z_squared){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -878,7 +886,7 @@ BOOST_AUTO_TEST_CASE(diff_x_squared_plus_y_squared_plus_z_squared){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{2,2,2};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -924,6 +932,7 @@ BOOST_AUTO_TEST_CASE(diff_sin_lx_squared_times_yl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -935,7 +944,7 @@ BOOST_AUTO_TEST_CASE(diff_sin_lx_squared_times_yl){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{-1,-1,0};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -977,6 +986,7 @@ BOOST_AUTO_TEST_CASE(diff_cos_lx_squaredl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -988,7 +998,7 @@ BOOST_AUTO_TEST_CASE(diff_cos_lx_squaredl){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{-1,0,0};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -1028,6 +1038,7 @@ BOOST_AUTO_TEST_CASE(diff_tan_lx_over_zl){
 
 	bertini::System sys;
 	bertini::parsing::classic::parse(str.begin(), str.end(), sys);
+	sys.SetEvalMethod(bertini::EvalMethod::FunctionTree);
 
 	Eigen::Matrix<dbl, 3, 1> var_dbl;
 	Eigen::Matrix<mpfr, 3, 1> var_mpfr;
@@ -1039,7 +1050,7 @@ BOOST_AUTO_TEST_CASE(diff_tan_lx_over_zl){
 
 	auto func = sys.Function(0);
 	auto vars = sys.Variables();
-	auto JFunc = MakeJacobian(func->Differentiate());
+	auto JFunc = Jacobian::Make(func->Differentiate());
 
 	std::vector<int> multidegree{-1,0,-1};
 	bool multidegree_ok = multidegree==func->MultiDegree(vars);
@@ -1078,16 +1089,16 @@ BOOST_AUTO_TEST_CASE(diff_tan_lx_over_zl){
 
 BOOST_AUTO_TEST_CASE(arcsine_differentiate)
 {
-	std::shared_ptr<Variable> x = MakeVariable("x");
+	std::shared_ptr<Variable> x = Variable::Make("x");
 	auto N = asin(pow(x,2)+1);
-	auto J = MakeJacobian(N->Differentiate());
+	auto J = Jacobian::Make(N->Differentiate());
 
 	x->set_current_value<dbl>(xnum_dbl);
-	x->set_current_value<mpfr>(bertini::complex(xstr_real,xstr_imag));
+	x->set_current_value<mpfr>(bertini::mpfr_complex(xstr_real,xstr_imag));
 
 	//(2*x)/(1 - (x^2 + 1)^2)^(1/2)
 	dbl exact_dbl = 2.0*xnum_dbl / pow(1.0 - pow((xnum_dbl*xnum_dbl + 1.0),2),0.5);
-	mpfr exact_mpfr = bertini::complex(2.0)*xnum_mpfr / pow(bertini::complex(1.0) - pow(xnum_mpfr*xnum_mpfr + bertini::complex(1.0),2),mpfr(0.5));
+	mpfr exact_mpfr = bertini::mpfr_complex(2.0)*xnum_mpfr / pow(bertini::mpfr_complex(1.0) - pow(xnum_mpfr*xnum_mpfr + bertini::mpfr_complex(1.0),2),mpfr(0.5));
 
 	BOOST_CHECK(fabs(J->EvalJ<dbl>(x).real() / exact_dbl.real() -1) < threshold_clearance_d);
 	BOOST_CHECK(fabs(J->EvalJ<dbl>(x).imag() / exact_dbl.imag() -1) < threshold_clearance_d);
@@ -1098,15 +1109,15 @@ BOOST_AUTO_TEST_CASE(arcsine_differentiate)
 
 BOOST_AUTO_TEST_CASE(arccosine_differentiate)
 {
-	std::shared_ptr<Variable> x = MakeVariable("x");
+	std::shared_ptr<Variable> x = Variable::Make("x");
 	auto N = acos(pow(x,2)+1);
-	auto J = MakeJacobian(N->Differentiate());
+	auto J = Jacobian::Make(N->Differentiate());
 
 	x->set_current_value<dbl>(xnum_dbl);
-	x->set_current_value<mpfr>(bertini::complex(xstr_real,xstr_imag));
+	x->set_current_value<mpfr>(bertini::mpfr_complex(xstr_real,xstr_imag));
 
 	dbl exact_dbl = -2.0*xnum_dbl / pow(1.0 - pow((xnum_dbl*xnum_dbl + 1.0),2),0.5);
-	mpfr exact_mpfr = -bertini::complex(2.0)*xnum_mpfr / pow(bertini::complex(1.0) - pow(xnum_mpfr*xnum_mpfr + bertini::complex(1.0),2),mpfr(0.5));
+	mpfr exact_mpfr = -bertini::mpfr_complex(2.0)*xnum_mpfr / pow(bertini::mpfr_complex(1.0) - pow(xnum_mpfr*xnum_mpfr + bertini::mpfr_complex(1.0),2),mpfr(0.5));
 
 	BOOST_CHECK(fabs(J->EvalJ<dbl>(x).real() / exact_dbl.real() -1) < threshold_clearance_d);
 	BOOST_CHECK(fabs(J->EvalJ<dbl>(x).imag() / exact_dbl.imag() -1) < threshold_clearance_d);
@@ -1116,17 +1127,17 @@ BOOST_AUTO_TEST_CASE(arccosine_differentiate)
 
 BOOST_AUTO_TEST_CASE(arctangent_differentiate)
 {
-	std::shared_ptr<Variable> x = MakeVariable("x");
+	std::shared_ptr<Variable> x = Variable::Make("x");
 	auto N = atan(pow(x,2)+1);
-	auto J = MakeJacobian(N->Differentiate());
+	auto J = Jacobian::Make(N->Differentiate());
 
 
 	x->set_current_value<dbl>(xnum_dbl);
-	x->set_current_value<mpfr>(bertini::complex(xstr_real,xstr_imag));
+	x->set_current_value<mpfr>(bertini::mpfr_complex(xstr_real,xstr_imag));
 
 	//(2*x)/((x^2 + 1)^2 + 1)
 	dbl exact_dbl = 2.0*xnum_dbl / ( pow((xnum_dbl*xnum_dbl + 1.0),2) + 1.0);
-	mpfr exact_mpfr = bertini::complex(2.0)*xnum_mpfr / ( pow((xnum_mpfr*xnum_mpfr + bertini::complex(1.0)),2) + bertini::complex(1.0));
+	mpfr exact_mpfr = bertini::mpfr_complex(2.0)*xnum_mpfr / ( pow((xnum_mpfr*xnum_mpfr + bertini::mpfr_complex(1.0)),2) + bertini::mpfr_complex(1.0));
 
 	BOOST_CHECK(fabs(J->EvalJ<dbl>(x).real() / exact_dbl.real() -1) < threshold_clearance_d);
 	BOOST_CHECK(fabs(J->EvalJ<dbl>(x).imag() / exact_dbl.imag() -1) < threshold_clearance_d);
@@ -1140,11 +1151,11 @@ BOOST_AUTO_TEST_CASE(integer_power)
 
 	DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 
-	std::shared_ptr<Variable> x = MakeVariable("x");
-	std::shared_ptr<Variable> t = MakeVariable("t");
+	std::shared_ptr<Variable> x = Variable::Make("x");
+	std::shared_ptr<Variable> t = Variable::Make("t");
 
 	auto f = pow(x - 1,2)*(1-t) + (pow(x,2) + 1)*t;
-	std::shared_ptr<Jacobian> j = MakeJacobian(f->Differentiate());
+	std::shared_ptr<Jacobian> j = Jacobian::Make(f->Differentiate());
 
 
 	x->set_current_value(mpfr("-0.844487","-0.535576"));
@@ -1172,8 +1183,8 @@ BOOST_AUTO_TEST_CASE(integer_power_system)
 
 	DefaultPrecision(CLASS_TEST_MPFR_DEFAULT_DIGITS);
 	System sys;
-	std::shared_ptr<Variable> x = MakeVariable("x");
-	std::shared_ptr<Variable> t = MakeVariable("t"); 
+	std::shared_ptr<Variable> x = Variable::Make("x");
+	std::shared_ptr<Variable> t = Variable::Make("t"); 
 
 	sys.AddFunction( pow(x - 1,2)*(1-t) + (pow(x,2) + 1)*t);
 
@@ -1186,16 +1197,108 @@ BOOST_AUTO_TEST_CASE(integer_power_system)
 
 	auto J = sys.Jacobian(curr_x,curr_t);
 
-	BOOST_CHECK(abs(real(J(0,0)) - mpfr_float("-2.129232")) < threshold_clearance_mp);
-	BOOST_CHECK(abs(imag(J(0,0)) - mpfr_float("0.354138")) < threshold_clearance_mp);
+	BOOST_CHECK_CLOSE( real(J(0,0)), mpfr_float("-2.129232"), threshold_clearance_mp);
+	BOOST_CHECK_CLOSE( imag(J(0,0)), mpfr_float("0.354138"), threshold_clearance_mp);
 
 	curr_x << mpfr("0.900000000000000","0.435889894354067355223698198386");
 	curr_t = mpfr("0.1");
 
 	J = sys.Jacobian(curr_x,curr_t);
 
-	BOOST_CHECK(abs(real(J(0,0))- mpfr_float(0)) < threshold_clearance_mp);
+	BOOST_CHECK_SMALL(real(J(0,0)), threshold_clearance_mp); // target value is 0, so relative is not useful
 	BOOST_CHECK_CLOSE(imag(J(0,0)), mpfr_float("0.871779788708134710447396396772"), 100*threshold_clearance_mp);
 }
+
+
+
+
+BOOST_AUTO_TEST_CASE(linprod_diff_eval)
+{
+	using bertini::VariableGroup;
+	
+	auto x = Variable::Make("x");
+	auto y = Variable::Make("y");
+	auto h0 = Variable::Make("HOM0");
+	auto h1 = Variable::Make("HOM1");
+	auto z = Variable::Make("z");
+	
+	
+	
+	VariableGroup v0{x,z,y};
+	VariableGroup v1{y};
+	Mat<dbl> coeff_dbl(3,4);
+	Mat<mpfr> coeff_mpfr(3,4);
+	
+	for(int ii = 0; ii < 3; ++ii)
+	{
+		for(int jj = 0; jj < 4; ++jj)
+		{
+			coeff_dbl(ii,jj) = dbl(ii+1, jj+1);
+			coeff_mpfr(ii,jj) = mpfr(ii+1, jj+1);
+		}
+	}
+	
+	
+	
+	std::shared_ptr<bertini::node::Node> linprod_node = (mpfr(1,1)*x + mpfr(1,2)*z + mpfr(1,3)*y+ mpfr(1,4)) * (mpfr(2,1)*x + mpfr(2,2)*z + mpfr(2,3)*y+ mpfr(2,4))*(mpfr(3,1)*x + mpfr(3,2)*z + mpfr(3,3)*y+ mpfr(3,4));
+	std::shared_ptr<bertini::node::Node> linprod = bertini::node::LinearProduct::Make(v0, coeff_mpfr);
+	
+	dbl xval_d = dbl(.5,1);
+	dbl yval_d = dbl(.6,1);
+	dbl zval_d = dbl(.7,1);
+	dbl h0val_d = dbl(.34, -2.1);
+	dbl h1val_d = dbl(-1.2, .0043);
+	mpfr xval_mp = mpfr(".5", "1");
+	mpfr yval_mp = mpfr(".6", "1");
+	mpfr zval_mp = mpfr(".7", "1");
+	mpfr h0val_mp = mpfr(".34", "-2.1");
+	mpfr h1val_mp = mpfr("-1.2", ".0043");
+	
+	v0[0]->set_current_value(xval_d);
+	v0[1]->set_current_value(zval_d);
+	v1[0]->set_current_value(yval_d);
+	v0[0]->set_current_value(xval_mp);
+	v0[1]->set_current_value(zval_mp);
+	v1[0]->set_current_value(yval_mp);
+	
+    auto J_node = bertini::node::Jacobian::Make(linprod_node->Differentiate());
+    auto J = bertini::node::Jacobian::Make(linprod->Differentiate());
+	
+    dbl evalx_d = J->EvalJ<dbl>(x);
+    dbl exactx_d = J_node->EvalJ<dbl>(x);
+    mpfr evalx_mp = J->EvalJ<mpfr>(x);
+    mpfr exactx_mp = J_node->EvalJ<mpfr>(x);
+    
+    
+    
+    BOOST_CHECK(fabs(evalx_d.real()/exactx_d.real() - 1) < threshold_clearance_d);
+    BOOST_CHECK(fabs(evalx_d.imag()/exactx_d.imag() - 1) < threshold_clearance_d);
+    BOOST_CHECK(fabs(evalx_mp.real()/exactx_mp.real() - 1) < threshold_clearance_mp);
+    BOOST_CHECK(fabs(evalx_mp.imag()/exactx_mp.imag() - 1) < threshold_clearance_mp);
+    
+    
+    evalx_d = J->EvalJ<dbl>(z);
+    exactx_d = J_node->EvalJ<dbl>(z);
+    evalx_mp = J->EvalJ<mpfr>(z);
+    exactx_mp = J_node->EvalJ<mpfr>(z);
+	
+	BOOST_CHECK(fabs(evalx_d.real()/exactx_d.real() - 1) < threshold_clearance_d);
+	BOOST_CHECK(fabs(evalx_d.imag()/exactx_d.imag() - 1) < threshold_clearance_d);
+	BOOST_CHECK(fabs(evalx_mp.real()/exactx_mp.real() - 1) < threshold_clearance_mp);
+	BOOST_CHECK(fabs(evalx_mp.imag()/exactx_mp.imag() - 1) < threshold_clearance_mp);
+	
+    evalx_d = J->EvalJ<dbl>(y);
+    exactx_d = J_node->EvalJ<dbl>(y);
+    evalx_mp = J->EvalJ<mpfr>(y);
+    exactx_mp = J_node->EvalJ<mpfr>(y);
+	
+	BOOST_CHECK(fabs(evalx_d.real()/exactx_d.real() - 1) < threshold_clearance_d);
+	BOOST_CHECK(fabs(evalx_d.imag()/exactx_d.imag() - 1) < threshold_clearance_d);
+	BOOST_CHECK(fabs(evalx_mp.real()/exactx_mp.real() - 1) < threshold_clearance_mp);
+	BOOST_CHECK(fabs(evalx_mp.imag()/exactx_mp.imag() - 1) < threshold_clearance_mp);
+	
+	
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
