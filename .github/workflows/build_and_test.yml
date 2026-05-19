@@ -9,6 +9,7 @@ on:
       - 'doc_resources/**'
       - 'Doxyfile'
       - '**/*.md'
+      - '**/*.html'
       - '.github/workflows/build_docs.yml'
   pull_request:
     paths-ignore:
