@@ -3,7 +3,7 @@ on:
   push
 jobs:
   sync:
-    if: github.repository == 'bertiniteam/b2'
+    if: github.repository == 'bertiniteam/b2' #only on official
     runs-on: ubuntu-latest
     steps:
     - name: Sync to GitLab
