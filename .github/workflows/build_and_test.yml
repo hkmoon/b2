@@ -24,6 +24,11 @@ on:
         required: false
         type: boolean
         default: false
+      ref:
+        description: 'Branch, tag, or SHA to check out before building (defaults to the calling workflow''s ref).'
+        required: false
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       full_matrix:
@@ -196,6 +201,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.ref }}
       - name: Cache cibuildwheel + pip + Homebrew
         uses: actions/cache@v5
         with:

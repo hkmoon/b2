@@ -18,6 +18,11 @@ on:
         required: false
         type: boolean
         default: true
+      ref:
+        description: 'Branch, tag, or SHA to build docs for (defaults to the dispatched ref).'
+        required: false
+        type: string
+        default: ''
 
 concurrency:
   group: docs-${{ github.ref }}
@@ -35,6 +40,7 @@ jobs:
       # Docs only need the ubuntu-latest / python-3.11 wheel; skip the full
       # OS/Python matrix and the wheel/C++ test jobs.
       minimal: true
+      ref: ${{ inputs.ref }}
 
   build_docs:
     name: Build docs
@@ -48,6 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
+          ref: ${{ inputs.ref || github.ref }}
           # gitpython (used by python/docs/source/conf.py to derive version)
           # needs the full history; the default depth=1 leaves it unable to
           # resolve HEAD's commit object on some refs.
