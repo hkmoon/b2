@@ -18,10 +18,21 @@ on:
       - '**/*.md'
       - '.github/workflows/build_docs.yml'
   workflow_call:
+    inputs:
+      minimal:
+        description: 'Build only the ubuntu-latest / python-3.11 wheel; skip C++ tests, Windows, macOS, and wheel tests.'
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
     inputs:
       full_matrix:
         description: 'Run full OS and Python matrix'
+        required: false
+        type: boolean
+        default: false
+      minimal:
+        description: 'Build only the ubuntu-latest / python-3.11 wheel; skip C++ tests, Windows, macOS, and wheel tests.'
         required: false
         type: boolean
         default: false
@@ -46,7 +57,10 @@ jobs:
           # Mac available to the maintainer). Intel macOS support is paused
           # pending a reproducer or an upstream fix. Re-add "macos-15-intel"
           # below when ready to revisit.
-          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/develop" || "${{ github.ref }}" == refs/tags/* || "${{ inputs.full_matrix }}" == "true" || "${{ github.event.pull_request.base.ref }}" == "develop" || "${{ github.event.pull_request.base.ref }}" == "main" ]]; then
+          if [[ "${{ inputs.minimal }}" == "true" ]]; then
+            echo 'os=["ubuntu-latest"]' >> $GITHUB_OUTPUT
+            echo 'python_versions=["3.11"]' >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/develop" || "${{ github.ref }}" == refs/tags/* || "${{ inputs.full_matrix }}" == "true" || "${{ github.event.pull_request.base.ref }}" == "develop" || "${{ github.event.pull_request.base.ref }}" == "main" ]]; then
             echo 'os=["ubuntu-latest","macos-14"]' >> $GITHUB_OUTPUT
             echo 'python_versions=["3.9","3.10","3.11","3.12","3.13"]' >> $GITHUB_OUTPUT
           else
@@ -56,6 +70,7 @@ jobs:
 
   test_cpp_unix:
     name: C++ tests on ${{ matrix.os }}
+    if: ${{ inputs.minimal != true }}
     needs: [set_matrix]
     runs-on: ${{ matrix.os }}
     strategy:
@@ -119,6 +134,7 @@ jobs:
 
   test_cpp_windows:
     name: C++ tests on Windows
+    if: ${{ inputs.minimal != true }}
     runs-on: windows-latest
     env:
       CONDA_PKGS_DIRS: ${{ github.workspace }}\conda_pkgs
@@ -287,7 +303,8 @@ jobs:
           if-no-files-found: error
 
   build_windows_wheels:
-    name: Windows Python-${{ matrix.python-version }} wheels 
+    name: Windows Python-${{ matrix.python-version }} wheels
+    if: ${{ inputs.minimal != true }}
     runs-on: windows-latest
     env:
       CONDA_PKGS_DIRS: ${{ github.workspace }}\conda_pkgs
@@ -350,6 +367,7 @@ jobs:
 
   test_wheels_linux_macos:
     name: Test wheels on ${{ matrix.os }} / py${{ matrix.python-version }}
+    if: ${{ inputs.minimal != true }}
     needs: [set_matrix, build_macos_ubuntu_wheels]
     runs-on: ${{ matrix.os }}
     strategy:
@@ -383,6 +401,7 @@ jobs:
 
   test_wheels_windows:
     name: Test wheel on windows-${{ matrix.python-version }}
+    if: ${{ inputs.minimal != true }}
     needs: [build_windows_wheels]
     runs-on: windows-latest
     strategy:
