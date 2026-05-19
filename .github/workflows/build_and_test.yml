@@ -4,7 +4,19 @@ on:
   push:
     branches:
       - '**'
+    paths-ignore:
+      - 'python/docs/**'
+      - 'doc_resources/**'
+      - 'Doxyfile'
+      - '**/*.md'
+      - '.github/workflows/build_docs.yml'
   pull_request:
+    paths-ignore:
+      - 'python/docs/**'
+      - 'doc_resources/**'
+      - 'Doxyfile'
+      - '**/*.md'
+      - '.github/workflows/build_docs.yml'
   workflow_call:
   workflow_dispatch:
     inputs:
