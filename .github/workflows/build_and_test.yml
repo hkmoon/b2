@@ -16,6 +16,7 @@ on:
       - 'doc_resources/**'
       - 'Doxyfile'
       - '**/*.md'
+      - '**/*.html'
       - '.github/workflows/build_docs.yml'
   workflow_call:
     inputs:
