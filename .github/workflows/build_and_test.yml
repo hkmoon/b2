@@ -230,7 +230,7 @@ jobs:
         run: |
           SW_VERS=$(sw_vers -productVersion | cut -d. -f1)
           echo "MACOSX_DEPLOYMENT_TARGET=${SW_VERS}.0" >> $GITHUB_ENV
-      - uses: pypa/cibuildwheel@v2.23
+      - uses: pypa/cibuildwheel@v3
         env:
           # Build cp39 through cp313 for both Linux (manylinux) and macOS.
           # Boost.Python and eigenpy are rebuilt per target Python in BEFORE_BUILD
