@@ -69,7 +69,7 @@ jobs:
             echo 'python_versions=["3.11"]' >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/develop" || "${{ github.ref }}" == refs/tags/* || "${{ inputs.full_matrix }}" == "true" || "${{ github.event.pull_request.base.ref }}" == "develop" || "${{ github.event.pull_request.base.ref }}" == "main" ]]; then
             echo 'os=["ubuntu-latest","macos-14"]' >> $GITHUB_OUTPUT
-            echo 'python_versions=["3.9","3.10","3.11","3.12","3.13"]' >> $GITHUB_OUTPUT
+            echo 'python_versions=["3.9","3.10","3.11","3.12","3.13","3.14"]' >> $GITHUB_OUTPUT
           else
             echo 'os=["ubuntu-latest","macos-14"]' >> $GITHUB_OUTPUT
             echo 'python_versions=["3.11"]' >> $GITHUB_OUTPUT
@@ -192,7 +192,7 @@ jobs:
         run: ctest --output-on-failure --parallel
 
   build_macos_ubuntu_wheels:
-    name: ${{ matrix.os }} Python-${{ matrix.python-version }} wheels 
+    name: ${{ matrix.os }} Python-${{ matrix.python-version }} wheels
     needs: [set_matrix]
     runs-on: ${{ matrix.os }}
     strategy:
@@ -256,7 +256,7 @@ jobs:
             brew install gmp mpfr libmpc eigen@3 &&
             cd /tmp &&
             { [ -f eigenpy-3.11.0.tar.gz ] || curl -fsSL -o eigenpy-3.11.0.tar.gz https://github.com/stack-of-tasks/eigenpy/releases/download/v3.11.0/eigenpy-3.11.0.tar.gz ; }
-          
+
           # Build Boost and eigenpy fresh against the active per-Python interpreter
           # so each wheel bundles a matching libboost_python3X.
           CIBW_BEFORE_BUILD_LINUX: >
@@ -320,7 +320,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
       - uses: actions/checkout@v5
         with:
@@ -416,7 +416,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
       - uses: actions/checkout@v5
