@@ -213,6 +213,7 @@ jobs:
             ~/.cache/cibuildwheel
             ~/Library/Caches/Homebrew
             /tmp/boost_1_90_0.tar.bz2
+            /tmp/eigen-3.4.0.tar.gz
             /tmp/eigenpy-3.12.0.tar.gz
           key: ${{ runner.os }}-cibw-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'python/pyproject.toml', 'CMakeLists.txt', 'core/CMakeLists.txt', '.github/workflows/build_and_test.yml') }}
           restore-keys: |
@@ -244,8 +245,12 @@ jobs:
           # against the manylinux2014 system python3 produces a libboost_python39 that
           # all five wheels would then bundle, breaking import on cp310/311/312/313.
           CIBW_BEFORE_ALL_LINUX: >
-            yum install -y wget gmp-devel mpfr-devel libmpc-devel eigen3-devel libtool &&
+            yum install -y wget gmp-devel mpfr-devel libmpc-devel libtool &&
             cd /tmp &&
+            { [ -f eigen-3.4.0.tar.gz ] || wget -q https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz ; } &&
+            rm -rf eigen-3.4.0 && tar xzf eigen-3.4.0.tar.gz &&
+            cmake -S eigen-3.4.0 -B eigen-3.4.0/bld -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release &&
+            cmake --install eigen-3.4.0/bld &&
             { [ -f eigenpy-3.12.0.tar.gz ] || wget -q https://github.com/stack-of-tasks/eigenpy/releases/download/v3.12.0/eigenpy-3.12.0.tar.gz ; }
           # On macOS, Homebrew's boost-python3 / eigenpy bottles track the current
           # Homebrew default Python (now 3.14), so a cp313 wheel that bundles them
